@@ -30,7 +30,7 @@
 
     function update() {
       nav.classList.toggle("is-solid", window.scrollY > 8);
-      var probe = nav.offsetHeight / 2;
+      var probe = nav.offsetHeight + 1;
       var dark = false;
       for (var i = 0; i < toned.length; i++) {
         var r = toned[i].getBoundingClientRect();
@@ -109,7 +109,8 @@
           return;
         }
         document.body.classList.remove("is-locked");
-        if (location.hash === "#" + d.id) setHash("#work");
+        var from = opener && opener.closest("section[id]");
+        if (location.hash === "#" + d.id) setHash("#" + (from ? from.id : "work"));
         if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
         else {
           // opened from a shared link: land on that tool's card
