@@ -3010,3 +3010,32 @@ button {
 .nav.is-open .nav__toggle .i-close {
   display: inline;
 }
+/* Story text: larger mono labels and pills in the wide layouts */
+.s-mono {
+  font-size: 10.5px;
+}
+.s-chip {
+  font-size: 9.5px;
+}
+.is-tall .s-chip {
+  font-size: 10px;
+}
+.is-tall .s-mono {
+  font-size: 10.5px;
+}
+@media (max-width: 1000px) {
+  .about {
+    row-gap: 0;
+  }
+  .about__bio {
+    margin-top: 28px;
+  }
+  .career {
+    margin-top: 48px;
+  }
+}
+@media (max-width: 520px) {
+  .titleblock dt {
+    min-height: 2.6em;
+  }
+}

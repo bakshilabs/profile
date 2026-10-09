@@ -101,6 +101,14 @@
           document.body.classList.remove("is-locked");
           if (location.hash === "#" + d.id) setHash("#work");
           if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+          else {
+            // opened from a shared link: land on that tool's card
+            var card = document.querySelector('.card__link[data-case="' + d.id + '"], .feature__body[data-case="' + d.id + '"]');
+            if (card) {
+              card.scrollIntoView({ block: "center" });
+              card.focus({ preventScroll: true });
+            }
+          }
         }
       });
     });

@@ -187,8 +187,8 @@
       var M = tall ? { x: 16, y: 58, w: 308 } : { x: 20, y: 66, w: 282 };
       var pitch = M.w / WD.c;
       M.h = pitch * WD.r;
-      var K = tall ? { x: 16, y: 216, w: 308 } : { x: 20, y: 228, w: 282 };
-      var SY = tall ? 334 : 340;
+      var K = tall ? { x: 16, y: 216, w: 308 } : { x: 20, y: 214, w: 282 };
+      var SY = tall ? 334 : 350;
       var PNL = tall ? { x: 16, y: 352, w: 308, h: 350, cx: 28, cw: 284, ch: 46, pitch: 54, y0: 394 } : { x: 316, y: 20, w: 264, h: 335, cx: 328, cw: 240, ch: 52, pitch: 58, y0: 60 };
       tx(svg, M.x, tall ? 28 : 30, "676 PROCUREMENT SOURCES", "s-mono");
       tx(svg, M.x, tall ? 44 : 48, "SECTOR · RAIL AND METRO", "s-mono s-dim");
@@ -350,8 +350,8 @@
         tgx += c.w + 5;
       });
       var claude = h("g", { opacity: 0 }, svg);
-      h("rect", { x: dbx - 30, y: dby - 40, width: 60, height: 18, rx: 9, fill: "none", stroke: C.mint }, claude);
-      tx(claude, dbx, dby - 27.5, "CLAUDE", "s-chip", { "text-anchor": "middle", fill: C.mint });
+      h("rect", { x: dbx - 52, y: dby - 40, width: 104, height: 18, rx: 9, fill: "none", stroke: C.mint }, claude);
+      tx(claude, dbx, dby - 27.5, "CPV + KEYWORDS", "s-chip", { "text-anchor": "middle", fill: C.mint });
 
       var r = rng(5), parts = [];
       for (var i = 0; i < 46; i++) {
@@ -402,8 +402,9 @@
           set(p.el, "y", (y - 2).toFixed(1));
           op(p.el, t > p.t0 && q < 1 ? 0.9 : 0);
         });
-        var c = P(t, 0.5, 3.9, E.inOut) * fade;
-        text(count, fmt(57840 * c));
+        var c0 = P(t, 0.5, 3.9, E.inOut), c = c0 * fade;
+        text(count, fmt(57840 * c0));
+        op(count, fade);
         set(fillLevel, "height", (78 * c).toFixed(1));
         set(fillLevel, "y", (dby + 88 - 78 * c).toFixed(1));
         runs.forEach(function (bar, k) {
@@ -634,18 +635,19 @@
       var svg = st.svg;
       var Lg = h("g", tall ? { transform: "translate(-4 0) scale(0.92)" } : null, svg);
       var Rg = h("g", tall ? { transform: "translate(-238 330) scale(0.98)" } : null, svg);
-      tx(Lg, 24, 30, "ILLUSTRATIVE VERDICTS · LAB AND WORKPLACE", "s-mono");
+      tx(Lg, 24, 30, "WORST VERDICT IN EACH SECTION", "s-mono");
       ["LBC", "WELL", "BRIEF"].forEach(function (c, i) {
         tx(Lg, 247 + i * 48, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
       });
-      var sections = ["Spandrels", "MEP enclosures", "Bird safety", "Blades", "Facade profiles", "Expressed frame", "Column cladding"];
-      var V = [["a", "p", "g"], ["a", "p", "p"], ["p", "p", "g"], ["a", "g", "p"], ["p", "p", "p"], ["a", "p", "g"], ["p", "f", "p"]];
+      var sections = ["Spandrels", "MEP enclosures", "Bird safety", "Blades", "Facade profiles"];
+      var V = [["a", "g", "g"], ["a", "p", "p"], ["a", "g", "g"], ["g", "g", "g"], ["a", "g", "g"]];
+      var PITCH = 50;
       var col = { p: C.teal, a: C.amber, g: C.grey, f: C.red };
       var scan = h("rect", { x: 18, y: 0, width: 352, height: 34, rx: 7, fill: "rgba(22,255,198,0.07)", stroke: "rgba(22,255,198,0.4)", opacity: 0 }, Lg);
       var rows = sections.map(function (name, i) {
-        var y = 68 + i * 38;
+        var y = 72 + i * PITCH;
         var rg = h("g", { opacity: 0 }, Lg);
-        h("line", { x1: 24, x2: 370, y1: y + 36, y2: y + 36, stroke: "rgba(143,166,176,0.14)" }, rg);
+        h("line", { x1: 24, x2: 370, y1: y + 42, y2: y + 42, stroke: "rgba(143,166,176,0.14)" }, rg);
         tx(rg, 24, y + 21, name, "s-ui");
         var ev = h("g", { opacity: 0 }, rg);
         var evx = 132;
@@ -672,23 +674,23 @@
       var RX = tall ? 260 : 392;
       h("rect", { x: RX, y: 20, width: RW, height: 335, rx: 12, fill: C.panel, stroke: C.line }, Rg);
       tx(Rg, RX + 16, 44, "VERDICTS", "s-mono");
-      var totals = { p: 0, a: 0, g: 0, f: 0 };
+      var totals = { p: 0, a: 0, g: 0, f: 0 }, cellsN = V.length * 3;
       V.forEach(function (row) { row.forEach(function (c) { totals[c]++; }); });
       var segs = [], sx = RX + 16, barW = RW - 32;
       ["p", "a", "g", "f"].forEach(function (k) {
-        var w = (totals[k] / 21) * barW;
+        var w = (totals[k] / cellsN) * barW;
         segs.push({ el: h("rect", { x: sx, y: 56, width: 0, height: 10, fill: col[k] }, Rg), w: w });
         sx += w;
       });
       var legend = h("g", { opacity: 0 }, Rg);
-      [["p", "PASS"], ["a", "PARTIAL"], ["g", "GAP"], ["f", "FAIL"]].forEach(function (l, i) {
+      [["p", "PASS"], ["a", "PARTIAL"], ["g", "GAP"]].forEach(function (l, i) {
         var lx = RX + 16 + (i % 2) * (tall ? 120 : 80), ly = 86 + Math.floor(i / 2) * 18;
         h("rect", { x: lx, y: ly - 7, width: 8, height: 8, rx: 2, fill: col[l[0]] }, legend);
         tx(legend, lx + 14, ly, l[1] + " " + totals[l[0]], "s-chip", { fill: C.text });
       });
       var gy0 = 128;
-      tx(Rg, RX + 16, gy0, "FAILS AND GAPS · RANKED", "s-mono");
-      var issueList = [["Column cladding", "FAIL · WELL V2", C.red], ["Spandrels", "GAP · CLIENT BRIEF", C.grey], ["Blades", "GAP · WELL V2", C.grey], ["Bird safety", "GAP · CLIENT BRIEF", C.grey], ["Expressed frame", "GAP · CLIENT BRIEF", C.grey]];
+      tx(Rg, RX + 16, gy0, "OPEN REQUESTS · RANKED", "s-mono");
+      var issueList = [["Akustik Plus", "HIGH · VOC REPORT", C.amber], ["PPG Signal White", "HIGH · CORRECT HPD", C.amber], ["PPG Traffic White", "HIGH · CORRECT HPD", C.amber], ["POHL Bronze Dark", "HIGH · RED LIST", C.amber], ["AGC glass", "MEDIUM · C2C LEVEL", C.grey]];
       var skelR = issueList.map(function (g, i) {
         return h("rect", { x: RX + 12, y: gy0 + 12 + i * 41, width: RW - 24, height: 35, rx: 7, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, Rg);
       });
@@ -709,14 +711,14 @@
           op(r.g, P(t, 0.1 + i * 0.1, 0.5 + i * 0.1) * fade);
           op(r.ev, P(t, 0.8 + i * 0.12, 1.1 + i * 0.12) * fade);
           r.cells.forEach(function (c, k) {
-            var t0 = 1.9 + i * 0.48 + k * 0.12;
+            var t0 = 1.9 + i * 0.6 + k * 0.14;
             var p = P(t, t0, t0 + 0.25);
             set(c.box, "fill", p > 0.5 ? col[c.code] : "none");
             set(c.box, "stroke", p > 0.5 ? col[c.code] : "rgba(143,166,176,0.3)");
             op(c.mark, p);
           });
         });
-        var row = Math.floor(clamp((t - 1.9) / 0.48, 0, 6.99));
+        var row = Math.floor(clamp((t - 1.9) / 0.6, 0, rows.length - 0.01));
         set(scan, "y", rows[row].y + 1);
         op(scan, t > 1.9 && t < 5.4 ? 1 : 0);
         var b = P(t, 5.6, 6.6, E.inOut);
@@ -745,7 +747,7 @@
       var svg = st.svg;
       var wires = h("g", null, svg);
       var LAY = tall
-        ? { refs: [[117, 12], [228, 12], [6, 12]], rw: 106, rh: 78, an: [[6, 130], [176, 130]], aw: 158, ah: 112, pres: [6, 294, 328, 250], cols: 3, tw: 96, th: 56 }
+        ? { refs: [[6, 12], [117, 12], [228, 12]], rw: 106, rh: 78, an: [[6, 130], [176, 130]], aw: 158, ah: 112, pres: [6, 294, 328, 250], cols: 3, tw: 96, th: 56 }
         : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
@@ -754,7 +756,7 @@
         tx(g, x + 12, y + 22, title, tall ? (kind === "r" ? "s-ui s-ui-xs" : "s-ui s-ui-sm") : "s-ui");
         return g;
       }
-      var refs = ["Building survey", "Workshop notes", tall ? "Energy use" : "Energy use 2023–25"].map(function (title, i) {
+      var refs = ["Building survey", tall ? "Energy use" : "Energy use 2023–25", "Workshop notes"].map(function (title, i) {
         var x = LAY.refs[i][0], y = LAY.refs[i][1], w = LAY.rw, hh = LAY.rh;
         var g = node(x, y, w, hh, title, "r");
         var inner = w - 24;
@@ -762,8 +764,8 @@
           h("rect", { x: x + 12, y: y + 32, width: 30, height: hh - 44, rx: 2, fill: "none", stroke: "rgba(143,166,176,0.45)" }, g);
           for (var k = 0; k < 4; k++) h("rect", { x: x + 50, y: y + 36 + k * 9, width: (inner - 40) * (1 - k * 0.12), height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
         }
-        if (i === 1) for (var m = 0; m < 5; m++) h("rect", { x: x + 12, y: y + 34 + m * 8, width: inner * (1 - (m % 3) * 0.16), height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
-        if (i === 2) for (var n = 0; n < 9; n++) { var bh = 8 + ((n * 7) % 26); h("rect", { x: x + 12 + n * (inner / 9), y: y + hh - 10 - bh, width: inner / 9 - 5, height: bh, rx: 1.5, fill: "rgba(143,220,210,0.55)" }, g); }
+        if (i === 2) for (var m = 0; m < 5; m++) h("rect", { x: x + 12, y: y + 34 + m * 8, width: inner * (1 - (m % 3) * 0.16), height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
+        if (i === 1) for (var n = 0; n < 9; n++) { var bh = 8 + ((n * 7) % 26); h("rect", { x: x + 12 + n * (inner / 9), y: y + hh - 10 - bh, width: inner / 9 - 5, height: bh, rx: 1.5, fill: "rgba(143,220,210,0.55)" }, g); }
         return { g: g, out: tall ? [x + w / 2, y + hh] : [x + w, y + hh / 2] };
       });
       var an = ["Retrofit opportunities", "Stakeholder priorities"].map(function (title, i) {
@@ -785,10 +787,10 @@
         return { r: r, t: tt };
       });
       var slides = [], skelS = [];
-      for (var q = 0; q < 6; q++) {
+      for (var q = 0; q < 5; q++) {
         skelS.push(h("rect", { x: PX + 12 + (q % LAY.cols) * (LAY.tw + 8), y: PY + 62 + Math.floor(q / LAY.cols) * (LAY.th + 8), width: LAY.tw, height: LAY.th, rx: 3, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, pres));
       }
-      for (var k = 0; k < 6; k++) {
+      for (var k = 0; k < 5; k++) {
         var sx = PX + 12 + (k % LAY.cols) * (LAY.tw + 8), sy = PY + 62 + Math.floor(k / LAY.cols) * (LAY.th + 8);
         var sg = h("g", { opacity: 0 }, pres);
         h("rect", { x: sx, y: sy, width: LAY.tw, height: LAY.th, rx: 3, fill: k === 0 ? C.ink : "#eef2f1", stroke: C.line }, sg);
@@ -818,18 +820,18 @@
       var w1, w2;
       if (tall) {
         var a0 = an[0], a1 = an[1];
+        // the survey and the meter data feed the retrofit analysis; the workshop notes feed the stakeholder one
         w1 = [
-          wire(down(refs[0].out, [a0.x + 114, a0.y])),
-          wire(down(refs[2].out, [a0.x + 44, a0.y])),
-          wire(down(refs[1].out, [a1.x + 114, a1.y])),
-          wire(down(refs[0].out, [a1.x + 44, a1.y])),
+          wire(down(refs[0].out, [a0.x + 44, a0.y])),
+          wire(down(refs[1].out, [a0.x + 114, a0.y])),
+          wire(down(refs[2].out, [a1.x + 104, a1.y])),
         ];
         w2 = [
           wire(down([a0.x + LAY.aw / 2, a0.y + LAY.ah], [PX + PW * 0.26, PY])),
           wire(down([a1.x + LAY.aw / 2, a1.y + LAY.ah], [PX + PW * 0.74, PY])),
         ];
       } else {
-        w1 = [wire(across(refs[0].out, an[0].in)), wire(across(refs[2].out, an[0].in)), wire(across(refs[1].out, an[1].in)), wire(across(refs[0].out, an[1].in))];
+        w1 = [wire(across(refs[0].out, an[0].in)), wire(across(refs[1].out, an[0].in)), wire(across(refs[2].out, an[1].in))];
       }
       if (!tall) {
         w2 = [wire(across([an[0].x + LAY.aw, an[0].y + 56], [PX, PY + 76])), wire(across([an[1].x + LAY.aw, an[1].y + 56], [PX, PY + 146]))];
@@ -1165,7 +1167,7 @@
       var rv = iso(L, 0, 3 * FH + FH - 3);
 
       return function (t) {
-        var e1 = t < 8.0 ? 1 : 1 - P(t, 8.0, 8.3);
+        var e1 = 1 - P(t, 15.4, 15.9);
         var e2 = P(t, 8.3, 8.4) * (1 - P(t, 15.4, 15.9));
         // phones have room for one exchange, so the load notice gives way to the question
         if (tall) show(loaded, 1 - P(t, 0.1, 0.4));
@@ -1218,7 +1220,7 @@
   };
 
   function setChipScale(mode) {
-    chipK = mode === "tall" ? 6.5 : 5.7;
+    chipK = mode === "tall" ? 6.5 : 6.3;
   }
 
   /* Engine: build each story for its width, run it only while it is on screen */
@@ -1249,9 +1251,10 @@
           to = i + 1 < s.def.beats.length ? s.def.beats[i + 1][0] : s.def.dur;
         }
       }
+      var ending = t > s.def.dur - 0.8;
       s.beats.forEach(function (b, i) {
-        b.classList.toggle("is-on", i === idx);
-        b.classList.toggle("is-past", i < idx);
+        b.classList.toggle("is-on", !ending && i === idx);
+        b.classList.toggle("is-past", !ending && i < idx);
         if (i === idx) b.style.setProperty("--p", clamp((t - from) / (to - from), 0, 1).toFixed(3));
       });
     }
