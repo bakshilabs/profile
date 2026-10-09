@@ -279,7 +279,7 @@
         }
         var landed = 0;
         for (var n = 0; n < 5; n++) if (t > 3.0 + n * 0.24 + 0.7) landed++;
-        text(status, t < 0.3 ? "READY TO SCAN" : t < 2.9 ? "SCANNING " + Math.round(676 * sweep) + " / 676" : t < 3.7 ? "MATCHING RESULTS" : landed + (landed === 1 ? " OPPORTUNITY FOUND" : " OPPORTUNITIES FOUND"));
+        text(status, t < 0.3 ? "READY TO SCAN" : t < 2.9 ? "SCANNING " + Math.round(676 * sweep) + " / 676" : t < 3.7 ? "MATCHING RESULTS" : landed < 5 ? landed + (landed === 1 ? " OPPORTUNITY FOUND" : " OPPORTUNITIES FOUND") : "6 OPPORTUNITIES · TOP 5 SHOWN");
         sectorChips.forEach(function (cg, n) { op(cg, n === 0 ? 1 : 0.55 + 0.45 * (1 - fade)); });
         cards.forEach(function (c, i) {
           var t0 = 3.0 + i * 0.24;
@@ -773,11 +773,12 @@
         var g = node(x, y, w, LAY.ah, title, "a");
         var run = h("rect", { x: x + 12, y: y + 32, width: 40, height: 18, rx: 5, fill: "none", stroke: C.mint }, g);
         var runT = tx(g, x + 32, y + 45, "Run", "s-chip", { "text-anchor": "middle", fill: C.mint });
+        var reW = 6 * chipK + 14;
         var spin = h("circle", { cx: x + 64, cy: y + 41, r: 5, fill: "none", stroke: C.mint, "stroke-width": 1.6, "stroke-dasharray": "18 40", opacity: 0 }, g);
         var lines = [0, 1, 2, 3].map(function (k) {
           return h("rect", { x: x + 12, y: y + 62 + k * 10, width: 0, height: 4, rx: 2, fill: k === 0 ? "rgba(230,238,240,0.8)" : "rgba(143,166,176,0.45)" }, g);
         });
-        return { g: g, run: run, runT: runT, spin: spin, lines: lines, w: w - 24, in: [x, y + 56], x: x, y: y, cx: x + 64, cy: y + 41 };
+        return { g: g, run: run, runT: runT, reW: reW, spin: spin, lines: lines, w: w - 24, in: [x, y + 56], x: x, y: y, cx: x + 64, cy: y + 41 };
       });
       var PX = LAY.pres[0], PY = LAY.pres[1], PW = LAY.pres[2], PH = LAY.pres[3];
       var pres = node(PX, PY, PW, PH, "Client update deck", "p");
@@ -859,10 +860,14 @@
         });
         an.forEach(function (a, i) {
           op(a.g, P(t, 1.3 + i * 0.2, 1.7 + i * 0.2) * fade);
-          var pressed = t > 3.9 + i * 0.25;
-          set(a.run, "fill", pressed ? C.mint : "none");
-          set(a.runT, "fill", pressed ? C.ink : C.mint);
+          var pressed = t > 3.9 + i * 0.25, done = t > 5.5 + i * 0.25;
+          set(a.run, "fill", pressed && !done ? C.mint : "none");
+          set(a.runT, "fill", pressed && !done ? C.ink : C.mint);
+          set(a.run, "width", done ? a.reW.toFixed(1) : 40);
+          set(a.runT, "x", (a.x + 12 + (done ? a.reW : 40) / 2).toFixed(1));
+          text(a.runT, done ? "Re-run" : "Run");
           op(a.spin, t > 3.9 + i * 0.25 && t < 4.6 + i * 0.25 ? 1 : 0);
+          set(a.spin, "cx", (a.x + 12 + (done ? a.reW : 40) + 12).toFixed(1));
           set(a.spin, "transform", "rotate(" + ((t * 540) % 360).toFixed(0) + " " + a.cx + " " + a.cy + ")");
           a.lines.forEach(function (l, k) {
             set(l, "width", (a.w * [1, 0.86, 0.94, 0.66][k] * P(t, 4.6 + i * 0.25 + k * 0.16, 5.0 + i * 0.25 + k * 0.16)).toFixed(1));
@@ -1060,7 +1065,7 @@
   SCENES.modelchat = {
     dur: 16.4,
     still: 6.6,
-    beats: [[0, 0], [2.7, 1], [3.6, 2], [8.3, 0], [10.3, 1], [10.9, 2]],
+    beats: [[0, 0], [3.6, 1], [8.3, 2]],
     size: { wide: [560, 420], tall: [560, 780] },
     keepStage: true,
     init: function (stage, mode) {

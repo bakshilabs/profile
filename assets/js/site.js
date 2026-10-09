@@ -97,23 +97,26 @@
       });
       d.addEventListener("close", function () {
         resetWalk(d.querySelector("[data-walk]"));
+        if (d.dataset.switching) {
+          // another sheet is opening in its place, so the page stays locked
+          delete d.dataset.switching;
+          return;
+        }
         if (d.dataset.closingTo) {
           // a link inside the sheet has already chosen where the page goes
           delete d.dataset.closingTo;
           document.body.classList.remove("is-locked");
           return;
         }
-        if (!d.dataset.switching) {
-          document.body.classList.remove("is-locked");
-          if (location.hash === "#" + d.id) setHash("#work");
-          if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
-          else {
-            // opened from a shared link: land on that tool's card
-            var card = document.querySelector('.card__link[data-case="' + d.id + '"], .feature__body[data-case="' + d.id + '"]');
-            if (card) {
-              card.scrollIntoView({ block: "center" });
-              card.focus({ preventScroll: true });
-            }
+        document.body.classList.remove("is-locked");
+        if (location.hash === "#" + d.id) setHash("#work");
+        if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+        else {
+          // opened from a shared link: land on that tool's card
+          var card = document.querySelector('.card__link[data-case="' + d.id + '"], .feature__body[data-case="' + d.id + '"]');
+          if (card) {
+            card.scrollIntoView({ block: window.matchMedia("(max-width: 760px)").matches ? "start" : "center" });
+            card.focus({ preventScroll: true });
           }
         }
       });
@@ -126,9 +129,9 @@
       if (!d) return false;
       var current = document.querySelector("[data-case-dialog][open]");
       if (current && current !== d) {
+        // the close event fires later; its handler clears this flag
         current.dataset.switching = "1";
         current.close();
-        delete current.dataset.switching;
       } else if (!current) {
         opener = from || null;
       }

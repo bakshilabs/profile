@@ -3317,3 +3317,23 @@ button {
     margin-top: 4px;
   }
 }
+/* Paired cards keep their step labels on two lines so the pair stays level */
+@media (min-width: 1181px) {
+  .cards .card:not(.card--wide) .beats > span {
+    min-height: calc(2 * 1.35em + 10px);
+  }
+}
+/* Tablet ModelChat: a shorter viewer leaves the chat room for a whole exchange */
+@media (max-width: 1000px) {
+  .feature .mc:not(.is-tall) .mc__viewer {
+    aspect-ratio: 16 / 10;
+  }
+  .feature .mc:not(.is-tall) .mc__chat {
+    height: 320px;
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .walk__steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
