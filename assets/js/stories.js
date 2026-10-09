@@ -996,7 +996,7 @@
           ctx.font = font(10, "mono", 500);
           ctx.fillText(LBL[k], lx + 15, y0 + 109);
         }
-        var b3 = P(t, 6.3, 6.8);
+        var b3o = P(t, 6.3, 6.55), b3 = P(t, 6.55, 6.85);
         var ry = y0 + 132;
         ctx.globalAlpha = (1 - b2) * 0.5 * fade;
         ctx.setLineDash([3, 4]);
@@ -1004,17 +1004,17 @@
         roundRect(ctx, L, ry + 18, sw, 56, 8); ctx.stroke();
         roundRect(ctx, L, ry + 86, sw, 56, 8); ctx.stroke();
         ctx.setLineDash([]);
-        ctx.globalAlpha = Math.max(b2 * (1 - b3), b3) * fade;
+        ctx.globalAlpha = Math.max(b2 * (1 - b3o), b3) * fade;
         ctx.fillStyle = "rgba(143,166,176,0.2)";
         ctx.fillRect(L, ry, sw, 1);
-        ctx.globalAlpha = b2 * (1 - b3) * fade;
+        ctx.globalAlpha = b2 * (1 - b3o) * fade;
         ctx.fillStyle = "#fff";
         ctx.font = font(30, "serif", 400);
         ctx.fillText(fmt(56873 * P(t, 3.3, 3.9, E.inOut)), L, ry + 44);
         ctx.fillStyle = C.mist;
         ctx.font = font(10, "mono", 500);
         spaced(ctx, "HOMES BELOW EPC C", L, ry + 62, 1.1);
-        ctx.globalAlpha = P(t, 4.4, 4.9) * (1 - b3) * fade;
+        ctx.globalAlpha = P(t, 4.4, 4.9) * (1 - b3o) * fade;
         ctx.fillStyle = "#fff";
         ctx.font = font(30, "serif", 400);
         ctx.fillText("£570m", L, ry + 110);
@@ -1097,14 +1097,16 @@
         var top = h("polygon", { points: pts([[rs[0], 0, z1], [rs[1], 0, z1], [rs[1], W, z1], [rs[0], W, z1]]), fill: roof ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)", stroke: "rgba(143,220,210,0.5)", "stroke-width": 0.8 }, g);
         floors.push({ g: g, left: left, right: right, top: top, k: k, roof: roof });
       }
-      // 34 columns on every storey around a central core, 340 in all
+      // one column grid for the whole building, kept inside each storey's footprint: 340 columns in all
       var cols = h("g", { stroke: C.mint, "stroke-width": 1.2, "stroke-linecap": "round", opacity: 0 }, cam);
       var colLines = [];
       for (var f = 0; f < FLOORS; f++) {
         for (var cy = 0; cy < 4; cy++) {
-          for (var cx = 0; cx < 9; cx++) {
+          for (var cx = -2; cx < 9; cx++) {
+            var x = 10 + cx * 35, y = 8 + cy * 28, fx = span(f);
+            if (x < fx[0] || x > fx[1]) continue;
             if (cx === 4 && (cy === 1 || cy === 2)) continue;
-            var fx = span(f), x = fx[0] + 10 + cx * (fx[1] - fx[0] - 20) / 8, y = 8 + cy * 28;
+            if (cx === -2 && (cy === 1 || cy === 2)) continue;
             colLines.push({ el: h("polyline", { points: pts([[x, y, f * FH], [x, y, f * FH + FH - 3]]), fill: "none" }, cols), f: f });
           }
         }
@@ -1193,7 +1195,7 @@
 
         var iso1 = P(t, 3.6, 4.6, E.inOut) * (1 - P(t, 10.9, 11.6, E.inOut));
         var colsOn = P(t, 11.2, 12.0, E.inOut) * (1 - P(t, 15.3, 16.0, E.inOut));
-        var zoom = (tall ? 0.9 : 1) * (1 + 0.28 * iso1);
+        var zoom = (tall ? 0.9 : 1) * (1 + 0.2 * iso1);
         set(cam, "transform", "translate(" + cxs[0].toFixed(1) + " " + cxs[1].toFixed(1) + ") scale(" + zoom.toFixed(3) + ") translate(" + (-cxs[0]).toFixed(1) + " " + (-cxs[1]).toFixed(1) + ")");
         floors.forEach(function (fl) {
           var sel = fl.k === 3;
