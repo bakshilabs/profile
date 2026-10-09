@@ -2265,3 +2265,233 @@ button {
 .contact {
   padding-bottom: clamp(56px, 7vw, 88px);
 }
+
+/* Method figures: small dark stories in the same parts as the Work section */
+.move__fig.mf {
+  margin-bottom: 26px;
+  border-radius: 12px;
+  background-color: #0f222b;
+  background-image: radial-gradient(rgba(143, 166, 176, 0.16) 0.8px, transparent 0.8px);
+  background-size: 16px 16px;
+  box-shadow: 0 0 0 1px rgba(12, 27, 36, 0.06), 0 18px 36px -24px rgba(12, 27, 36, 0.6);
+}
+.mf-node > rect:first-child {
+  fill: #132a34;
+  stroke: rgba(143, 166, 176, 0.24);
+}
+.mf-bar--soft {
+  fill: #8fdcd2;
+}
+.mf-bar--mint {
+  fill: #16ffc6;
+}
+.mf-bar--sky {
+  fill: #59c7fc;
+}
+.move__fig .mf-title {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  fill: #e6eef0;
+  text-anchor: start;
+}
+.mf-line {
+  fill: rgba(143, 166, 176, 0.4);
+}
+.mf-line--hi {
+  fill: rgba(230, 238, 240, 0.8);
+}
+.mf-check rect {
+  fill: rgba(22, 255, 198, 0.14);
+}
+.move__fig .mf-check text {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: #16ffc6;
+  text-anchor: middle;
+}
+.mf-wire {
+  fill: none;
+  stroke: rgba(143, 220, 210, 0.55);
+  stroke-width: 1.2;
+}
+.mf-ring {
+  stroke-dasharray: 3 4;
+  animation: fig-dash 1.6s linear infinite;
+}
+.mf-pulse {
+  fill: #16ffc6;
+  filter: drop-shadow(0 0 3px rgba(22, 255, 198, 0.8));
+}
+.mf-q rect {
+  fill: #132a34;
+  stroke: rgba(143, 166, 176, 0.32);
+}
+.move__fig .mf-q text {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0;
+  fill: #e6eef0;
+  text-anchor: start;
+}
+.move__fig .mf-cap {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  fill: #93a7b0;
+  text-anchor: middle;
+}
+.move__fig .mf-centre {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  fill: #93a7b0;
+  text-anchor: middle;
+}
+.mf-stop rect {
+  fill: #132a34;
+  stroke: rgba(143, 166, 176, 0.32);
+  animation: mf-stop 4.8s linear infinite;
+  animation-delay: var(--d);
+}
+.move__fig .mf-stop text {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: #e6eef0;
+  text-anchor: middle;
+}
+@keyframes mf-stop {
+  0%,
+  12% {
+    fill: rgba(22, 255, 198, 0.2);
+    stroke: #16ffc6;
+  }
+  18%,
+  100% {
+    fill: #132a34;
+    stroke: rgba(143, 166, 176, 0.32);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mf-pulse {
+    display: none;
+  }
+}
+.offer__title {
+  text-wrap: balance;
+}
+.mc__answer b {
+  white-space: nowrap;
+}
+
+/* Featured story laid out like the cards */
+.feature__visual {
+  min-width: 0;
+}
+.feature__visual .beats {
+  margin-bottom: 0;
+}
+.feature__body {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+.feature__body .card__meta {
+  display: flex;
+}
+.feature__name {
+  display: block;
+}
+.feature__body .card__foot {
+  margin-top: 28px;
+  padding-top: 0;
+}
+.feature__body:hover .card__more svg {
+  transform: translateX(4px);
+}
+
+/* Calls to action after Services and in each case sheet */
+.next,
+.case__ask {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  padding: 24px 28px;
+  border-radius: 14px;
+  background: var(--paper-deep);
+}
+.next p,
+.case__ask p {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.case__ask {
+  margin-top: clamp(40px, 5vw, 56px);
+}
+
+/* Contact questions read as a list */
+.prompts__n {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--mist);
+}
+
+@media (max-width: 760px) {
+  .walk__steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .walk__step {
+    min-width: 0;
+    padding: 10px 6px 8px;
+  }
+  .walk__t {
+    font-size: 13px;
+  }
+  .walk__count {
+    display: none;
+  }
+  .walk__stage {
+    aspect-ratio: 16 / 10;
+  }
+  .walk__img {
+    object-position: 50% 0;
+  }
+  .next,
+  .case__ask {
+    padding: 20px;
+  }
+}
+.feature__text {
+  display: block;
+}
+.feature__body .card__stat {
+  margin: 0;
+}
+.case__title:focus {
+  outline: none;
+}

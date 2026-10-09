@@ -395,15 +395,15 @@
     dur: 11,
     still: 8.6,
     beats: [[0, 0], [3.6, 1], [6.6, 2]],
-    size: { wide: [600, 375], tall: [340, 540] },
+    size: { wide: [600, 375], tall: [340, 500] },
     init: function (stage, mode) {
       var tall = mode === "tall";
       var cv = canvasStage(stage, tall ? 340 : 600, tall ? 540 : 375);
       var ctx = cv.ctx;
       var N = 16;
-      var G = tall ? { s: 9.4, ox: 170, oy: 150, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 330, oy: 136, maxH: 104, hx: 24, hy: 30 };
-      var CALL = tall ? { x: 16, y: 418, w: 308, h: 100 } : { x: 24, y: 58, w: 196, h: 92 };
-      var LEG = tall ? { x: 16, y: 386, w: 180 } : { x: 24, y: 334, w: 150 };
+      var G = tall ? { s: 9.4, ox: 170, oy: 238, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 330, oy: 136, maxH: 104, hx: 24, hy: 30 };
+      var CALL = tall ? { x: 16, y: 44, w: 308, h: 80 } : { x: 24, y: 58, w: 196, h: 92 };
+      var LEG = tall ? { x: 16, y: 470, w: 180 } : { x: 24, y: 334, w: 150 };
       var r = rng(21), typeBase = [];
       for (var i = 0; i < N; i++) typeBase.push(0.32 + 0.6 * r());
       typeBase[2] = 0.78;
@@ -490,8 +490,9 @@
           if (hh < 0.5) continue;
           var inRow = j === SEL_J, isSel = i === SEL_I && j === SEL_J;
           var ghost = inRow ? 0 : slice;
-          if (pick > 0 && !isSel) ghost = Math.max(ghost, inRow ? pick * 0.6 : 1);
-          if (ghost > 0.5) bar(i, j, hh, v[i][j], 0.22 * fade, true);
+          if (pick > 0 && !isSel) {
+            bar(i, j, hh, v[i][j], lerp(ghost > 0.5 ? 0.22 : 1, 0.2, pick) * fade + (1 - fade) * 0.2, ghost > 0.5 && pick < 0.5);
+          } else if (ghost > 0.5) bar(i, j, hh, v[i][j], 0.22 * fade, true);
           else bar(i, j, hh, v[i][j], (1 - ghost * 0.7) * fade + (1 - fade) * 0.2, false);
           if (isSel && pick > 0) {
             var cs = corners(i, j);
@@ -508,7 +509,7 @@
         spaced(ctx, "256 BUILDING AND CLIMATE MODELS", G.hx, G.hy, 1.1);
         ctx.globalAlpha = slice * (1 - pick) * fade;
         ctx.fillStyle = C.mint;
-        spaced(ctx, "SECTION · CLIMATE 5A CHICAGO", G.hx, G.hy + 18, 1.1);
+        spaced(ctx, "SECTION · CLIMATE 5A CHICAGO", G.hx, tall ? 144 : G.hy + 18, 1.1);
         ctx.globalAlpha = 1;
 
         var lg = ctx.createLinearGradient(LEG.x, 0, LEG.x + LEG.w, 0);
@@ -534,7 +535,7 @@
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(bx, by - 4);
-          if (tall) { ctx.lineTo(8, by - 4); ctx.lineTo(8, CALL.y + 24); ctx.lineTo(CALL.x, CALL.y + 24); }
+          if (tall) ctx.lineTo(bx, CALL.y + CALL.h);
           else { ctx.lineTo(bx, CALL.y + 62); ctx.lineTo(CALL.x + CALL.w, CALL.y + 62); }
           ctx.stroke();
           ctx.fillStyle = C.mint;
@@ -548,11 +549,11 @@
           ctx.fillStyle = "#ffffff";
           ctx.font = font(34, "serif", 400);
           var val = String(Math.round(575 * P(t, 6.9, 7.6)));
-          ctx.fillText(val, CALL.x + 14, CALL.y + 60);
+          ctx.fillText(val, CALL.x + 14, CALL.y + (tall ? 58 : 60));
           var vw = ctx.measureText(val).width;
           ctx.fillStyle = C.mist;
           ctx.font = font(10, "mono", 500);
-          if (tall) spaced(ctx, "MJ/M² SITE EUI", CALL.x + 26 + vw, CALL.y + 60, 1);
+          if (tall) spaced(ctx, "MJ/M² SITE EUI", CALL.x + 26 + vw, CALL.y + 58, 1);
           else spaced(ctx, "MJ/M² SITE EUI", CALL.x + 14, CALL.y + 80, 1);
           ctx.globalAlpha = 1;
         }
@@ -570,7 +571,7 @@
       var tall = mode === "tall";
       var st = svgStage(stage, tall ? 340 : 600, tall ? 690 : 375, "ms" + mode);
       var svg = st.svg;
-      var Lg = h("g", tall ? { transform: "translate(-6 0) scale(0.95)" } : null, svg);
+      var Lg = h("g", tall ? { transform: "translate(-4 0) scale(0.92)" } : null, svg);
       var Rg = h("g", tall ? { transform: "translate(-238 330) scale(0.98)" } : null, svg);
       tx(Lg, 24, 30, "LAB AND WORKPLACE PALETTE", "s-mono");
       ["LBC", "WELL", "BRIEF"].forEach(function (c, i) {
@@ -683,13 +684,13 @@
       var svg = st.svg;
       var wires = h("g", null, svg);
       var LAY = tall
-        ? { refs: [[10, 14], [10, 124], [10, 234]], rw: 156, rh: 96, an: [[180, 40], [180, 212]], aw: 138, ah: 122, pres: [10, 360, 320, 248], cols: 3, tw: 92, th: 56 }
+        ? { refs: [[8, 14], [8, 124], [8, 234]], rw: 144, rh: 96, an: [[172, 40], [172, 212]], aw: 150, ah: 122, pres: [8, 360, 324, 248], cols: 3, tw: 94, th: 56 }
         : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
         h("rect", { x: x, y: y, width: w, height: hh, rx: 9, fill: C.panel, stroke: C.line }, g);
         h("rect", { x: x, y: y, width: w, height: 3, rx: 1.5, fill: kind === "a" ? C.mint : kind === "p" ? C.sky : C.soft }, g);
-        tx(g, x + 12, y + 22, title, "s-ui");
+        tx(g, x + 12, y + 22, title, tall ? "s-ui s-ui-sm" : "s-ui");
         return g;
       }
       var refs = ["Building survey", "Workshop notes", "Energy use 2023–25"].map(function (title, i) {
@@ -754,7 +755,7 @@
       if (tall) {
         var a0 = an[0], a1 = an[1], ex = a0.x + LAY.aw;
         w2 = [
-          wire("M" + ex + " " + (a0.y + 56) + " L" + (ex + 12) + " " + (a0.y + 56) + " L" + (ex + 12) + " " + (PY - 14) + " Q" + (ex + 12) + " " + PY + " " + (PX + PW * 0.86) + " " + PY),
+          wire("M" + ex + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (PY - 14) + " Q" + (ex + 8) + " " + PY + " " + (PX + PW * 0.86) + " " + PY),
           wire("M" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah) + " C" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah + 10) + " " + (PX + PW * 0.55) + " " + (PY - 10) + " " + (PX + PW * 0.55) + " " + PY),
         ];
       } else {
@@ -884,9 +885,9 @@
             ctx.globalAlpha = (1 - ring) * fade;
             ctx.strokeStyle = C.mint;
             ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 3 + ring * 9, 0, Math.PI * 2); ctx.stroke();
-            ctx.globalAlpha = 0.9 * fade;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 4.4, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(p.x, p.y, 3 + ring * 7, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 0.55 * fade;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 3.7, 0, Math.PI * 2); ctx.stroke();
           }
         }
         ctx.globalAlpha = 1;
@@ -962,7 +963,7 @@
         ctx.fillStyle = C.mist;
         ctx.font = font(10, "mono", 500);
         spaced(ctx, "HOMES FUNDED", L, ry + 142, 1.1);
-        spaced(ctx, "CO2E SAVED A YEAR", L + sw * 0.52, ry + 142, 1.1);
+        spaced(ctx, "CO₂E SAVED A YEAR", L + sw * 0.52, ry + 142, 1.1);
         ctx.globalAlpha = 1;
       };
     },
@@ -1049,7 +1050,7 @@
       var q1 = "What is the gross floor area of Level 03? Isolate that floor.";
       var q2 = "Now show only the columns, across the whole building.";
       var u1 = msg("mc__user"), t1 = tools(["query_index", "compute_quantity", "isolate", "focus_camera"]);
-      var a1 = msg("mc__answer", "Level 03 has a gross floor area of about <b>0</b> m². The floor is isolated and the camera is fitted to it.");
+      var a1 = msg("mc__answer", "Level 03 has a gross floor area of about <b>0</b>&nbsp;m². The floor is isolated and the camera is fitted to it.");
       var u2 = msg("mc__user"), t2 = tools(["query_index", "isolate", "focus_camera"]);
       var a2 = msg("mc__answer", "The viewer now shows only the columns, all <b>0</b> of them across the building.");
       var n1 = a1.querySelector("b"), n2 = a2.querySelector("b");

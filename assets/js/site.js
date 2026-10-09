@@ -121,6 +121,17 @@
     }
 
     document.addEventListener("click", function (e) {
+      var to = e.target.closest("[data-close-to]");
+      if (to) {
+        e.preventDefault();
+        var openSheet = document.querySelector("[data-case-dialog][open]");
+        opener = null;
+        if (openSheet) openSheet.close();
+        var target = document.getElementById(to.getAttribute("data-close-to"));
+        history.replaceState(null, "", "#" + to.getAttribute("data-close-to"));
+        if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+        return;
+      }
       var link = e.target.closest("[data-case]");
       if (!link) return;
       if (open(link.getAttribute("data-case"), link)) e.preventDefault();
