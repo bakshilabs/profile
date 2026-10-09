@@ -1,18 +1,11 @@
 /* Bakshi Labs */
 
 @font-face {
-  font-family: "Newsreader";
+  font-family: "Schibsted Grotesk";
   font-style: normal;
-  font-weight: 200 800;
+  font-weight: 400 900;
   font-display: swap;
-  src: url("../fonts/newsreader-var.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Newsreader";
-  font-style: italic;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url("../fonts/newsreader-var-italic.woff2") format("woff2");
+  src: url("../fonts/schibsted-grotesk-var.woff2") format("woff2");
 }
 @font-face {
   font-family: "Inter";
@@ -54,7 +47,7 @@
   --tint: #e3f2ef;
   --grid: rgba(12, 27, 36, 0.055);
 
-  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --display: "Schibsted Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 
@@ -189,7 +182,7 @@ button {
 }
 .head__title {
   margin-top: 20px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(34px, 4.2vw, 56px);
   font-weight: 380;
   line-height: 1.08;
@@ -308,7 +301,7 @@ button {
   height: 26px;
 }
 .brand__name {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 21px;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -397,7 +390,7 @@ button {
     padding: 14px 0;
     border-bottom: 1px solid var(--line-soft);
     border-radius: 0;
-    font-family: var(--serif);
+    font-family: var(--display);
     font-size: 24px;
     opacity: 1;
   }
@@ -439,7 +432,7 @@ button {
 }
 .hero__title {
   margin-top: 28px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(40px, 5.4vw, 76px);
   font-weight: 360;
   line-height: 1.04;
@@ -544,7 +537,7 @@ button {
 .titleblock b {
   display: block;
   margin-bottom: 6px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(30px, 3vw, 42px);
   font-weight: 380;
   line-height: 1;
@@ -607,7 +600,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 36px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(19px, 1.8vw, 23px);
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -684,7 +677,7 @@ button {
 }
 .feature__name {
   margin-top: 14px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(34px, 3.4vw, 48px);
   font-weight: 380;
   line-height: 1.05;
@@ -722,7 +715,7 @@ button {
   color: var(--mist);
 }
 .card__stat b {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 30px;
   font-weight: 380;
   letter-spacing: -0.02em;
@@ -761,7 +754,7 @@ button {
 }
 .card__name {
   margin-top: 12px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(26px, 2.4vw, 32px);
   font-weight: 400;
   line-height: 1.1;
@@ -908,7 +901,7 @@ button {
 }
 .move__title {
   margin-top: 8px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(24px, 2.2vw, 29px);
   font-weight: 400;
   line-height: 1.15;
@@ -953,7 +946,7 @@ button {
   color: var(--teal-deep);
 }
 .offer__title {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(26px, 2.4vw, 32px);
   font-weight: 400;
   line-height: 1.1;
@@ -961,7 +954,7 @@ button {
 }
 .offer__when {
   margin-top: 10px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 19px;
   font-style: italic;
   line-height: 1.4;
@@ -1024,7 +1017,7 @@ button {
 }
 .about__name {
   margin-top: 20px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(44px, 5vw, 68px);
   font-weight: 360;
   line-height: 1;
@@ -1043,7 +1036,7 @@ button {
 }
 .about__bio .about__lead {
   margin-top: 0;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(23px, 2.2vw, 28px);
   font-weight: 380;
   line-height: 1.35;
@@ -1088,7 +1081,7 @@ button {
 .career__org {
   display: block;
   margin-top: 2px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 20px;
   font-weight: 420;
   line-height: 1.2;
@@ -1138,7 +1131,7 @@ button {
 }
 .prompts p {
   margin-top: 12px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(21px, 2vw, 26px);
   font-weight: 380;
   line-height: 1.3;
@@ -1307,7 +1300,7 @@ button {
 .case__title {
   max-width: 900px;
   margin: clamp(24px, 3vw, 36px) 0 clamp(24px, 3vw, 32px);
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(30px, 3.2vw, 44px);
   font-weight: 380;
   line-height: 1.08;
@@ -1334,7 +1327,7 @@ button {
   line-height: 1.65;
 }
 .case__problem p {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 21px;
   font-weight: 380;
   line-height: 1.4;
@@ -1528,7 +1521,7 @@ button {
   border-bottom: 1px solid var(--line);
 }
 .compare thead th {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 21px;
   font-weight: 400;
   border-bottom-color: var(--ink);
@@ -1559,7 +1552,7 @@ button {
   border-top: 2px solid var(--teal);
 }
 .making__t {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 22px;
   font-weight: 400;
 }
@@ -1582,7 +1575,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 22px;
   text-decoration: none;
 }
@@ -1808,13 +1801,13 @@ button {
   letter-spacing: 0.06em;
 }
 .s-num {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 30px;
   font-weight: 400;
   fill: #ffffff;
 }
 .s-num-sm {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 22px;
   font-weight: 400;
   fill: #ffffff;
@@ -1906,7 +1899,7 @@ button {
   gap: 8px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--ink-line);
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 17px;
   color: var(--white);
 }
@@ -2434,7 +2427,7 @@ button {
 .next p,
 .case__ask p {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(20px, 2vw, 24px);
   font-weight: 400;
   line-height: 1.3;
@@ -2678,4 +2671,221 @@ button {
     max-width: 340px;
     justify-self: end;
   }
+}
+
+/* Display type in Schibsted Grotesk: weights and tracking for a sans */
+.hero__title,
+.contact__title,
+.about__name {
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.hero__title em {
+  font-style: normal;
+  font-weight: 500;
+}
+.head__title,
+.case__title,
+.feature__name,
+.card__name,
+.move__title,
+.offer__title,
+.making__t,
+.career__org,
+.brand__name,
+.compare thead th,
+.case__nav a {
+  font-weight: 500;
+  letter-spacing: -0.022em;
+}
+.titleblock b,
+.card__stat b,
+.about__bio .about__lead,
+.prompts p,
+.case__problem p,
+.next p,
+.case__ask p {
+  font-weight: 450;
+  letter-spacing: -0.015em;
+}
+.offer__when {
+  font-style: normal;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.s-num,
+.s-num-sm {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Contact: each question wired to the tools that answer it */
+.asks {
+  border-top: 1px solid var(--ink-line);
+}
+.ask {
+  display: grid;
+  grid-template-columns: minmax(0, 0.55fr) minmax(0, 1.6fr) minmax(0, 1.25fr);
+  gap: 12px clamp(24px, 3vw, 48px);
+  align-items: center;
+  padding-block: 22px;
+  border-bottom: 1px solid var(--ink-line);
+}
+.ask__area {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal-soft);
+}
+.ask__q {
+  font-family: var(--display);
+  font-size: clamp(19px, 1.8vw, 23px);
+  font-weight: 450;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+.ask__tools {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 34px;
+}
+.ask__tools::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 17px;
+  width: 26px;
+  border-top: 1.4px dashed rgba(143, 220, 210, 0.6);
+}
+.ask__tools::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16ffc6;
+  box-shadow: 0 0 6px rgba(22, 255, 198, 0.8);
+}
+.ask__tools a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(143, 166, 176, 0.3);
+  border-radius: 8px;
+  background: #132a34;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+.ask__tools a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: #16ffc6;
+}
+.ask__tools a:hover {
+  border-color: #16ffc6;
+  background: #183441;
+}
+.mail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "label label" "address actions";
+  gap: 12px 32px;
+  align-items: end;
+  margin-top: clamp(48px, 6vw, 72px);
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid var(--ink-line);
+  border-radius: 16px;
+  background: #112630;
+}
+.mail .label {
+  grid-area: label;
+  margin: 0;
+}
+.mail__address {
+  grid-area: address;
+  min-width: 0;
+  font-family: var(--display);
+  font-size: clamp(26px, 4.2vw, 52px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--white);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.mail__address:hover {
+  color: #16ffc6;
+}
+.mail__actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btn--ghostdark {
+  border-color: rgba(143, 166, 176, 0.45);
+  background: transparent;
+  color: var(--white);
+}
+.btn--ghostdark:hover {
+  border-color: #16ffc6;
+  color: #16ffc6;
+}
+.reach {
+  margin-top: 28px;
+}
+.reach__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mist);
+  text-decoration: none;
+}
+.reach__link span {
+  text-decoration: underline;
+  text-decoration-color: rgba(143, 166, 176, 0.4);
+  text-underline-offset: 4px;
+}
+.reach__link:hover {
+  color: var(--white);
+}
+.footer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .ask {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .mail {
+    grid-template-columns: 1fr;
+    grid-template-areas: "label" "address" "actions";
+  }
+}
+/* The case study link always sits on its own line */
+.card__foot,
+.card--wide .card__foot,
+.feature__body .card__foot {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }

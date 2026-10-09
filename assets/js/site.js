@@ -15,6 +15,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initNav();
     initCases();
+    initCopy();
     initZoom();
     initFeatureVideo();
     initReveal();
@@ -215,6 +216,37 @@
     });
     toggle.addEventListener("click", function () {
       setVideo(!walk.classList.contains("is-video"));
+    });
+  }
+
+  /* Copy the email address, falling back to selecting it */
+  function initCopy() {
+    document.querySelectorAll("[data-copy]").forEach(function (btn) {
+      var label = btn.textContent;
+      btn.addEventListener("click", function () {
+        var value = btn.getAttribute("data-copy");
+        function done(text) {
+          btn.textContent = text;
+          setTimeout(function () {
+            btn.textContent = label;
+          }, 2000);
+        }
+        function select() {
+          var target = document.querySelector(".mail__address");
+          if (!target || !window.getSelection) return;
+          var range = document.createRange();
+          range.selectNodeContents(target);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          done("Address selected");
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(value).then(function () {
+            done("Copied");
+          }, select);
+        } else select();
+      });
     });
   }
 

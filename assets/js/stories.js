@@ -149,7 +149,8 @@
     return api;
   }
   function font(size, family, weight) {
-    var fam = family === "serif" ? '"Newsreader", Georgia, serif' : family === "mono" ? '"IBM Plex Mono", monospace' : '"Inter", system-ui, sans-serif';
+    var fam = family === "serif" ? '"Schibsted Grotesk", "Inter", system-ui, sans-serif' : family === "mono" ? '"IBM Plex Mono", monospace' : '"Inter", system-ui, sans-serif';
+    if (family === "serif") weight = 500;
     return (weight || 400) + " " + size + "px " + fam;
   }
   function spaced(ctx, s, x, y, track) {
@@ -725,7 +726,7 @@
       var svg = st.svg;
       var wires = h("g", null, svg);
       var LAY = tall
-        ? { refs: [[6, 12], [117, 12], [228, 12]], rw: 106, rh: 78, an: [[176, 130], [6, 130]], aw: 158, ah: 112, pres: [6, 294, 328, 250], cols: 3, tw: 96, th: 56 }
+        ? { refs: [[117, 12], [228, 12], [6, 12]], rw: 106, rh: 78, an: [[6, 130], [176, 130]], aw: 158, ah: 112, pres: [6, 294, 328, 250], cols: 3, tw: 96, th: 56 }
         : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
@@ -799,14 +800,14 @@
       if (tall) {
         var a0 = an[0], a1 = an[1];
         w1 = [
-          wire(down(refs[0].out, [a0.x + 44, a0.y])),
-          wire(down(refs[2].out, [a0.x + 114, a0.y])),
+          wire(down(refs[0].out, [a0.x + 114, a0.y])),
+          wire(down(refs[2].out, [a0.x + 44, a0.y])),
           wire(down(refs[1].out, [a1.x + 114, a1.y])),
           wire(down(refs[0].out, [a1.x + 44, a1.y])),
         ];
         w2 = [
-          wire(down([a0.x + LAY.aw / 2, a0.y + LAY.ah], [PX + PW * 0.74, PY])),
-          wire(down([a1.x + LAY.aw / 2, a1.y + LAY.ah], [PX + PW * 0.26, PY])),
+          wire(down([a0.x + LAY.aw / 2, a0.y + LAY.ah], [PX + PW * 0.26, PY])),
+          wire(down([a1.x + LAY.aw / 2, a1.y + LAY.ah], [PX + PW * 0.74, PY])),
         ];
       } else {
         w1 = [wire(across(refs[0].out, an[0].in)), wire(across(refs[2].out, an[0].in)), wire(across(refs[1].out, an[1].in)), wire(across(refs[0].out, an[1].in))];
@@ -877,7 +878,7 @@
       var cv = canvasStage(stage, tall ? 340 : 600, tall ? 700 : 375);
       var ctx = cv.ctx;
       var data = window.SOUTHWARK;
-      var MAP = tall ? { x: 60, y: 10, w: 220, h: 352 } : { x: 40, y: 10, w: 250, h: 336 };
+      var MAP = tall ? { x: 60, y: 24, w: 220, h: 338 } : { x: 40, y: 26, w: 250, h: 318 };
       var bw = data.b[0], bh = data.b[1];
       var sc = Math.min(MAP.w / bw, MAP.h / bh);
       var ox = MAP.x + (MAP.w - bw * sc) / 2, oy = MAP.y + (MAP.h - bh * sc) / 2;
@@ -1087,8 +1088,11 @@
         h("circle", { cx: 0, cy: 0, r: 2.5, fill: C.mint }, label);
         h("polyline", { points: "0,0 24,22 120,22", fill: "none", stroke: C.mint }, label);
       }
+      if (tall) h("rect", { x: -196, y: -44, width: 208, height: 76, rx: 10, fill: "#132a34", stroke: "rgba(143,166,176,0.3)" }, label);
       var area = tx(label, tall ? 0 : 28, tall ? 0 : 16, "", tall ? "s-num" : "s-num-sm", tall ? { "text-anchor": "end" } : null);
       tx(label, tall ? 0 : 28, tall ? 20 : 38, "LEVEL 03 · GFA", "s-mono", tall ? { "text-anchor": "end" } : null);
+      var leader = h("polyline", { points: "", fill: "none", stroke: C.mint, "stroke-width": 1.4, opacity: 0 }, svg);
+      var leadDot = h("circle", { r: 3.5, fill: C.mint, opacity: 0 }, svg);
       var colLabel = h("g", { opacity: 0 }, svg);
       var colCount = tx(colLabel, 536, 50, "", "s-num", { "text-anchor": "end" });
       tx(colLabel, 536, 70, "COLUMNS · WHOLE BUILDING", "s-mono", { "text-anchor": "end" });
@@ -1171,9 +1175,16 @@
         op(cols, colsOn);
         colLines.forEach(function (c) { op(c.el, P(t, 11.2 + c.f * 0.1, 11.6 + c.f * 0.1)); });
         var lx = cxs[0] + (lp[0] - cxs[0]) * zoom, ly = cxs[1] + (lp[1] - cxs[1] - 6 * iso1) * zoom;
-        if (tall) move(label, 536, 50);
-        else move(label, lx, ly);
-        op(label, P(t, 4.6, 5.0) * (1 - P(t, 7.8, 8.2)));
+        var labA = P(t, 4.6, 5.0) * (1 - P(t, 7.8, 8.2));
+        if (tall) {
+          move(label, 536, 64);
+          set(leader, "points", "440,96 440," + (ly - 10).toFixed(1) + " " + lx.toFixed(1) + "," + ly.toFixed(1));
+          set(leadDot, "cx", lx.toFixed(1));
+          set(leadDot, "cy", ly.toFixed(1));
+          op(leader, labA);
+          op(leadDot, labA);
+        } else move(label, lx, ly);
+        op(label, labA);
         text(area, areaNow + " m²");
         op(colLabel, P(t, 12.0, 12.4) * (1 - P(t, 15.3, 15.8)));
         text(colCount, colsNow);
