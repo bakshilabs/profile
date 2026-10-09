@@ -2612,3 +2612,70 @@ button {
   color: var(--teal-deep);
   text-underline-offset: 3px;
 }
+.s-ui-xs {
+  font-size: 10.5px;
+}
+
+/* Featured story: full width, its text in a row beneath */
+.feature {
+  display: block;
+}
+.feature .mc:not(.is-tall) {
+  grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
+}
+.feature .mc:not(.is-tall) .mc__viewer {
+  aspect-ratio: 16 / 9;
+}
+.feature__body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 16px clamp(28px, 4vw, 56px);
+  align-items: end;
+  margin-top: 26px;
+}
+.feature__head {
+  display: block;
+}
+.feature__name {
+  margin-top: 10px;
+}
+.feature__text {
+  margin-top: 0;
+}
+.feature__body .card__foot {
+  margin-top: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .feature__body {
+    grid-template-columns: 1fr;
+  }
+}
+/* Southwark row reads text first */
+@media (min-width: 901px) {
+  .card--flip .card__link {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+  }
+  .card--flip .card__visual {
+    order: 2;
+  }
+}
+/* Case sheet header separates from scrolled content */
+.case__top {
+  box-shadow: 0 10px 18px -16px rgba(12, 27, 36, 0.5);
+}
+/* Hero fits a 900px screen with the title block in view */
+.hero {
+  padding-top: calc(var(--nav-h) + clamp(28px, 4.5vw, 64px));
+}
+.titleblock {
+  margin-top: clamp(36px, 4.5vw, 60px);
+}
+@media (min-width: 901px) {
+  .portrait {
+    max-width: 340px;
+    justify-self: end;
+  }
+}

@@ -190,7 +190,7 @@
       var SY = tall ? 334 : 340;
       var PNL = tall ? { x: 16, y: 352, w: 308, h: 350, cx: 28, cw: 284, ch: 46, pitch: 54, y0: 394 } : { x: 316, y: 20, w: 264, h: 335, cx: 328, cw: 240, ch: 52, pitch: 58, y0: 60 };
       tx(svg, M.x, tall ? 28 : 30, "676 PROCUREMENT SOURCES", "s-mono");
-      tx(svg, M.x, tall ? 44 : 48, "SECTOR · HIGH SPEED RAIL AND METRO", "s-mono s-dim");
+      tx(svg, M.x, tall ? 44 : 48, "SECTOR · RAIL AND METRO", "s-mono s-dim");
       var g = h("g", null, svg), dots = [];
       for (var i = 0; i < WD.d.length; i += 2) {
         var x = M.x + (WD.d[i] + 0.5) * pitch, y = M.y + (WD.d[i + 1] + 0.5) * pitch;
@@ -288,7 +288,7 @@
           var fp = P(t, t0, t0 + 0.7, E.inOut);
           var y = lerp(PNL.y0 + c.slot * PNL.pitch, PNL.y0 + c.rank * PNL.pitch, P(t, 6.5, 7.4, E.inOut));
           var x0 = c.p.x, y0 = c.p.y, x1 = c.rx, y1 = y + mid;
-          var mx = tall ? (x0 + x1) / 2 + 40 : (x0 + x1) / 2, my = tall ? (y0 + y1) / 2 : Math.min(y0, y1) - 30;
+          var mx = tall ? 352 : (x0 + x1) / 2, my = tall ? (y0 + y1) / 2 : Math.min(y0, y1) - 30;
           set(c.fly, "cx", quad(x0, mx, x1, fp).toFixed(1));
           set(c.fly, "cy", quad(y0, my, y1, fp).toFixed(1));
           op(c.fly, t > t0 && fp < 1 ? 1 : 0);
@@ -312,13 +312,13 @@
     dur: 11,
     still: 8.8,
     beats: [[0, 0], [3.9, 1], [6.9, 2]],
-    size: { wide: [600, 375], tall: [340, 670] },
+    size: { wide: [600, 375], tall: [340, 700] },
     init: function (stage, mode) {
       var tall = mode === "tall";
-      var st = svgStage(stage, tall ? 340 : 600, tall ? 670 : 375, "gs" + mode);
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 700 : 375, "gs" + mode);
       var svg = st.svg;
       var L = tall ? { hx: 20, hy: 28, sx: 24, sy: 54, sp: 27, dbx: 268, dby: 64, out: 186 } : { hx: 24, hy: 30, sx: 28, sy: 62, sp: 34, dbx: 250, dby: 92, out: 166 };
-      var R = tall ? { x: 16, y: 300, w: 308, h: 360, rx: 28, rw: 284, y0: 340, pitch: 52 } : { x: 330, y: 20, w: 250, h: 335, rx: 342, rw: 226, y0: 58, pitch: 48 };
+      var R = tall ? { x: 16, y: 330, w: 308, h: 360, rx: 28, rw: 284, y0: 370, pitch: 52 } : { x: 330, y: 20, w: 250, h: 335, rx: 342, rw: 226, y0: 58, pitch: 48 };
       tx(svg, L.hx, L.hy, "270+ PUBLIC SOURCES", "s-mono");
       var sources = ["UK PORTALS", "EU PORTALS", "US PORTALS", "DEVELOPMENT BANKS", "OCDS PUBLISHERS", "PERMITS", "SEC FILINGS", "INDUSTRY NEWS"];
       var srcEls = sources.map(function (s, i) {
@@ -338,6 +338,14 @@
       var runs = [], runH = [10, 14, 17, 21, 24, 27, 29, 31];
       for (var k = 0; k < 8; k++) runs.push(h("rect", { x: dbx - 32 + k * 8.4, y: dby + 196, width: 6, height: 0, rx: 1.5, fill: C.soft }, svg));
       tx(svg, dbx, dby + 212, "UPDATE RUNS", "s-mono s-dim", { "text-anchor": "middle" });
+      var TG = tall ? { x: 20, y: 300 } : { x: 24, y: 334 };
+      var tgLabel = tx(svg, TG.x, TG.y + 11, "YOUR TARGETS", "s-mono s-dim");
+      var tgx = TG.x + 92, targets = [];
+      ["COMMERCIAL", "INFRASTRUCTURE"].forEach(function (name) {
+        var c = chip(svg, tgx, TG.y, name, "mint");
+        targets.push(c.g);
+        tgx += c.w + 5;
+      });
       var claude = h("g", { opacity: 0 }, svg);
       h("rect", { x: dbx - 30, y: dby - 40, width: 60, height: 18, rx: 9, fill: "none", stroke: C.mint }, claude);
       tx(claude, dbx, dby - 27.5, "CLAUDE", "s-chip", { "text-anchor": "middle", fill: C.mint });
@@ -400,6 +408,8 @@
           set(bar, "height", hh.toFixed(1));
           set(bar, "y", (dby + 196 - hh).toFixed(1));
         });
+        targets.forEach(function (g, n) { op(g, (0.25 + 0.75 * P(t, 6.3 + n * 0.15, 6.6 + n * 0.15)) * fade + 0.25 * (1 - fade)); });
+        op(tgLabel, 0.6 + 0.4 * P(t, 6.3, 6.6));
         op(claude, (t > 4.2 && t < 7 ? 0.6 + 0.4 * Math.sin(t * 6) : P(t, 3.9, 4.2) * (1 - P(t, 7, 7.4))) * fade);
         rowEls.forEach(function (row, i) {
           var t0 = 3.9 + i * 0.3;
@@ -490,9 +500,11 @@
         ctx.globalAlpha = 1;
       }
 
+      var OX_END = G.ox;
       return function (t) {
         cv.begin();
         var fade = 1 - P(t, 10.2, 10.8, E.inOut);
+        if (!tall) G.ox = lerp(300, OX_END, P(t, 6.5, 7.2, E.inOut) * fade);
         ctx.lineWidth = 0.6;
         ctx.strokeStyle = "rgba(143,166,176,0.18)";
         for (var k = 0; k <= N; k++) {
@@ -600,7 +612,7 @@
       var svg = st.svg;
       var Lg = h("g", tall ? { transform: "translate(-4 0) scale(0.92)" } : null, svg);
       var Rg = h("g", tall ? { transform: "translate(-238 330) scale(0.98)" } : null, svg);
-      tx(Lg, 24, 30, "SAMPLE PALETTE · LAB AND WORKPLACE", "s-mono");
+      tx(Lg, 24, 30, "ILLUSTRATIVE VERDICTS · LAB AND WORKPLACE", "s-mono");
       ["LBC", "WELL", "BRIEF"].forEach(function (c, i) {
         tx(Lg, 247 + i * 48, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
       });
@@ -704,23 +716,23 @@
     dur: 10.8,
     still: 8.8,
     beats: [[0, 0], [3.0, 1], [5.6, 2]],
-    size: { wide: [600, 375], tall: [340, 620] },
+    size: { wide: [600, 375], tall: [340, 556] },
     init: function (stage, mode) {
       var tall = mode === "tall";
-      var st = svgStage(stage, tall ? 340 : 600, tall ? 620 : 375, "wn" + mode);
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 556 : 375, "wn" + mode);
       var svg = st.svg;
       var wires = h("g", null, svg);
       var LAY = tall
-        ? { refs: [[8, 14], [8, 124], [8, 234]], rw: 144, rh: 96, an: [[170, 40], [170, 212]], aw: 146, ah: 122, pres: [8, 360, 324, 248], cols: 3, tw: 94, th: 56 }
+        ? { refs: [[6, 12], [117, 12], [228, 12]], rw: 106, rh: 78, an: [[176, 130], [6, 130]], aw: 158, ah: 112, pres: [6, 294, 328, 250], cols: 3, tw: 96, th: 56 }
         : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
         h("rect", { x: x, y: y, width: w, height: hh, rx: 9, fill: C.panel, stroke: C.line }, g);
         h("rect", { x: x, y: y, width: w, height: 3, rx: 1.5, fill: kind === "a" ? C.mint : kind === "p" ? C.sky : C.soft }, g);
-        tx(g, x + 12, y + 22, title, tall ? "s-ui s-ui-sm" : "s-ui");
+        tx(g, x + 12, y + 22, title, tall ? (kind === "r" ? "s-ui s-ui-xs" : "s-ui s-ui-sm") : "s-ui");
         return g;
       }
-      var refs = ["Building survey", "Workshop notes", "Energy use 2023–25"].map(function (title, i) {
+      var refs = ["Building survey", "Workshop notes", tall ? "Energy use" : "Energy use 2023–25"].map(function (title, i) {
         var x = LAY.refs[i][0], y = LAY.refs[i][1], w = LAY.rw, hh = LAY.rh;
         var g = node(x, y, w, hh, title, "r");
         var inner = w - 24;
@@ -730,7 +742,7 @@
         }
         if (i === 1) for (var m = 0; m < 5; m++) h("rect", { x: x + 12, y: y + 34 + m * 8, width: inner * (1 - (m % 3) * 0.16), height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
         if (i === 2) for (var n = 0; n < 9; n++) { var bh = 8 + ((n * 7) % 26); h("rect", { x: x + 12 + n * (inner / 9), y: y + hh - 10 - bh, width: inner / 9 - 5, height: bh, rx: 1.5, fill: "rgba(143,220,210,0.55)" }, g); }
-        return { g: g, out: [x + w, y + hh / 2] };
+        return { g: g, out: tall ? [x + w / 2, y + hh] : [x + w, y + hh / 2] };
       });
       var an = ["Retrofit opportunities", "Stakeholder priorities"].map(function (title, i) {
         var x = LAY.an[i][0], y = LAY.an[i][1], w = LAY.aw;
@@ -777,15 +789,27 @@
         var dx = (b[0] - a[0]) * 0.5;
         return "M" + a[0] + " " + a[1] + " C" + (a[0] + dx) + " " + a[1] + " " + (b[0] - dx) + " " + b[1] + " " + b[0] + " " + b[1];
       }
-      var w1 = [wire(across(refs[0].out, an[0].in)), wire(across(refs[2].out, an[0].in)), wire(across(refs[1].out, an[1].in)), wire(across(refs[0].out, an[1].in))];
-      var w2;
+      function down(a, b) {
+        var dy = (b[1] - a[1]) * 0.5;
+        return "M" + a[0] + " " + a[1] + " C" + a[0] + " " + (a[1] + dy) + " " + b[0] + " " + (b[1] - dy) + " " + b[0] + " " + b[1];
+      }
+      var w1, w2;
       if (tall) {
-        var a0 = an[0], a1 = an[1], ex = a0.x + LAY.aw;
+        var a0 = an[0], a1 = an[1];
+        w1 = [
+          wire(down(refs[0].out, [a0.x + 44, a0.y])),
+          wire(down(refs[2].out, [a0.x + 114, a0.y])),
+          wire(down(refs[1].out, [a1.x + 114, a1.y])),
+          wire(down(refs[0].out, [a1.x + 44, a1.y])),
+        ];
         w2 = [
-          wire("M" + ex + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (PY - 20) + " Q" + (ex + 8) + " " + (PY - 12) + " " + (ex - 2) + " " + (PY - 12) + " L" + (a1.x + LAY.aw / 2 + 8) + " " + (PY - 12) + " Q" + (a1.x + LAY.aw / 2) + " " + (PY - 12) + " " + (a1.x + LAY.aw / 2) + " " + PY),
-          wire("M" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah) + " L" + (a1.x + LAY.aw / 2) + " " + PY),
+          wire(down([a0.x + LAY.aw / 2, a0.y + LAY.ah], [PX + PW * 0.74, PY])),
+          wire(down([a1.x + LAY.aw / 2, a1.y + LAY.ah], [PX + PW * 0.26, PY])),
         ];
       } else {
+        w1 = [wire(across(refs[0].out, an[0].in)), wire(across(refs[2].out, an[0].in)), wire(across(refs[1].out, an[1].in)), wire(across(refs[0].out, an[1].in))];
+      }
+      if (!tall) {
         w2 = [wire(across([an[0].x + LAY.aw, an[0].y + 56], [PX, PY + 76])), wire(across([an[1].x + LAY.aw, an[1].y + 56], [PX, PY + 146]))];
       }
       function runWires(ws, t, t0) {
