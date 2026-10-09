@@ -3039,3 +3039,57 @@ button {
     min-height: 2.6em;
   }
 }
+/* Featured story: the chat never sets the panel height, so the page holds still */
+.feature .mc:not(.is-tall) .mc__chat {
+  height: 0;
+  min-height: 100%;
+}
+@media (max-width: 1000px) {
+  .feature .mc:not(.is-tall) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .feature .mc:not(.is-tall) .mc__viewer {
+    aspect-ratio: 4 / 3;
+  }
+  .feature .mc:not(.is-tall) .mc__chat {
+    height: 280px;
+    min-height: 0;
+    border-left: 0;
+    border-top: 1px solid var(--ink-line);
+  }
+}
+/* Open phone menu keeps paper and ink over dark sections */
+@media (max-width: 900px) {
+  .nav.is-open,
+  .nav.is-open.is-dark.is-solid {
+    background: var(--paper);
+    color: var(--ink);
+  }
+}
+.beats > span {
+  text-wrap: balance;
+}
+.compare td {
+  text-wrap: pretty;
+}
+.case__ask {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+@media (max-width: 640px) {
+  .case__ask {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+}
+@media (min-width: 641px) and (max-width: 1100px) {
+  .offer {
+    grid-template-columns: 40px minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .offer__head {
+    grid-column: 2 / -1;
+  }
+  .offer__body {
+    grid-column: 2;
+  }
+}

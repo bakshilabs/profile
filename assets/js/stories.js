@@ -1038,8 +1038,9 @@
         ctx.strokeStyle = C.mint; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = "#fff";
         ctx.font = font(26, "serif", 400);
-        ctx.fillText(fmt(4160 * slider), L, ry + 124);
-        ctx.fillText((7.1 * slider).toFixed(1) + " kt/yr", L + sw * 0.52, ry + 124);
+        // at the atlas's default weights, with carbon value at 30
+        ctx.fillText(fmt(4079 * slider), L, ry + 124);
+        ctx.fillText((6.6 * slider).toFixed(1) + " kt/yr", L + sw * 0.52, ry + 124);
         ctx.fillStyle = C.mist;
         ctx.font = font(10, "mono", 500);
         ctx.strokeStyle = C.mint;
