@@ -62,6 +62,9 @@
       var el = document.getElementById(id);
       if (el) io.observe(el);
     });
+    // The hero has no link, so reaching it clears the highlight.
+    var hero = document.getElementById("top");
+    if (hero) io.observe(hero);
   }
 
   /* Hero network: hubs on a loose ring around a glowing core, slowly turning */
