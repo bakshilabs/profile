@@ -119,7 +119,8 @@
     stage.appendChild(c);
     var ctx = c.getContext("2d");
     var bg = document.createElement("canvas");
-    var api = { ctx: ctx, w: w, h: hgt, scale: 1, dirty: true };
+    var api = { ctx: ctx, w: w, h: hgt, scale: 1, dirty: true, redraw: null };
+    stage.__canvasApi = api;
     function fit() {
       var r = stage.getBoundingClientRect();
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -133,6 +134,7 @@
       b.fillStyle = "rgba(143,166,176,0.16)";
       for (var x = 1; x < w; x += 16) for (var y = 1; y < hgt; y += 16) b.fillRect(x - 0.6, y - 0.6, 1.2, 1.2);
       api.dirty = true;
+      if (api.redraw) api.redraw();
     }
     fit();
     if ("ResizeObserver" in window) new ResizeObserver(fit).observe(stage);
@@ -1059,6 +1061,8 @@
       if (s.built) return;
       s.render = s.def.init(s.stage);
       s.built = true;
+      // a resized canvas is cleared, so draw the current frame again
+      if (s.stage.__canvasApi) s.stage.__canvasApi.redraw = function () { s.render(s.t); };
     }
     function beat(s, t) {
       var idx = 0, from = 0, to = s.def.dur;
@@ -1077,12 +1081,14 @@
     }
     function still(s) {
       build(s);
-      s.render(s.def.still);
-      beat(s, s.def.still);
+      s.t = s.def.still;
+      s.render(s.t);
+      beat(s, s.t);
     }
 
     if (reduce || !("IntersectionObserver" in window)) {
       live.forEach(still);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { live.forEach(still); });
       return;
     }
 
