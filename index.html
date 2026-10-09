@@ -17,8 +17,10 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preload" href="assets/fonts/newsreader-var.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/plex-mono-500.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="assets/css/site.css" />
     <script src="assets/js/site.js" defer></script>
+    <script src="assets/js/stories.js" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -50,7 +52,7 @@
           <div class="hero__copy">
             <p class="kicker">Claude training and tool building for AEC teams</p>
             <h1 class="hero__title" id="hero-title">I teach architecture and engineering teams to use Claude on their own projects, then <em>build the tools they ask&nbsp;for.</em></h1>
-            <p class="hero__sub">I was an Associate Partner at Foster + Partners until 2026. I now run hands-on Claude training for architecture, engineering and property practices, and I build tools with their teams for bid searches, BIM queries, energy models and retrofit planning.</p>
+            <p class="hero__sub">I was an Associate Partner at Foster + Partners until 2026. The tools I build with architecture, engineering and property teams cover bid searches, BIM queries, energy models and retrofit planning.</p>
             <div class="hero__actions">
               <a class="btn btn--dark" href="#contact">Start a conversation <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
               <a class="btn btn--line" href="#work">See the seven tools</a>
@@ -71,19 +73,6 @@
         </div>
       </section>
 
-      <section class="firms" data-tone="light" aria-label="Previous practices">
-        <div class="wrap firms__inner">
-          <p class="label">Previously at</p>
-          <ul class="firms__list">
-            <li>Rafael Viñoly Architects</li>
-            <li>Werner Sobek</li>
-            <li>WSP</li>
-            <li>SOM</li>
-            <li>Foster + Partners</li>
-          </ul>
-        </div>
-      </section>
-
       <section class="section section--ink" id="work" data-tone="dark" aria-labelledby="work-title">
         <div class="wrap">
           <header class="head">
@@ -92,73 +81,81 @@
             <p class="head__lede">Each one started as a slow, manual task that a team described to me. Five of them run in your browser today. The other two need a local server or a Claude login, so you can watch them in recorded walkthroughs.</p>
           </header>
 
-          <article class="feature">
+          <article class="feature story-card">
             <a class="feature__media" href="#modelchat" data-case="modelchat" aria-label="ModelChat case study">
-              <span class="feature__chrome" aria-hidden="true"><i></i><i></i><i></i><span>ModelChat</span></span>
-              <video class="feature__video" muted loop playsinline preload="none" poster="assets/img/posters/modelchat-loop.jpg" data-autoplay data-src="assets/video/modelchat-loop.mp4" data-src-webm="assets/video/modelchat-loop.webm" aria-hidden="true"></video>
+              <div class="mc story" data-story="modelchat" role="img" aria-label="A question about Level 03 is typed into the chat, Claude calls its model tools, and the 3D viewer isolates the floor and reports its area. A follow-up shows only the columns.">
+                <div class="mc__viewer"></div>
+                <div class="mc__chat"><p class="mc__head"><span>ModelChat</span><i></i><em>Index loaded</em></p><div class="mc__log"></div></div>
+              </div>
             </a>
             <div class="feature__body">
-              <p class="card__meta"><span class="card__num">03</span>Design · BIM model queries</p>
+              <p class="card__meta">Design · BIM model queries</p>
               <h3 class="feature__name">ModelChat</h3>
               <p class="feature__text">Ask an IFC model a question in plain English. Claude answers by calling 14 tools that query the model and drive the 3D viewer, so the floor you asked about is isolated and measured while you read the answer.</p>
-              <p class="card__stat"><b>14</b>tools Claude can call</p>
+              <span class="beats beats--list" aria-hidden="true"><span>Ask in plain English</span><span>Claude calls model tools</span><span>The viewer shows the answer</span></span>
               <a class="btn btn--light" href="#modelchat" data-case="modelchat">Read the case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             </div>
           </article>
 
           <ol class="cards">
-          <li class="card">
-            <a class="card__link" href="#strategic-project-discovery" data-case="strategic-project-discovery">
-              <span class="card__media"><img src="assets/img/cards/strategic-project-discovery.jpg" width="1400" height="875" alt="Strategic Project Discovery interface" loading="lazy" decoding="async" /></span>
-              <span class="card__meta"><span class="card__num">01</span>Win work · Live project search</span>
-              <span class="card__name">Strategic Project Discovery</span>
-              <span class="card__text">It searches 676 procurement sources across seven sectors and scores every result for sector, scale and geography fit.</span>
-              <span class="card__foot"><span class="card__stat"><b>676</b>procurement sources</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-            </a>
-          </li>
-          <li class="card">
+          <li class="card story-card">
             <a class="card__link" href="#growthsignal" data-case="growthsignal">
-              <span class="card__media"><img src="assets/img/cards/growthsignal.jpg" width="1400" height="875" alt="GrowthSignal interface" loading="lazy" decoding="async" /></span>
-              <span class="card__meta"><span class="card__num">02</span>Win work · Bid-intelligence database</span>
+              <span class="card__media story" data-story="growthsignal" role="img" aria-label="Records stream from eight kinds of public source into one database, Claude tags each one, and the pipeline re-ranks against a firm’s targets."><span class="story__stage"></span><noscript><img src="assets/img/cards/growthsignal.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+              <span class="beats" aria-hidden="true"><span>Collect 270+ sources</span><span>Claude tags each record</span><span>Rank against your targets</span></span>
+              <span class="card__meta">Win work · Bid-intelligence database</span>
               <span class="card__name">GrowthSignal</span>
-              <span class="card__text">It collects about 58,000 public tenders and programmes from more than 270 sources, and Claude tags every record with sector, stage, value and location.</span>
+              <span class="card__text">About 58,000 public tenders and programmes from more than 270 sources land in one database, and Claude tags each with sector, stage, value and location.</span>
               <span class="card__foot"><span class="card__stat"><b>58,000</b>tenders and programmes</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
             </a>
           </li>
-          <li class="card">
+          <li class="card story-card">
+            <a class="card__link" href="#strategic-project-discovery" data-case="strategic-project-discovery">
+              <span class="card__media story" data-story="strategic-project-discovery" role="img" aria-label="A scan sweeps across 676 procurement sources, five matches move into a results list, and each is scored and ranked for fit."><span class="story__stage"></span><noscript><img src="assets/img/cards/strategic-project-discovery.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+              <span class="beats" aria-hidden="true"><span>Search 676 sources</span><span>Collect the matches</span><span>Score each for fit</span></span>
+              <span class="card__meta">Win work · Live project search</span>
+              <span class="card__name">Strategic Project Discovery</span>
+              <span class="card__text">A bid team searches 676 procurement sources in one scan and sees each result scored for sector, scale and geography fit.</span>
+              <span class="card__foot"><span class="card__stat"><b>676</b>procurement sources</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            </a>
+          </li>
+          <li class="card story-card">
             <a class="card__link" href="#reference-buildings-explorer" data-case="reference-buildings-explorer">
-              <span class="card__media"><img src="assets/img/cards/reference-buildings-explorer.jpg" width="1400" height="875" alt="Reference Buildings Explorer interface" loading="lazy" decoding="async" /></span>
-              <span class="card__meta"><span class="card__num">04</span>Design · Energy modelling</span>
+              <span class="card__media story" data-story="reference-buildings-explorer" role="img" aria-label="An energy city of 256 building and climate models rises, a section plane slices one climate, and one building’s site energy intensity is read out."><span class="story__stage"></span><noscript><img src="assets/img/cards/reference-buildings-explorer.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+              <span class="beats" aria-hidden="true"><span>Raise 256 models</span><span>Slice one climate</span><span>Read one result</span></span>
+              <span class="card__meta">Design · Energy modelling</span>
               <span class="card__name">Reference Buildings Explorer</span>
-              <span class="card__text">It shows EnergyPlus geometry and results for 16 US DOE reference building types in 16 climates, across six interactive 3D views.</span>
+              <span class="card__text">Sixteen US DOE reference building types in sixteen climates become six interactive 3D views of EnergyPlus geometry and results.</span>
               <span class="card__foot"><span class="card__stat"><b>256</b>building and climate models</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
             </a>
           </li>
-          <li class="card">
+          <li class="card story-card">
             <a class="card__link" href="#materialscan" data-case="materialscan">
-              <span class="card__media"><img src="assets/img/cards/materialscan.jpg" width="1400" height="875" alt="MaterialScan interface" loading="lazy" decoding="async" /></span>
-              <span class="card__meta"><span class="card__num">05</span>Design · Material compliance</span>
+              <span class="card__media story" data-story="materialscan" role="img" aria-label="Each section of a material palette is scored against LBC 4.1, WELL v2 and the client brief, and the open evidence gaps are ranked."><span class="story__stage"></span><noscript><img src="assets/img/cards/materialscan.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+              <span class="beats" aria-hidden="true"><span>Read the evidence</span><span>Score three standards</span><span>Rank the open gaps</span></span>
+              <span class="card__meta">Design · Material compliance</span>
               <span class="card__name">MaterialScan</span>
-              <span class="card__text">It scores every product in a lab and workplace project’s material palette against LBC 4.1, WELL v2 and the client brief.</span>
-              <span class="card__foot"><span class="card__stat"><b>3</b>standards per product</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+              <span class="card__text">Every product in a lab and workplace palette is scored against LBC 4.1, WELL v2 and the client brief, with the evidence beside each verdict.</span>
+              <span class="card__foot"><span class="card__stat"><b>3</b>standards: LBC 4.1, WELL v2, client brief</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
             </a>
           </li>
-          <li class="card">
+          <li class="card story-card">
             <a class="card__link" href="#worknodescanvas" data-case="worknodescanvas">
-              <span class="card__media"><img src="assets/img/cards/worknodescanvas.jpg" width="1400" height="875" alt="WorkNodesCanvas interface" loading="lazy" decoding="async" /></span>
-              <span class="card__meta"><span class="card__num">06</span>Deliver · Document workbench</span>
+              <span class="card__media story" data-story="worknodescanvas" role="img" aria-label="Three source documents are wired into two Claude analyses, which are wired into a client deck that builds slide by slide."><span class="story__stage"></span><noscript><img src="assets/img/cards/worknodescanvas.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+              <span class="beats" aria-hidden="true"><span>Wire in the sources</span><span>Claude analyses them</span><span>Build the deck</span></span>
+              <span class="card__meta">Deliver · Document workbench</span>
               <span class="card__name">WorkNodesCanvas</span>
-              <span class="card__text">It wires source documents into Claude analyses, and analyses into finished PPTX decks, DOCX reports and web pages.</span>
-              <span class="card__foot"><span class="card__stat"><b>3</b>output formats</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+              <span class="card__text">Surveys, workshop notes and meter data feed Claude analyses, which feed finished PPTX decks, DOCX reports and web pages.</span>
+              <span class="card__foot"><span class="card__stat"><b>3</b>outputs: PPTX, DOCX and HTML</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
             </a>
           </li>
-          <li class="card">
+          <li class="card story-card">
             <a class="card__link" href="#southwark-retrofit-atlas" data-case="southwark-retrofit-atlas">
-              <span class="card__media"><img src="assets/img/cards/southwark-retrofit-atlas.jpg" width="1400" height="875" alt="Southwark Retrofit Atlas interface" loading="lazy" decoding="async" /></span>
-              <span class="card__meta"><span class="card__num">07</span>Portfolio · Housing retrofit</span>
+              <span class="card__media story" data-story="southwark-retrofit-atlas" role="img" aria-label="Southwark’s homes appear coloured by EPC band, the 56,873 below band C are costed, and a £47.0m budget funds 4,079 homes in priority order."><span class="story__stage"></span><noscript><img src="assets/img/cards/southwark-retrofit-atlas.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+              <span class="beats" aria-hidden="true"><span>Map every home</span><span>Cost each package</span><span>Fund the best first</span></span>
+              <span class="card__meta">Portfolio · Housing retrofit</span>
               <span class="card__name">Southwark Retrofit Atlas</span>
-              <span class="card__text">It costs a retrofit package for each of Southwark’s 149,062 homes and shows what a fixed budget buys in homes, carbon and cost per tonne.</span>
-              <span class="card__foot"><span class="card__stat"><b>149,062</b>homes costed</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+              <span class="card__text">56,873 of Southwark’s 149,062 homes sit below EPC C, and 86% of them can reach it for a median £5.8k.</span>
+              <span class="card__foot"><span class="card__stat"><b>£5.8k</b>median cost to reach EPC C</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
             </a>
           </li>
           </ol>
@@ -169,8 +166,7 @@
         <div class="wrap">
           <header class="head">
             <p class="label">Method</p>
-            <h2 class="head__title" id="method-title">A licence gives a team access to Claude. Practice on their own projects is what gets them using it.</h2>
-            <p class="head__lede">Every engagement follows the same three moves. I train people on their real work, I listen to the questions they ask, and I build the tools those questions point to.</p>
+            <h2 class="head__title" id="method-title">Teams start using their Claude licences once they have practised on their own projects.</h2>
           </header>
           <ol class="moves">
             <li class="move">
@@ -184,7 +180,7 @@
               </svg>
               <p class="move__n">01</p>
               <h3 class="move__title">Train on the team’s own work</h3>
-              <p>I build each session around documents and tasks the team already has, such as research, document analysis, reports, proposals and project administration. A typical exercise has Claude organise points gathered from several documents, and the consultant review the result before it goes into their normal workflow.</p>
+              <p>I build each session around work the team already does: research, document analysis, reports, proposals and project administration. In a typical exercise Claude pulls the key points out of several documents, and the consultant checks the summary before it goes into their normal workflow.</p>
             </li>
             <li class="move">
               <svg class="move__fig" viewBox="0 0 320 150" aria-hidden="true">
@@ -196,7 +192,7 @@
               </svg>
               <p class="move__n">02</p>
               <h3 class="move__title">Collect the questions people ask</h3>
-              <p>Training produces questions such as “Could it compare these two specs?” and “Where did I solve this before?”. Grouped together, they show which workflows are worth changing, for example document review or a knowledge assistant for past projects.</p>
+              <p>During training people ask questions such as “Could it compare these two specs?” and “Where did I solve this before?” Grouped together, those questions show which workflows are worth changing, for example document review or a knowledge assistant for past projects.</p>
             </li>
             <li class="move">
               <svg class="move__fig" viewBox="0 0 320 150" aria-hidden="true">
@@ -208,7 +204,7 @@
               </svg>
               <p class="move__n">03</p>
               <h3 class="move__title">Build in short loops with the people who will use it</h3>
-              <p>I study the existing process, redesign the workflow and build a prototype. The people who will use it test it, I improve it, and it goes into use. The next problem then starts the loop again.</p>
+              <p>I study the existing process, redesign the workflow and build a prototype. The people who will use it test it, I improve it, and it goes into use.</p>
             </li>
           </ol>
         </div>
@@ -257,7 +253,7 @@
                 <h3 class="offer__title">Embedded engineer</h3>
                 <p class="offer__when">Choose this when a larger team has a steady stream of workflows to improve.</p>
               </div>
-              <p class="offer__body">An architect or engineer from Bakshi Labs works inside your team two or three days a week. Each week runs through the same cycle of understanding, building, testing, improving and teaching.</p>
+              <p class="offer__body">An architect or engineer from my team works inside yours two or three days a week. Each week runs through the same cycle of understanding, building, testing, improving and teaching.</p>
               <p class="offer__out"><span>You leave with</span>Tools built inside the team’s own process, and people who know how to run them.</p>
             </li>
           </ol>
@@ -269,7 +265,14 @@
           <div class="about__side">
             <p class="label">About</p>
             <h2 class="about__name" id="about-title">Arpan Bakshi</h2>
-            <p class="about__role">Claude training and tool building for AEC teams</p>
+            <ol class="career">
+              <li><span class="career__year">2008</span><span class="career__org">Rafael Viñoly Architects</span><span class="career__role">Computational and environmental designer, New York</span></li>
+              <li><span class="career__year">2010</span><span class="career__org">Werner Sobek</span><span class="career__role">Sustainability consultant, Stuttgart</span></li>
+              <li><span class="career__year">2010</span><span class="career__org">WSP</span><span class="career__role">Sustainability manager, New York</span></li>
+              <li><span class="career__year">2013</span><span class="career__org">SOM</span><span class="career__role">High-performance design lead, New York</span></li>
+              <li><span class="career__year">2015</span><span class="career__org">Foster + Partners</span><span class="career__role">Associate, then Associate Partner, London</span></li>
+              <li class="is-now"><span class="career__year">2026</span><span class="career__org">Atlas Learn and Bakshi Labs</span><span class="career__role">Co-founder of Atlas Learn and founder of Bakshi Labs, London</span></li>
+            </ol>
           </div>
           <div class="about__bio">
             <p class="about__lead">I have spent eighteen years working on buildings, first on their environmental performance and now on the tools and habits of the teams who design them.</p>
@@ -277,14 +280,6 @@
             <p>At Foster + Partners from 2015 to 2026 I managed environmental strategy, microclimate analytics and computational modelling on international projects, and I led a technology team that built digital tools for the firm’s design and consulting work. As Associate Partner I co-created a strategic advisory service line and won a multi-year contract to write a sustainability vision plan for a global pharmaceutical company’s property portfolio.</p>
             <p>In 2026 I co-founded Atlas Learn. Its hands-on workshops in Central London have trained more than 250 senior professionals to use Claude Code and Cowork, and I have designed AI training for a consultancy’s leadership team and a FinTech board. Bakshi Labs is where I take that training into practice with AEC teams.</p>
           </div>
-          <ol class="career">
-            <li><span class="career__year">2008</span><span class="career__org">Rafael Viñoly Architects</span><span class="career__role">Computational and environmental designer, New York</span></li>
-            <li><span class="career__year">2010</span><span class="career__org">Werner Sobek</span><span class="career__role">Sustainability consultant, Stuttgart</span></li>
-            <li><span class="career__year">2010</span><span class="career__org">WSP</span><span class="career__role">Sustainability manager, New York</span></li>
-            <li><span class="career__year">2013</span><span class="career__org">SOM</span><span class="career__role">High performance design lead, New York</span></li>
-            <li><span class="career__year">2015</span><span class="career__org">Foster + Partners</span><span class="career__role">Associate, then Associate Partner, London</span></li>
-            <li class="is-now"><span class="career__year">2026</span><span class="career__org">Atlas Learn and Bakshi Labs</span><span class="career__role">Co-founder of Atlas Learn and founder of Bakshi Labs, London</span></li>
-          </ol>
         </div>
       </section>
 
@@ -293,19 +288,16 @@
           <header class="head">
             <p class="label">Contact</p>
             <h2 class="head__title contact__title" id="contact-title">Tell me where the work slows down.</h2>
-            <p class="head__lede">These four questions are a good place to start. A first conversation ends with one priority and a date for the first working session.</p>
+            <p class="head__lede">Bring the question closest to your team’s work. A first conversation ends with one priority and a date for the first working session.</p>
           </header>
           <ol class="prompts">
-            <li><span class="prompts__area">Portfolio and asset research</span><p>What are you trying to learn, compare or publish?</p></li>
-            <li><span class="prompts__area">Existing buildings and retrofit</span><p>Which decisions take longest or depend on manual analysis?</p></li>
-            <li><span class="prompts__area">Practice operations</span><p>Where does information move repeatedly between people, files and formats?</p></li>
-            <li><span class="prompts__area">Marketing and growth</span><p>Which research, proposals or content are hard to repeat at the standard you want?</p></li>
+            <li><span class="prompts__area">Winning work</span><p>Which bids does your team find too late?</p></li>
+            <li><span class="prompts__area">Design</span><p>Which design checks still depend on someone reading a model by hand?</p></li>
+            <li><span class="prompts__area">Delivery</span><p>Which reports does your team rebuild from the same sources every month?</p></li>
+            <li><span class="prompts__area">Portfolio</span><p>Which retrofit decisions are waiting on analysis nobody has time to run?</p></li>
           </ol>
           <div class="reach">
-            <p class="reach__text">The code and project pages for all seven tools are on GitHub.</p>
-            <div class="reach__links">
-              <a class="btn btn--light" href="https://github.com/bakshi-labs" target="_blank" rel="noopener">Bakshi Labs on GitHub <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
+            <a class="reach__link" href="https://github.com/bakshi-labs" target="_blank" rel="noopener">The code and project pages for all seven tools are on GitHub <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
         </div>
       </section>
@@ -322,72 +314,57 @@
       </div>
     </footer>
 
-    <dialog class="case" id="strategic-project-discovery" aria-labelledby="strategic-project-discovery-title" data-case-dialog>
+    <dialog class="case" id="modelchat" aria-labelledby="modelchat-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>01</span>Win work · Live project search</p>
-          <button class="case__close" type="button" data-close><span class="sr-only">Close Strategic Project Discovery case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <p class="case__label">Design · BIM model queries</p>
+          <button class="case__close" type="button" data-close><span class="sr-only">Close ModelChat case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
-        <h2 class="case__title" id="strategic-project-discovery-title">Strategic Project Discovery searches live procurement sources</h2>
+        <h2 class="case__title" id="modelchat-title">ModelChat answers plain-English questions about a BIM model</h2>
         <div class="case__body">
           <figure class="walk" data-walk>
             <div class="walk__frame">
-              <div class="walk__chrome" aria-hidden="true"><i></i><i></i><i></i><span>Strategic Project Discovery</span></div>
+              <div class="walk__chrome" aria-hidden="true"><i></i><i></i><i></i><span>ModelChat</span></div>
               <div class="walk__stage">
-                <img class="walk__img is-active" src="assets/img/work/strategic-project-discovery-step1.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 1: Opportunities" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step2.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 2: Fit assessment" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step3.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 3: Region" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step4.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 4: All sectors" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step5.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 5: World map" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step6.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 6: Sources" loading="lazy" decoding="async" />
-                <video class="walk__video" playsinline controls preload="none" poster="assets/img/posters/strategic-project-discovery.jpg" data-src="assets/video/strategic-project-discovery.mp4"></video>
+                <img class="walk__img is-active" src="assets/img/work/modelchat-step1.jpg" width="1400" height="649" alt="ModelChat, step 1: Load a model" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/modelchat-step2.jpg" width="1400" height="649" alt="ModelChat, step 2: Navigate" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/modelchat-step3.jpg" width="1400" height="649" alt="ModelChat, step 3: Ask a question" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/modelchat-step4.jpg" width="1400" height="649" alt="ModelChat, step 4: The viewer responds" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/modelchat-step5.jpg" width="1400" height="649" alt="ModelChat, step 5: Follow-up" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/modelchat-step6.jpg" width="1400" height="649" alt="ModelChat, step 6: Back to the building" loading="lazy" decoding="async" />
+                <video class="walk__video" playsinline controls preload="none" poster="assets/img/posters/modelchat.jpg" data-src="assets/video/modelchat.mp4" data-start="3.9"></video>
               </div>
             </div>
             <div class="walk__bar">
-              <ol class="walk__steps" aria-label="Strategic Project Discovery walkthrough steps">
-              <li><button class="walk__step" type="button" aria-pressed="true" data-desc="A scan of High Speed Rail and Metro lists stage, urgency, value, deadline and source for each result."><span class="walk__n">01</span><span class="walk__t">Opportunities</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Each result gets a sector, scale and geography fit, an estimated win probability and a one-line verdict."><span class="walk__n">02</span><span class="walk__t">Fit assessment</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="The scan narrows to one region and runs again."><span class="walk__n">03</span><span class="walk__t">Region</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="One click scans all seven sectors in turn."><span class="walk__n">04</span><span class="walk__t">All sectors</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Every opportunity is plotted on a map and coloured by urgency."><span class="walk__n">05</span><span class="walk__t">World map</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="The 676 sources sit in 36 categories, and each scan uses exactly the ones you select."><span class="walk__n">06</span><span class="walk__t">Sources</span></button></li>
+              <ol class="walk__steps" aria-label="ModelChat walkthrough steps">
+              <li><button class="walk__step" type="button" aria-pressed="true" data-desc="A 10,600-element timber office, exported from Revit as IFC, is preprocessed once and then cached."><span class="walk__n">01</span><span class="walk__t">Load a model</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="You orbit the model and use the view cube to snap to any of 26 views."><span class="walk__n">02</span><span class="walk__t">Navigate</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Claude answers by calling its model tools: queries on the index and actions in the viewer."><span class="walk__n">03</span><span class="walk__t">Ask a question</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="The floor is isolated and framed while the answer explains how its area was measured."><span class="walk__n">04</span><span class="walk__t">The viewer responds</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Follow-up questions keep the context, so the view narrows to the columns on every storey."><span class="walk__n">05</span><span class="walk__t">Follow-up</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Show all restores the full model and the home view."><span class="walk__n">06</span><span class="walk__t">Back to the building</span></button></li>
               </ol>
               <button class="walk__play" type="button" data-video-toggle aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z" fill="currentColor"/></svg><span>Demo video</span></button>
             </div>
-            <figcaption class="walk__caption" aria-live="polite">A scan of High Speed Rail and Metro lists stage, urgency, value, deadline and source for each result.</figcaption>
+            <figcaption class="walk__caption" aria-live="polite">A 10,600-element timber office, exported from Revit as IFC, is preprocessed once and then cached.</figcaption>
           </figure>
           <div class="case__text">
             <section class="case__problem">
               <h3 class="case__h">The problem</h3>
-              <p>Business development teams check the same procurement portals by hand, one sector at a time, and notices still slip through.</p>
+              <p>Getting an answer out of a BIM model usually needs a specialist and a desktop licence.</p>
             </section>
             <section class="case__built">
               <h3 class="case__h">What I built</h3>
-              <p>I built a single web page that runs a live search across 676 procurement sources in 36 categories. Each result is plotted on a world map with a fit assessment for sector, scale and geography, an estimated win probability and a one-line verdict.</p>
-              <p>It needs no server or database. The hosted version opens in demo mode with fictional opportunities, and a Gemini API key switches it to live searches.</p>
+              <p>I built a browser BIM viewer with a Claude chat panel. Claude answers by calling a fixed set of 14 tools: six query the model index for storeys, categories, spaces, properties and quantities, and eight act in the viewer to isolate, highlight, section and frame elements.</p>
+              <p>The test model is a ten-storey timber office from the NordicLCA project, exported from Revit as IFC4 with about 10,600 elements.</p>
             </section>
             <aside class="case__facts">
-              <div><h3 class="case__h">Built with</h3><ul class="case__stack"><li>React</li><li>Leaflet</li><li>Gemini with Google Search</li></ul></div>
-              <div><h3 class="case__h">Status</h3><p>Runs in your browser with sample data.</p></div>
-              <a class="btn btn--dark" href="https://bakshi-labs.github.io/StrategicProjectDiscovery-DeltaOps/" target="_blank" rel="noopener">Open the live tool <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+              <div><h3 class="case__h">Built with</h3><ul class="case__stack"><li>Three.js</li><li>web-ifc</li><li>Claude Code</li></ul></div>
+              <div><h3 class="case__h">Status</h3><p>Recorded from a local instance, because the chat runs through a local Claude Code login.</p></div>
+              <a class="btn btn--dark" href="https://bakshi-labs.github.io/ModelChat-DeltaOps/" target="_blank" rel="noopener">Open the project page <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             </aside>
           </div>
         </div>
-        <section class="case__more">
-          <h3 class="case__h">How the two business development tools compare</h3>
-          <div class="compare">
-            <table>
-              <thead><tr><th scope="col"><span class="sr-only">Criterion</span></th><th scope="col">Strategic Project Discovery</th><th scope="col">GrowthSignal</th></tr></thead>
-              <tbody>
-              <tr><th scope="row">How it works</th><td data-label="Strategic Project Discovery">A live web search across 676 procurement sources on each scan.</td><td data-label="GrowthSignal">Connectors collect about 58,000 records from 270+ sources on every update run.</td></tr>
-              <tr><th scope="row">Setup</th><td data-label="Strategic Project Discovery">One web page and an API key.</td><td data-label="GrowthSignal">A server, a SQLite database and a Claude login.</td></tr>
-              <tr><th scope="row">Coverage</th><td data-label="Strategic Project Discovery">Anything web search can reach, including portals without a connector.</td><td data-label="GrowthSignal">Connected sources only, with every record complete and de-duplicated.</td></tr>
-              <tr><th scope="row">Memory</th><td data-label="Strategic Project Discovery">Each scan stands alone and saves as a JSON file.</td><td data-label="GrowthSignal">Full history, with record updates, notes and duplicate merging.</td></tr>
-              <tr><th scope="row">Best for</th><td data-label="Strategic Project Discovery">A business development lead preparing for a pipeline meeting.</td><td data-label="GrowthSignal">A business development team running its pipeline every day.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
         <nav class="case__nav" aria-label="Other case studies">
           <a href="#southwark-retrofit-atlas" data-case="southwark-retrofit-atlas"><span>Previous</span>Southwark Retrofit Atlas</a>
           <a href="#growthsignal" data-case="growthsignal"><span>Next</span>GrowthSignal</a>
@@ -397,7 +374,7 @@
     <dialog class="case" id="growthsignal" aria-labelledby="growthsignal-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>02</span>Win work · Bid-intelligence database</p>
+          <p class="case__label">Win work · Bid-intelligence database</p>
           <button class="case__close" type="button" data-close><span class="sr-only">Close GrowthSignal case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
         <h2 class="case__title" id="growthsignal-title">GrowthSignal collects public tenders and programmes into one database</h2>
@@ -461,62 +438,77 @@
           </div>
         </section>
         <nav class="case__nav" aria-label="Other case studies">
-          <a href="#strategic-project-discovery" data-case="strategic-project-discovery"><span>Previous</span>Strategic Project Discovery</a>
-          <a href="#modelchat" data-case="modelchat"><span>Next</span>ModelChat</a>
+          <a href="#modelchat" data-case="modelchat"><span>Previous</span>ModelChat</a>
+          <a href="#strategic-project-discovery" data-case="strategic-project-discovery"><span>Next</span>Strategic Project Discovery</a>
         </nav>
       </div>
     </dialog>
-    <dialog class="case" id="modelchat" aria-labelledby="modelchat-title" data-case-dialog>
+    <dialog class="case" id="strategic-project-discovery" aria-labelledby="strategic-project-discovery-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>03</span>Design · BIM model queries</p>
-          <button class="case__close" type="button" data-close><span class="sr-only">Close ModelChat case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <p class="case__label">Win work · Live project search</p>
+          <button class="case__close" type="button" data-close><span class="sr-only">Close Strategic Project Discovery case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
-        <h2 class="case__title" id="modelchat-title">ModelChat answers plain-English questions about a BIM model</h2>
+        <h2 class="case__title" id="strategic-project-discovery-title">Strategic Project Discovery searches live procurement sources</h2>
         <div class="case__body">
           <figure class="walk" data-walk>
             <div class="walk__frame">
-              <div class="walk__chrome" aria-hidden="true"><i></i><i></i><i></i><span>ModelChat</span></div>
+              <div class="walk__chrome" aria-hidden="true"><i></i><i></i><i></i><span>Strategic Project Discovery</span></div>
               <div class="walk__stage">
-                <img class="walk__img is-active" src="assets/img/work/modelchat-step1.jpg" width="1400" height="649" alt="ModelChat, step 1: Load a model" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/modelchat-step2.jpg" width="1400" height="649" alt="ModelChat, step 2: Navigate" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/modelchat-step3.jpg" width="1400" height="649" alt="ModelChat, step 3: Ask a question" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/modelchat-step4.jpg" width="1400" height="649" alt="ModelChat, step 4: The viewer responds" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/modelchat-step5.jpg" width="1400" height="649" alt="ModelChat, step 5: Follow-up" loading="lazy" decoding="async" />
-                <img class="walk__img" src="assets/img/work/modelchat-step6.jpg" width="1400" height="649" alt="ModelChat, step 6: Back to the building" loading="lazy" decoding="async" />
-                <video class="walk__video" playsinline controls preload="none" poster="assets/img/posters/modelchat.jpg" data-src="assets/video/modelchat.mp4" data-start="3.9"></video>
+                <img class="walk__img is-active" src="assets/img/work/strategic-project-discovery-step1.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 1: Opportunities" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step2.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 2: Fit assessment" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step3.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 3: Region" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step4.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 4: All sectors" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step5.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 5: World map" loading="lazy" decoding="async" />
+                <img class="walk__img" src="assets/img/work/strategic-project-discovery-step6.jpg" width="1400" height="649" alt="Strategic Project Discovery, step 6: Sources" loading="lazy" decoding="async" />
+                <video class="walk__video" playsinline controls preload="none" poster="assets/img/posters/strategic-project-discovery.jpg" data-src="assets/video/strategic-project-discovery.mp4"></video>
               </div>
             </div>
             <div class="walk__bar">
-              <ol class="walk__steps" aria-label="ModelChat walkthrough steps">
-              <li><button class="walk__step" type="button" aria-pressed="true" data-desc="A 10,600-element timber office, exported from Revit as IFC, is preprocessed once and then cached."><span class="walk__n">01</span><span class="walk__t">Load a model</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="You orbit the model and use the view cube to snap to any of 26 views."><span class="walk__n">02</span><span class="walk__t">Navigate</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Claude answers by calling its model tools: queries on the index and actions in the viewer."><span class="walk__n">03</span><span class="walk__t">Ask a question</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="The floor is isolated and framed while the answer explains how its area was measured."><span class="walk__n">04</span><span class="walk__t">The viewer responds</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Follow-up questions keep the context, so the view narrows to the columns on every storey."><span class="walk__n">05</span><span class="walk__t">Follow-up</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Show all restores the full model and the home view."><span class="walk__n">06</span><span class="walk__t">Back to the building</span></button></li>
+              <ol class="walk__steps" aria-label="Strategic Project Discovery walkthrough steps">
+              <li><button class="walk__step" type="button" aria-pressed="true" data-desc="A scan of High Speed Rail and Metro lists stage, urgency, value, deadline and source for each result."><span class="walk__n">01</span><span class="walk__t">Opportunities</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Each result gets a sector, scale and geography fit, an estimated win probability and a one-line verdict."><span class="walk__n">02</span><span class="walk__t">Fit assessment</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="The scan narrows to one region and runs again."><span class="walk__n">03</span><span class="walk__t">Region</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="One click scans all seven sectors in turn."><span class="walk__n">04</span><span class="walk__t">All sectors</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Every opportunity is plotted on a map and coloured by urgency."><span class="walk__n">05</span><span class="walk__t">World map</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="The 676 sources sit in 36 categories, and each scan uses exactly the ones you select."><span class="walk__n">06</span><span class="walk__t">Sources</span></button></li>
               </ol>
               <button class="walk__play" type="button" data-video-toggle aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z" fill="currentColor"/></svg><span>Demo video</span></button>
             </div>
-            <figcaption class="walk__caption" aria-live="polite">A 10,600-element timber office, exported from Revit as IFC, is preprocessed once and then cached.</figcaption>
+            <figcaption class="walk__caption" aria-live="polite">A scan of High Speed Rail and Metro lists stage, urgency, value, deadline and source for each result.</figcaption>
           </figure>
           <div class="case__text">
             <section class="case__problem">
               <h3 class="case__h">The problem</h3>
-              <p>Getting an answer out of a BIM model usually needs a specialist and a desktop licence.</p>
+              <p>Business development teams check the same procurement portals by hand, one sector at a time, and notices still slip through.</p>
             </section>
             <section class="case__built">
               <h3 class="case__h">What I built</h3>
-              <p>I built a browser BIM viewer with a Claude chat panel. Claude answers by calling a fixed set of 14 tools: six query the model index for storeys, categories, spaces, properties and quantities, and eight act in the viewer to isolate, highlight, section and frame elements.</p>
-              <p>The test model is a ten-storey timber office from the NordicLCA project, exported from Revit as IFC4 with about 10,600 elements. It is preprocessed once into a cache and then loads instantly.</p>
+              <p>I built a single web page that runs a live search across 676 procurement sources in 36 categories. Each result is plotted on a world map with a fit assessment for sector, scale and geography, an estimated win probability and a one-line verdict.</p>
+              <p>It needs no server or database. The hosted version opens in demo mode with fictional opportunities, and a Gemini API key switches it to live searches.</p>
             </section>
             <aside class="case__facts">
-              <div><h3 class="case__h">Built with</h3><ul class="case__stack"><li>Three.js</li><li>web-ifc</li><li>Claude Code</li></ul></div>
-              <div><h3 class="case__h">Status</h3><p>Recorded from a local instance, because the chat runs through a local Claude Code login.</p></div>
-              <a class="btn btn--dark" href="https://bakshi-labs.github.io/ModelChat-DeltaOps/" target="_blank" rel="noopener">Open the project page <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+              <div><h3 class="case__h">Built with</h3><ul class="case__stack"><li>React</li><li>Leaflet</li><li>Gemini with Google Search</li></ul></div>
+              <div><h3 class="case__h">Status</h3><p>Runs in your browser with sample data.</p></div>
+              <a class="btn btn--dark" href="https://bakshi-labs.github.io/StrategicProjectDiscovery-DeltaOps/" target="_blank" rel="noopener">Open the live tool <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             </aside>
           </div>
         </div>
+        <section class="case__more">
+          <h3 class="case__h">How the two business development tools compare</h3>
+          <div class="compare">
+            <table>
+              <thead><tr><th scope="col"><span class="sr-only">Criterion</span></th><th scope="col">Strategic Project Discovery</th><th scope="col">GrowthSignal</th></tr></thead>
+              <tbody>
+              <tr><th scope="row">How it works</th><td data-label="Strategic Project Discovery">A live web search across 676 procurement sources on each scan.</td><td data-label="GrowthSignal">Connectors collect about 58,000 records from 270+ sources on every update run.</td></tr>
+              <tr><th scope="row">Setup</th><td data-label="Strategic Project Discovery">One web page and an API key.</td><td data-label="GrowthSignal">A server, a SQLite database and a Claude login.</td></tr>
+              <tr><th scope="row">Coverage</th><td data-label="Strategic Project Discovery">Anything web search can reach, including portals without a connector.</td><td data-label="GrowthSignal">Connected sources only, with every record complete and de-duplicated.</td></tr>
+              <tr><th scope="row">Memory</th><td data-label="Strategic Project Discovery">Each scan stands alone and saves as a JSON file.</td><td data-label="GrowthSignal">Full history, with record updates, notes and duplicate merging.</td></tr>
+              <tr><th scope="row">Best for</th><td data-label="Strategic Project Discovery">A business development lead preparing for a pipeline meeting.</td><td data-label="GrowthSignal">A business development team running its pipeline every day.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <nav class="case__nav" aria-label="Other case studies">
           <a href="#growthsignal" data-case="growthsignal"><span>Previous</span>GrowthSignal</a>
           <a href="#reference-buildings-explorer" data-case="reference-buildings-explorer"><span>Next</span>Reference Buildings Explorer</a>
@@ -526,7 +518,7 @@
     <dialog class="case" id="reference-buildings-explorer" aria-labelledby="reference-buildings-explorer-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>04</span>Design · Energy modelling</p>
+          <p class="case__label">Design · Energy modelling</p>
           <button class="case__close" type="button" data-close><span class="sr-only">Close Reference Buildings Explorer case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
         <h2 class="case__title" id="reference-buildings-explorer-title">Reference Buildings Explorer shows energy model results in 3D</h2>
@@ -584,7 +576,7 @@
           </ol>
         </section>
         <nav class="case__nav" aria-label="Other case studies">
-          <a href="#modelchat" data-case="modelchat"><span>Previous</span>ModelChat</a>
+          <a href="#strategic-project-discovery" data-case="strategic-project-discovery"><span>Previous</span>Strategic Project Discovery</a>
           <a href="#materialscan" data-case="materialscan"><span>Next</span>MaterialScan</a>
         </nav>
       </div>
@@ -592,7 +584,7 @@
     <dialog class="case" id="materialscan" aria-labelledby="materialscan-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>05</span>Design · Material compliance</p>
+          <p class="case__label">Design · Material compliance</p>
           <button class="case__close" type="button" data-close><span class="sr-only">Close MaterialScan case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
         <h2 class="case__title" id="materialscan-title">MaterialScan checks materials against three standards</h2>
@@ -649,7 +641,7 @@
     <dialog class="case" id="worknodescanvas" aria-labelledby="worknodescanvas-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>06</span>Deliver · Document workbench</p>
+          <p class="case__label">Deliver · Document workbench</p>
           <button class="case__close" type="button" data-close><span class="sr-only">Close WorkNodesCanvas case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
         <h2 class="case__title" id="worknodescanvas-title">WorkNodesCanvas turns source documents into finished reports</h2>
@@ -706,7 +698,7 @@
     <dialog class="case" id="southwark-retrofit-atlas" aria-labelledby="southwark-retrofit-atlas-title" data-case-dialog>
       <div class="case__sheet">
         <div class="case__top">
-          <p class="case__label"><span>07</span>Portfolio · Housing retrofit</p>
+          <p class="case__label">Portfolio · Housing retrofit</p>
           <button class="case__close" type="button" data-close><span class="sr-only">Close Southwark Retrofit Atlas case study</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
         <h2 class="case__title" id="southwark-retrofit-atlas-title">Southwark Retrofit Atlas ranks retrofit priorities for 149,062 homes</h2>
@@ -756,7 +748,7 @@
         </div>
         <nav class="case__nav" aria-label="Other case studies">
           <a href="#worknodescanvas" data-case="worknodescanvas"><span>Previous</span>WorkNodesCanvas</a>
-          <a href="#strategic-project-discovery" data-case="strategic-project-discovery"><span>Next</span>Strategic Project Discovery</a>
+          <a href="#modelchat" data-case="modelchat"><span>Next</span>ModelChat</a>
         </nav>
       </div>
     </dialog>

@@ -226,7 +226,7 @@
   /* Gentle fade-up as blocks enter the viewport */
   function initReveal() {
     if (!("IntersectionObserver" in window) || reduceMotion) return;
-    var targets = document.querySelectorAll(".head, .feature, .card, .move, .offer, .about__side, .about__bio, .career, .prompts, .reach");
+    var targets = document.querySelectorAll(".head, .feature, .card, .move, .offer, .about__side, .about__bio, .prompts, .reach");
     var io = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
@@ -236,7 +236,7 @@
           }
         });
       },
-      { rootMargin: "0px 0px -6% 0px", threshold: 0.06 }
+      { rootMargin: "0px 0px -2% 0px", threshold: 0.01 }
     );
     targets.forEach(function (el) {
       el.classList.add("reveal");
