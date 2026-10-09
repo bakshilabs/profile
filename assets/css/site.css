@@ -2363,7 +2363,7 @@ button {
 @keyframes mf-stop {
   0%,
   12% {
-    fill: rgba(22, 255, 198, 0.2);
+    fill: #155551;
     stroke: #16ffc6;
   }
   18%,
@@ -2888,4 +2888,76 @@ button {
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
+}
+
+.mc__loaded {
+  padding: 9px 12px;
+  border: 1px dashed rgba(143, 166, 176, 0.35);
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--mist);
+}
+.mc__loaded span {
+  display: block;
+  color: #16ffc6;
+}
+.mc.is-tall .mc__viewer {
+  aspect-ratio: 560 / 780;
+}
+.mc.is-tall .mc__chat {
+  height: 60%;
+}
+.titleblock dd,
+.card__text,
+.feature__text,
+.ask__q {
+  text-wrap: pretty;
+}
+@media (max-width: 1000px) {
+  .about__side {
+    display: contents;
+  }
+  .about .label {
+    order: 1;
+  }
+  .about__name {
+    order: 2;
+  }
+  .about__bio {
+    order: 3;
+  }
+  .career {
+    order: 4;
+    margin-top: 8px;
+  }
+}
+@media (max-width: 520px) {
+  .hero__actions .btn {
+    flex: 1 1 100%;
+  }
+  .mail {
+    padding: 20px;
+  }
+  .mail__address {
+    font-size: clamp(19px, 6vw, 56px);
+    letter-spacing: -0.02em;
+  }
+}
+.card__stat--text {
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.card__stat--text b {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--teal-soft);
+}
+.mc.is-tall .mc__log {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 22%, #000 48%);
+  mask-image: linear-gradient(180deg, transparent 0, transparent 22%, #000 48%);
 }

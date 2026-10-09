@@ -363,7 +363,7 @@
       tx(svg, R.x + 16, R.y + 24, "SAMPLE RECORDS · RANKED", "s-mono");
       var rows = [
         ["Hospital extension, phase 2", "INSTITUTIONAL", "£95M", 63],
-        ["Water treatment upgrade", "ENERGY", "€410M", 48],
+        ["Grid substation upgrade", "ENERGY", "€410M", 48],
         ["Office refurbishment", "COMMERCIAL", "£1.2BN", 92],
         ["Housing estate renewal", "RESIDENTIAL", "£240M", 77],
         ["Rail depot design-build", "INFRASTRUCTURE", "US$238M", 86],
@@ -478,6 +478,18 @@
         return [[X(i0, j0), Y(i0, j0)], [X(i1, j0), Y(i1, j0)], [X(i1, j1), Y(i1, j1)], [X(i0, j1), Y(i0, j1)]];
       }
       function up(p, hh) { return [p[0], p[1] - hh]; }
+      var BG = [15, 34, 43];
+      function dimmed(rgb, k) {
+        return "rgb(" + rgb.map(function (v, n) { return Math.round(v * (1 - k) + BG[n] * k); }) + ")";
+      }
+      function solidDim(i, j, hh, val, k) {
+        var c = corners(i, j), A = c[0], B = c[1], Cc = c[2], D = c[3];
+        ctx.lineWidth = 0.6;
+        var edge = "rgba(143,166,176," + (0.35 * k).toFixed(3) + ")";
+        poly([D, Cc, up(Cc, hh), up(D, hh)], dimmed(color(val, 0.62), k), edge);
+        poly([B, Cc, up(Cc, hh), up(B, hh)], dimmed(color(val, 0.8), k), edge);
+        poly([up(A, hh), up(B, hh), up(Cc, hh), up(D, hh)], dimmed(color(val, 1), k), edge);
+      }
       function bar(i, j, hh, val, alpha, ghost) {
         var c = corners(i, j), A = c[0], B = c[1], Cc = c[2], D = c[3];
         ctx.globalAlpha = alpha;
@@ -532,8 +544,12 @@
           if (hh < 0.5) continue;
           var inRow = j === SEL_J, isSel = i === SEL_I && j === SEL_J;
           var ghost = inRow ? 0 : slice;
-          if (pick > 0 && !isSel) {
-            bar(i, j, hh, v[i][j], lerp(ghost > 0.5 ? 0.22 : 1, 0.2, pick) * fade + (1 - fade) * 0.2, ghost > 0.5 && pick < 0.5);
+          if (pick > 0.5 && !isSel) {
+            ctx.globalAlpha = fade + (1 - fade) * 0.2;
+            solidDim(i, j, hh, v[i][j], 0.72);
+            ctx.globalAlpha = 1;
+          } else if (pick > 0 && !isSel) {
+            bar(i, j, hh, v[i][j], lerp(ghost > 0.5 ? 0.22 : 1, 0.3, pick) * fade + (1 - fade) * 0.2, ghost > 0.5);
           } else if (ghost > 0.5) bar(i, j, hh, v[i][j], 0.22 * fade, true);
           else bar(i, j, hh, v[i][j], (1 - ghost * 0.7) * fade + (1 - fade) * 0.2, false);
           if (isSel && pick > 0) {
@@ -1039,7 +1055,7 @@
     dur: 16.4,
     still: 6.6,
     beats: [[0, 0], [2.7, 1], [3.6, 2], [8.3, 0], [10.3, 1], [10.9, 2]],
-    size: { wide: [560, 420], tall: [560, 860] },
+    size: { wide: [560, 420], tall: [560, 780] },
     keepStage: true,
     init: function (stage, mode) {
       var tall = mode === "tall";
@@ -1047,11 +1063,11 @@
       var chat = stage.querySelector(".mc__log");
       viewer.innerHTML = "";
       chat.innerHTML = "";
-      var st = svgStage(viewer, 560, tall ? 860 : 420, "mc" + (mode || "wide"));
+      var st = svgStage(viewer, 560, tall ? 780 : 420, "mc" + (mode || "wide"));
       var svg = st.svg;
       var cam = h("g", null, svg);
       // six storeys with columns, from the basement to Level 05
-      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 152 : 168;
+      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 122 : 168;
       function iso(x, y, z) { return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z]; }
       function pts(arr) {
         return arr.map(function (p) { var q = iso(p[0], p[1], p[2]); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
@@ -1096,7 +1112,7 @@
       var colLabel = h("g", { opacity: 0 }, svg);
       var colCount = tx(colLabel, 536, 50, "", "s-num", { "text-anchor": "end" });
       tx(colLabel, 536, 70, "COLUMNS · WHOLE BUILDING", "s-mono", { "text-anchor": "end" });
-      tx(svg, 24, tall ? 26 : 404, tall ? "TIMBER OFFICE · IFC4" : "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
+      if (!tall) tx(svg, 24, 404, "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
 
       function msg(cls, html) {
         var el = document.createElement("div");
@@ -1115,6 +1131,7 @@
           return row;
         }).concat([el]);
       }
+      msg("mc__loaded", "<span>Loaded</span>ARK_NordicLCA_Office_Timber.ifc<br>IFC4 · 10,609 entities · 10 storeys");
       var q1 = "What is the gross floor area of Level 03? Isolate that floor.";
       var q2 = "Now show only the columns, across the whole building.";
       var u1 = msg("mc__user"), t1 = tools(["query_index", "compute_quantity", "isolate", "focus_camera"]);
@@ -1141,6 +1158,7 @@
         });
       }
       var cxs = iso(L / 2, W / 2, 3 * FH + 7);
+      var rv = iso(L, 0, 3 * FH + FH - 3);
 
       return function (t) {
         var e1 = t < 8.0 ? 1 : 1 - P(t, 8.0, 8.3);
@@ -1178,9 +1196,10 @@
         var labA = P(t, 4.6, 5.0) * (1 - P(t, 7.8, 8.2));
         if (tall) {
           move(label, 536, 64);
-          set(leader, "points", "440,96 440," + (ly - 10).toFixed(1) + " " + lx.toFixed(1) + "," + ly.toFixed(1));
-          set(leadDot, "cx", lx.toFixed(1));
-          set(leadDot, "cy", ly.toFixed(1));
+          var vx = cxs[0] + (rv[0] - cxs[0]) * zoom, vy = cxs[1] + (rv[1] - cxs[1] - 6 * iso1) * zoom;
+          set(leader, "points", vx.toFixed(1) + ",96 " + vx.toFixed(1) + "," + vy.toFixed(1));
+          set(leadDot, "cx", vx.toFixed(1));
+          set(leadDot, "cy", vy.toFixed(1));
           op(leader, labA);
           op(leadDot, labA);
         } else move(label, lx, ly);
