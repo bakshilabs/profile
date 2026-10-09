@@ -1542,7 +1542,7 @@ button {
 
 .making {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   margin-top: 18px;
   counter-reset: make;
@@ -2958,6 +2958,55 @@ button {
   color: var(--teal-soft);
 }
 .mc.is-tall .mc__log {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 22%, #000 48%);
-  mask-image: linear-gradient(180deg, transparent 0, transparent 22%, #000 48%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 16%);
+}
+/* Between phone and desktop every card runs full width with its story beside the text */
+@media (max-width: 1180px) {
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (min-width: 901px) and (max-width: 1180px) {
+  .card .card__link {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+    gap: clamp(32px, 4vw, 64px);
+    align-items: center;
+  }
+  .card .beats {
+    margin-bottom: 0;
+  }
+  .card--flip .card__link {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+  }
+}
+/* Hero title sets in five lines on a laptop screen */
+.hero__title {
+  font-size: clamp(40px, 4.6vw, 66px);
+}
+/* Story beats read as sentences */
+.beats > span,
+.card .beats > span {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 450;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+@media (max-width: 760px) {
+  .beats > span,
+  .card .beats > span {
+    font-size: 12.5px;
+    letter-spacing: 0;
+  }
+}
+/* Menu button turns into a close button while the menu is open */
+.nav__toggle .i-close,
+.nav.is-open .nav__toggle .i-open {
+  display: none;
+}
+.nav.is-open .nav__toggle .i-close {
+  display: inline;
 }

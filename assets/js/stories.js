@@ -417,10 +417,13 @@
         rowEls.forEach(function (row, i) {
           var t0 = 3.9 + i * 0.3;
           var a = P(t, t0, t0 + 0.5);
-          op(skel[row.slot], 0.5 * (1 - a) * fade + 0.5 * (1 - fade));
-          var y = lerp(R.y0 + row.slot * R.pitch, R.y0 + row.rank * R.pitch, P(t, 6.9, 7.8, E.inOut));
-          move(row.g, lerp(-16, 0, a), y);
-          op(row.g, a * fade);
+          var gap = P(t, 6.95, 7.15) * (1 - P(t, 7.35, 7.6));
+          op(skel[row.slot], Math.max(0.5 * (1 - a), 0.5 * gap) * fade + 0.5 * (1 - fade));
+          // re-rank: each moving row fades out of its slot and settles into its rank
+          var moving = row.rank !== row.slot, out = P(t, 6.9, 7.2), back = P(t, 7.3, 7.75, E.out);
+          var y = R.y0 + (t < 7.25 || !moving ? row.slot : row.rank) * R.pitch;
+          move(row.g, lerp(-16, 0, a), y + (moving && t >= 7.25 ? 10 * (1 - back) : 0));
+          op(row.g, a * fade * (moving ? (t < 7.25 ? 1 - out : back) : 1));
           row.chips.forEach(function (cg, j) { op(cg, P(t, t0 + 0.4 + j * 0.2, t0 + 0.65 + j * 0.2)); });
           var sp = P(t, 6.7, 7.2);
           text(row.score, sp > 0 ? String(Math.round(row.val * sp)) : "");
@@ -529,7 +532,7 @@
         ctx.fillStyle = C.mist;
         ctx.font = font(tall ? 10 : 9.5, "mono", 500);
         ctx.save(); ctx.translate(X(0, N) + 2, Y(0, N) + 26); ctx.rotate(Math.atan2(0.5, 0.866)); spaced(ctx, "16 BUILDING TYPES", 0, 0, 1.2); ctx.restore();
-        ctx.save(); ctx.translate(X(N, N) + 24, Y(N, N) + 14); ctx.rotate(-Math.atan2(0.5, 0.866)); spaced(ctx, "16 CLIMATE ZONES", 0, 0, 1.2); ctx.restore();
+        ctx.save(); ctx.translate(X(N, N) + 24, Y(N, N) + 14); ctx.rotate(-Math.atan2(0.5, 0.866)); spaced(ctx, "16 CLIMATE LOCATIONS", 0, 0, 1.2); ctx.restore();
 
         var plane = t < 3.6 ? -1 : lerp(0, SEL_J + 0.5, P(t, 3.6, 5.6, E.inOut));
         var slice = P(t, 5.4, 5.9);
@@ -544,11 +547,11 @@
           if (hh < 0.5) continue;
           var inRow = j === SEL_J, isSel = i === SEL_I && j === SEL_J;
           var ghost = inRow ? 0 : slice;
-          if (pick > 0.5 && !isSel) {
+          if (pick > 0.5 && !isSel && !inRow) {
             ctx.globalAlpha = fade + (1 - fade) * 0.2;
             solidDim(i, j, hh, v[i][j], 0.72);
             ctx.globalAlpha = 1;
-          } else if (pick > 0 && !isSel) {
+          } else if (pick > 0 && !isSel && !inRow) {
             bar(i, j, hh, v[i][j], lerp(ghost > 0.5 ? 0.22 : 1, 0.3, pick) * fade + (1 - fade) * 0.2, ghost > 0.5);
           } else if (ghost > 0.5) bar(i, j, hh, v[i][j], 0.22 * fade, true);
           else bar(i, j, hh, v[i][j], (1 - ghost * 0.7) * fade + (1 - fade) * 0.2, false);
@@ -575,7 +578,7 @@
         ctx.globalAlpha = P(t, 1.2, 1.8) * fade;
         ctx.fillStyle = C.mist;
         ctx.font = font(10, "mono", 500);
-        spaced(ctx, "SITE EUI · MJ/M²", LEG.x, LEG.y - 8, 1);
+        spaced(ctx, "SITE EUI · MJ/m²", LEG.x, LEG.y - 8, 1);
         ctx.fillStyle = lg;
         roundRect(ctx, LEG.x, LEG.y, LEG.w, 5, 2.5); ctx.fill();
         ctx.fillStyle = C.mist;
@@ -611,8 +614,8 @@
           var vw = ctx.measureText(val).width;
           ctx.fillStyle = C.mist;
           ctx.font = font(10, "mono", 500);
-          if (tall) spaced(ctx, "MJ/M² SITE EUI", CALL.x + 26 + vw, CALL.y + 58, 1);
-          else spaced(ctx, "MJ/M² SITE EUI", CALL.x + 14, CALL.y + 80, 1);
+          if (tall) spaced(ctx, "MJ/m² SITE EUI", CALL.x + 26 + vw, CALL.y + 58, 1);
+          else spaced(ctx, "MJ/m² SITE EUI", CALL.x + 14, CALL.y + 80, 1);
           ctx.globalAlpha = 1;
         }
       };
@@ -1044,7 +1047,7 @@
         ctx.beginPath(); ctx.arc(L + 4, ry + 138.5, 1.8, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = C.mist;
         spaced(ctx, "HOMES FUNDED", L + 13, ry + 142, 1.1);
-        spaced(ctx, "CO₂E SAVED", L + sw * 0.52, ry + 142, 1.1);
+        spaced(ctx, "CO₂e SAVED", L + sw * 0.52, ry + 142, 1.1);
         ctx.globalAlpha = 1;
       };
     },
@@ -1066,8 +1069,8 @@
       var st = svgStage(viewer, 560, tall ? 780 : 420, "mc" + (mode || "wide"));
       var svg = st.svg;
       var cam = h("g", null, svg);
-      // six storeys with columns, from the basement to Level 05
-      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 122 : 168;
+      // ten storeys, as in the test model
+      var L = 300, W = 100, FH = 12, FLOORS = 10, OX = 193, OY = tall ? 146 : 172;
       function iso(x, y, z) { return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z]; }
       function pts(arr) {
         return arr.map(function (p) { var q = iso(p[0], p[1], p[2]); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
@@ -1087,12 +1090,13 @@
         var top = h("polygon", { points: pts([[0, 0, z1], [L, 0, z1], [L, W, z1], [0, W, z1]]), fill: k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)", stroke: "rgba(143,220,210,0.5)", "stroke-width": 0.8 }, g);
         floors.push({ g: g, left: left, right: right, top: top, k: k });
       }
-      // a structural grid of 12 x 4 columns on every storey
+      // 34 columns on every storey around a central core, 340 in all
       var cols = h("g", { stroke: C.mint, "stroke-width": 1.2, "stroke-linecap": "round", opacity: 0 }, cam);
       var colLines = [];
       for (var f = 0; f < FLOORS; f++) {
         for (var cy = 0; cy < 4; cy++) {
           for (var cx = 0; cx < 9; cx++) {
+            if (cx === 4 && (cy === 1 || cy === 2)) continue;
             var x = 10 + cx * 35, y = 8 + cy * 28;
             colLines.push({ el: h("polyline", { points: pts([[x, y, f * FH], [x, y, f * FH + FH - 3]]), fill: "none" }, cols), f: f });
           }
@@ -1131,7 +1135,7 @@
           return row;
         }).concat([el]);
       }
-      msg("mc__loaded", "<span>Loaded</span>ARK_NordicLCA_Office_Timber.ifc<br>IFC4 · 10,609 entities · 10 storeys");
+      var loaded = msg("mc__loaded", "<span>Loaded</span>ARK_NordicLCA_Office_Timber.ifc<br>IFC4 · 10,609 entities · 10 storeys");
       var q1 = "What is the gross floor area of Level 03? Isolate that floor.";
       var q2 = "Now show only the columns, across the whole building.";
       var u1 = msg("mc__user"), t1 = tools(["query_index", "compute_quantity", "isolate", "focus_camera"]);
@@ -1163,6 +1167,8 @@
       return function (t) {
         var e1 = t < 8.0 ? 1 : 1 - P(t, 8.0, 8.3);
         var e2 = P(t, 8.3, 8.4) * (1 - P(t, 15.4, 15.9));
+        // phones have room for one exchange, so the load notice gives way to the question
+        if (tall) show(loaded, 1 - P(t, 0.1, 0.4));
         show(u1, P(t, 0.2, 0.5) * e1);
         typing(u1, q1, P(t, 0.4, 2.4, E.lin));
         toolState(t1, t, 2.7, e1);
@@ -1179,7 +1185,7 @@
 
         var iso1 = P(t, 3.6, 4.6, E.inOut) * (1 - P(t, 10.9, 11.6, E.inOut));
         var colsOn = P(t, 11.2, 12.0, E.inOut) * (1 - P(t, 15.3, 16.0, E.inOut));
-        var zoom = 1 + 0.28 * iso1;
+        var zoom = (tall ? 0.9 : 1) * (1 + 0.28 * iso1);
         set(cam, "transform", "translate(" + cxs[0].toFixed(1) + " " + cxs[1].toFixed(1) + ") scale(" + zoom.toFixed(3) + ") translate(" + (-cxs[0]).toFixed(1) + " " + (-cxs[1]).toFixed(1) + ")");
         floors.forEach(function (fl) {
           var sel = fl.k === 3;
@@ -1191,7 +1197,7 @@
           set(fl.g, "transform", sel ? "translate(0 " + (-6 * iso1).toFixed(2) + ")" : "");
         });
         op(cols, colsOn);
-        colLines.forEach(function (c) { op(c.el, P(t, 11.2 + c.f * 0.1, 11.6 + c.f * 0.1)); });
+        colLines.forEach(function (c) { op(c.el, P(t, 11.2 + c.f * 0.06, 11.6 + c.f * 0.06)); });
         var lx = cxs[0] + (lp[0] - cxs[0]) * zoom, ly = cxs[1] + (lp[1] - cxs[1] - 6 * iso1) * zoom;
         var labA = P(t, 4.6, 5.0) * (1 - P(t, 7.8, 8.2));
         if (tall) {
