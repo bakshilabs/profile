@@ -908,7 +908,7 @@ button {
   letter-spacing: -0.016em;
   text-wrap: balance;
 }
-.move p:last-child {
+.move__title ~ p {
   margin-top: 14px;
   font-size: 16px;
   line-height: 1.65;
