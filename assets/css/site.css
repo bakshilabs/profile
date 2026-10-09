@@ -3093,3 +3093,48 @@ button {
     grid-column: 2;
   }
 }
+/* Hero: room above the dark Work section, and a tighter top on laptops */
+.hero {
+  padding-top: calc(var(--nav-h) + clamp(20px, 3vw, 40px));
+  padding-bottom: clamp(40px, 5vw, 56px);
+}
+@media (min-width: 721px) and (max-width: 900px) {
+  .hero__layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: end;
+  }
+  .portrait {
+    max-width: 240px;
+    justify-self: end;
+  }
+  .portrait__frame {
+    aspect-ratio: 4 / 5;
+  }
+}
+/* Method on tablets: figure beside its text */
+@media (min-width: 641px) and (max-width: 1100px) {
+  .moves {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+  }
+  .move {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: clamp(28px, 4vw, 48px);
+    align-items: start;
+  }
+  .move__fig {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    max-width: none;
+    margin-bottom: 0;
+  }
+  .move > :not(.move__fig) {
+    grid-column: 2;
+  }
+}
+.card__stat,
+.titleblock dd {
+  text-wrap: balance;
+}

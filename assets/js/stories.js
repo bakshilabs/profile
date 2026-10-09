@@ -1072,8 +1072,11 @@
       var st = svgStage(viewer, 560, tall ? 780 : 420, "mc" + (mode || "wide"));
       var svg = st.svg;
       var cam = h("g", null, svg);
-      // ten storeys, as in the test model
+      // ten storeys, as in the test model: a long podium, the main block, and a set-back top
       var L = 300, W = 100, FH = 12, FLOORS = 10, OX = 193, OY = tall ? 146 : 172;
+      function span(k) { return k < 2 ? [-80, L] : k > 8 ? [90, L] : [0, L]; }
+      // roofs are shaded only where they are open to the sky
+      function roofSpan(k) { return k === 1 ? [-80, 0] : k === 8 ? [0, 90] : span(k); }
       function iso(x, y, z) { return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z]; }
       function pts(arr) {
         return arr.map(function (p) { var q = iso(p[0], p[1], p[2]); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
@@ -1083,15 +1086,16 @@
       for (var gy = -50; gy <= 150; gy += 50) h("polyline", { points: pts([[-100, gy, 0], [400, gy, 0]]), fill: "none" }, grid);
       var floors = [];
       for (var k = 0; k < FLOORS; k++) {
-        var z0 = k * FH, z1 = z0 + FH - 3;
+        var z0 = k * FH, z1 = z0 + FH - 3, x0 = span(k)[0], x1 = span(k)[1];
         var g = h("g", null, cam);
-        var left = h("polygon", { points: pts([[0, W, z0], [L, W, z0], [L, W, z1], [0, W, z1]]), fill: "rgba(89,199,252,0.14)", stroke: "rgba(143,220,210,0.45)", "stroke-width": 0.8 }, g);
+        var left = h("polygon", { points: pts([[x0, W, z0], [x1, W, z0], [x1, W, z1], [x0, W, z1]]), fill: "rgba(89,199,252,0.14)", stroke: "rgba(143,220,210,0.45)", "stroke-width": 0.8 }, g);
         var right = h("polygon", { points: pts([[L, 0, z0], [L, W, z0], [L, W, z1], [L, 0, z1]]), fill: "rgba(89,199,252,0.08)", stroke: "rgba(143,220,210,0.45)", "stroke-width": 0.8 }, g);
         var mull = h("g", { stroke: "rgba(143,220,210,0.22)", "stroke-width": 0.6 }, g);
-        for (var mx = 25; mx < L; mx += 25) h("polyline", { points: pts([[mx, W, z0], [mx, W, z1]]), fill: "none" }, mull);
+        for (var mx = x0 + 25; mx < x1; mx += 25) h("polyline", { points: pts([[mx, W, z0], [mx, W, z1]]), fill: "none" }, mull);
         for (var my = 25; my < W; my += 25) h("polyline", { points: pts([[L, my, z0], [L, my, z1]]), fill: "none" }, mull);
-        var top = h("polygon", { points: pts([[0, 0, z1], [L, 0, z1], [L, W, z1], [0, W, z1]]), fill: k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)", stroke: "rgba(143,220,210,0.5)", "stroke-width": 0.8 }, g);
-        floors.push({ g: g, left: left, right: right, top: top, k: k });
+        var roof = k === FLOORS - 1 || k === 1 || k === 8, rs = roofSpan(k);
+        var top = h("polygon", { points: pts([[rs[0], 0, z1], [rs[1], 0, z1], [rs[1], W, z1], [rs[0], W, z1]]), fill: roof ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)", stroke: "rgba(143,220,210,0.5)", "stroke-width": 0.8 }, g);
+        floors.push({ g: g, left: left, right: right, top: top, k: k, roof: roof });
       }
       // 34 columns on every storey around a central core, 340 in all
       var cols = h("g", { stroke: C.mint, "stroke-width": 1.2, "stroke-linecap": "round", opacity: 0 }, cam);
@@ -1100,7 +1104,7 @@
         for (var cy = 0; cy < 4; cy++) {
           for (var cx = 0; cx < 9; cx++) {
             if (cx === 4 && (cy === 1 || cy === 2)) continue;
-            var x = 10 + cx * 35, y = 8 + cy * 28;
+            var fx = span(f), x = fx[0] + 10 + cx * (fx[1] - fx[0] - 20) / 8, y = 8 + cy * 28;
             colLines.push({ el: h("polyline", { points: pts([[x, y, f * FH], [x, y, f * FH + FH - 3]]), fill: "none" }, cols), f: f });
           }
         }
@@ -1138,6 +1142,7 @@
           return row;
         }).concat([el]);
       }
+      var shortChat = window.matchMedia("(max-width: 1000px)");
       var loaded = msg("mc__loaded", "<span>Loaded</span>ARK_NordicLCA_Office_Timber.ifc<br>IFC4 · 10,609 entities · 10 storeys");
       var q1 = "What is the gross floor area of Level 03? Isolate that floor.";
       var q2 = "Now show only the columns, across the whole building.";
@@ -1171,7 +1176,7 @@
         var e1 = 1 - P(t, 15.4, 15.9);
         var e2 = P(t, 8.3, 8.4) * (1 - P(t, 15.4, 15.9));
         // phones have room for one exchange, so the load notice gives way to the question
-        if (tall) show(loaded, 1 - P(t, 0.1, 0.4));
+        show(loaded, tall || shortChat.matches ? 1 - P(t, 0.1, 0.4) : 1);
         show(u1, P(t, 0.2, 0.5) * e1);
         typing(u1, q1, P(t, 0.4, 2.4, E.lin));
         toolState(t1, t, 2.7, e1);
@@ -1196,7 +1201,7 @@
           var hot = sel && iso1 > 0.5;
           set(fl.left, "fill", hot ? "rgba(22,255,198,0.30)" : "rgba(89,199,252,0.14)");
           set(fl.right, "fill", hot ? "rgba(22,255,198,0.20)" : "rgba(89,199,252,0.08)");
-          set(fl.top, "fill", hot ? "rgba(22,255,198,0.38)" : fl.k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)");
+          set(fl.top, "fill", hot ? "rgba(22,255,198,0.38)" : fl.roof ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)");
           set(fl.g, "transform", sel ? "translate(0 " + (-6 * iso1).toFixed(2) + ")" : "");
         });
         op(cols, colsOn);
