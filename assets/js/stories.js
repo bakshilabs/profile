@@ -105,8 +105,9 @@
     });
     return g;
   }
+  var chipK = 5.7;
   function chip(parent, x, y, label, kind) {
-    var w = label.length * 5.7 + 12;
+    var w = label.length * chipK + 12;
     var g = h("g", null, parent);
     var fill = kind === "mint" ? "rgba(22,255,198,0.14)" : kind === "value" ? "rgba(230,238,240,0.12)" : "rgba(143,166,176,0.16)";
     h("rect", { x: x, y: y, width: w, height: 15, rx: 7.5, fill: fill }, g);
@@ -401,8 +402,8 @@
       var cv = canvasStage(stage, tall ? 340 : 600, tall ? 540 : 375);
       var ctx = cv.ctx;
       var N = 16;
-      var G = tall ? { s: 9.4, ox: 170, oy: 238, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 330, oy: 136, maxH: 104, hx: 24, hy: 30 };
-      var CALL = tall ? { x: 16, y: 44, w: 308, h: 80 } : { x: 24, y: 58, w: 196, h: 92 };
+      var G = tall ? { s: 9.4, ox: 170, oy: 238, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 372, oy: 136, maxH: 104, hx: 24, hy: 30 };
+      var CALL = tall ? { x: 16, y: 44, w: 308, h: 80 } : { x: 24, y: 58, w: 190, h: 92 };
       var LEG = tall ? { x: 16, y: 470, w: 180 } : { x: 24, y: 334, w: 150 };
       var r = rng(21), typeBase = [];
       for (var i = 0; i < N; i++) typeBase.push(0.32 + 0.6 * r());
@@ -589,7 +590,7 @@
         var ev = h("g", { opacity: 0 }, rg);
         var evx = 132;
         (i % 3 === 1 ? ["EPD", "DECLARE"] : i % 3 === 2 ? ["HPD", "DECLARE"] : ["EPD", "HPD"]).forEach(function (lbl) {
-          var w = lbl.length * 5.7 + 10;
+          var w = lbl.length * chipK + 10;
           h("rect", { x: evx, y: y + 10, width: w, height: 14, rx: 3, fill: "none", stroke: "rgba(143,220,210,0.5)" }, ev);
           tx(ev, evx + w / 2, y + 20.5, lbl, "s-chip", { "text-anchor": "middle", fill: C.soft });
           evx += w + 4;
@@ -626,7 +627,7 @@
         tx(legend, lx + 14, ly, l[1] + " " + totals[l[0]], "s-chip", { fill: C.text });
       });
       var gy0 = 128;
-      tx(Rg, RX + 16, gy0, "OPEN ISSUES · RANKED", "s-mono");
+      tx(Rg, RX + 16, gy0, "FAILS AND GAPS · RANKED", "s-mono");
       var issueList = [["Column cladding", "FAIL · WELL V2", C.red], ["Spandrels", "GAP · CLIENT BRIEF", C.grey], ["Blades", "GAP · WELL V2", C.grey], ["Bird safety", "GAP · CLIENT BRIEF", C.grey], ["Expressed frame", "GAP · CLIENT BRIEF", C.grey]];
       var skelR = issueList.map(function (g, i) {
         return h("rect", { x: RX + 12, y: gy0 + 12 + i * 41, width: RW - 24, height: 35, rx: 7, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, Rg);
@@ -684,7 +685,7 @@
       var svg = st.svg;
       var wires = h("g", null, svg);
       var LAY = tall
-        ? { refs: [[8, 14], [8, 124], [8, 234]], rw: 144, rh: 96, an: [[172, 40], [172, 212]], aw: 150, ah: 122, pres: [8, 360, 324, 248], cols: 3, tw: 94, th: 56 }
+        ? { refs: [[8, 14], [8, 124], [8, 234]], rw: 144, rh: 96, an: [[170, 40], [170, 212]], aw: 146, ah: 122, pres: [8, 360, 324, 248], cols: 3, tw: 94, th: 56 }
         : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
@@ -755,8 +756,8 @@
       if (tall) {
         var a0 = an[0], a1 = an[1], ex = a0.x + LAY.aw;
         w2 = [
-          wire("M" + ex + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (PY - 14) + " Q" + (ex + 8) + " " + PY + " " + (PX + PW * 0.86) + " " + PY),
-          wire("M" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah) + " C" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah + 10) + " " + (PX + PW * 0.55) + " " + (PY - 10) + " " + (PX + PW * 0.55) + " " + PY),
+          wire("M" + ex + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (a0.y + 56) + " L" + (ex + 8) + " " + (PY - 20) + " Q" + (ex + 8) + " " + (PY - 12) + " " + (ex - 2) + " " + (PY - 12) + " L" + (a1.x + LAY.aw / 2 + 8) + " " + (PY - 12) + " Q" + (a1.x + LAY.aw / 2) + " " + (PY - 12) + " " + (a1.x + LAY.aw / 2) + " " + PY),
+          wire("M" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah) + " L" + (a1.x + LAY.aw / 2) + " " + PY),
         ];
       } else {
         w2 = [wire(across([an[0].x + LAY.aw, an[0].y + 56], [PX, PY + 76])), wire(across([an[1].x + LAY.aw, an[1].y + 56], [PX, PY + 146]))];
@@ -874,7 +875,7 @@
           var a = P(t, 0.2 + f * 1.8, 0.6 + f * 1.8);
           if (a <= 0) continue;
           var alpha = a * fade, rad = 1.7;
-          if (p.band < 2) alpha *= 1 - 0.6 * b2;
+          if (p.band < 2) alpha *= 1 - 0.5 * b2;
           else rad = 1.7 + 0.5 * b2 * (t < 6.3 ? 0.5 + 0.5 * Math.sin(t * 5 + p.pr * 6) : 0.4);
           var isFunded = p.fund !== undefined && slider >= p.fund;
           ctx.globalAlpha = alpha;
@@ -962,7 +963,13 @@
         ctx.fillText((6.6 * slider).toFixed(1) + " kt", L + sw * 0.52, ry + 124);
         ctx.fillStyle = C.mist;
         ctx.font = font(10, "mono", 500);
-        spaced(ctx, "HOMES FUNDED", L, ry + 142, 1.1);
+        ctx.strokeStyle = C.mint;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(L + 4, ry + 138.5, 3.6, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = C.mint;
+        ctx.beginPath(); ctx.arc(L + 4, ry + 138.5, 1.8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = C.mist;
+        spaced(ctx, "HOMES FUNDED", L + 13, ry + 142, 1.1);
         spaced(ctx, "CO₂E SAVED A YEAR", L + sw * 0.52, ry + 142, 1.1);
         ctx.globalAlpha = 1;
       };
@@ -986,7 +993,7 @@
       var svg = st.svg;
       var cam = h("g", null, svg);
       // six storeys with columns, from the basement to Level 05
-      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 176 : 168;
+      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 132 : 168;
       function iso(x, y, z) { return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z]; }
       function pts(arr) {
         return arr.map(function (p) { var q = iso(p[0], p[1], p[2]); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
@@ -1028,7 +1035,7 @@
       var colLabel = h("g", { opacity: 0 }, svg);
       var colCount = tx(colLabel, 536, 50, "", "s-num", { "text-anchor": "end" });
       tx(colLabel, 536, 70, "COLUMNS · WHOLE BUILDING", "s-mono", { "text-anchor": "end" });
-      tx(svg, 24, tall ? 40 : 404, "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
+      tx(svg, 24, tall ? 40 : 404, tall ? "TIMBER OFFICE · IFC4" : "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
 
       function msg(cls, html) {
         var el = document.createElement("div");
@@ -1117,6 +1124,10 @@
     },
   };
 
+  function setChipScale(mode) {
+    chipK = mode === "tall" ? 6.5 : 5.7;
+  }
+
   /* Engine: build each story for its width, run it only while it is on screen */
   function initStories() {
     var hosts = Array.prototype.slice.call(document.querySelectorAll("[data-story]"));
@@ -1164,6 +1175,7 @@
         }
       }
       s.mode = mode;
+      setChipScale(mode);
       s.render = s.def.init(s.stage, mode);
       s.built = true;
       if (s.stage.__canvasApi) s.stage.__canvasApi.redraw = function () { s.render(s.t); };
