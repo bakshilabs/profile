@@ -97,6 +97,12 @@
       });
       d.addEventListener("close", function () {
         resetWalk(d.querySelector("[data-walk]"));
+        if (d.dataset.closingTo) {
+          // a link inside the sheet has already chosen where the page goes
+          delete d.dataset.closingTo;
+          document.body.classList.remove("is-locked");
+          return;
+        }
         if (!d.dataset.switching) {
           document.body.classList.remove("is-locked");
           if (location.hash === "#" + d.id) setHash("#work");
@@ -142,7 +148,10 @@
         e.preventDefault();
         var openSheet = document.querySelector("[data-case-dialog][open]");
         opener = null;
-        if (openSheet) openSheet.close();
+        if (openSheet) {
+          openSheet.dataset.closingTo = "1";
+          openSheet.close();
+        }
         var target = document.getElementById(to.getAttribute("data-close-to"));
         setHash("#" + to.getAttribute("data-close-to"));
         if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
