@@ -8,6 +8,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initNav();
     initCases();
+    initZoom();
     initFeatureVideo();
     initReveal();
   });
@@ -141,6 +142,7 @@
     var caption = walk.querySelector(".walk__caption");
     var video = walk.querySelector(".walk__video");
     var toggle = walk.querySelector("[data-video-toggle]");
+    var count = walk.querySelector(".walk__count");
     walk._current = 0;
 
     function show(n, focus) {
@@ -154,7 +156,12 @@
         img.classList.toggle("is-active", k === cur);
       });
       caption.textContent = steps[cur].getAttribute("data-desc");
+      if (count) count.textContent = cur + 1 + " / " + steps.length;
       if (focus) steps[cur].focus();
+      if (!focus && steps[cur].scrollIntoView && window.matchMedia("(max-width: 760px)").matches) {
+        var strip = steps[cur].closest(".walk__steps");
+        if (strip) strip.scrollTo({ left: steps[cur].parentNode.offsetLeft - 16, behavior: "smooth" });
+      }
     }
     walk._show = show;
 
@@ -190,6 +197,27 @@
     });
     toggle.addEventListener("click", function () {
       setVideo(!walk.classList.contains("is-video"));
+    });
+  }
+
+  /* Phones: tap a walkthrough screenshot to see it at full size */
+  function initZoom() {
+    var dialog = document.querySelector("[data-zoom]");
+    if (!dialog || typeof dialog.showModal !== "function") return;
+    var img = dialog.querySelector("img");
+    document.addEventListener("click", function (e) {
+      var stage = e.target.closest("[data-zoomable]");
+      if (!stage || !window.matchMedia("(max-width: 760px)").matches) return;
+      if (stage.closest(".walk").classList.contains("is-video")) return;
+      var active = stage.querySelector(".walk__img.is-active");
+      if (!active) return;
+      img.src = active.currentSrc || active.src;
+      img.alt = active.alt;
+      dialog.showModal();
+      dialog.querySelector(".zoom__scroll").scrollLeft = 0;
+    });
+    dialog.querySelector("[data-zoom-close]").addEventListener("click", function () {
+      dialog.close();
     });
   }
 

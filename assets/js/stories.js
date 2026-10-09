@@ -1,6 +1,7 @@
 /* Bakshi Labs: animated stories for the seven tools.
-   Each scene builds its drawing once, then render(t) sets every element for time t,
-   so a scene can loop, pause off screen, or show one still frame. */
+   Each scene builds its drawing once for a wide or a tall (phone) layout, then
+   render(t) sets every element for time t. A scene can loop, pause off screen,
+   or hold one still frame. Stories open on their finished frame, then replay. */
 (function () {
   "use strict";
 
@@ -8,7 +9,6 @@
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var C = {
-    bg: "#0f222b",
     panel: "#132a34",
     panel2: "#183441",
     line: "rgba(143,166,176,0.24)",
@@ -21,6 +21,7 @@
     amber: "#e9b44c",
     red: "#e46b5d",
     grey: "#5d717a",
+    ink: "#0c1b24",
   };
 
   /* Timing helpers */
@@ -28,20 +29,10 @@
     return Math.min(b, Math.max(a, v));
   }
   var E = {
-    out: function (p) {
-      return 1 - Math.pow(1 - p, 3);
-    },
-    inOut: function (p) {
-      return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-    },
-    lin: function (p) {
-      return p;
-    },
-    back: function (p) {
-      var c1 = 1.5,
-        c3 = c1 + 1;
-      return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2);
-    },
+    out: function (p) { return 1 - Math.pow(1 - p, 3); },
+    inOut: function (p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; },
+    lin: function (p) { return p; },
+    back: function (p) { var c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
   };
   function P(t, a, b, e) {
     return (e || E.out)(clamp((t - a) / (b - a), 0, 1));
@@ -60,6 +51,9 @@
   }
   function fmt(n) {
     return Math.round(n).toLocaleString("en-GB");
+  }
+  function quad(a, m, b, p) {
+    return (1 - p) * (1 - p) * a + 2 * (1 - p) * p * m + p * p * b;
   }
 
   /* SVG helpers */
@@ -92,8 +86,8 @@
       el.textContent = s;
     }
   }
-  function move(el, x, y, s) {
-    set(el, "transform", "translate(" + x.toFixed(2) + " " + y.toFixed(2) + ")" + (s !== undefined ? " scale(" + s.toFixed(3) + ")" : ""));
+  function move(el, x, y) {
+    set(el, "transform", "translate(" + x.toFixed(2) + " " + y.toFixed(2) + ")");
   }
   function svgStage(stage, w, hgt, id) {
     var s = h("svg", { viewBox: "0 0 " + w + " " + hgt, "aria-hidden": "true", focusable: "false" });
@@ -104,12 +98,20 @@
     stage.appendChild(s);
     return { svg: s, defs: defs };
   }
-  function gradient(defs, id, stops, vertical) {
-    var g = h("linearGradient", { id: id, x1: 0, y1: 0, x2: vertical ? 0 : 1, y2: vertical ? 1 : 0 }, defs);
+  function gradient(defs, id, stops) {
+    var g = h("linearGradient", { id: id, x1: 0, y1: 0, x2: 1, y2: 0 }, defs);
     stops.forEach(function (s) {
       h("stop", { offset: s[0], "stop-color": s[1], "stop-opacity": s[2] === undefined ? 1 : s[2] }, g);
     });
     return g;
+  }
+  function chip(parent, x, y, label, kind) {
+    var w = label.length * 5.7 + 12;
+    var g = h("g", null, parent);
+    var fill = kind === "mint" ? "rgba(22,255,198,0.14)" : kind === "value" ? "rgba(230,238,240,0.12)" : "rgba(143,166,176,0.16)";
+    h("rect", { x: x, y: y, width: w, height: 15, rx: 7.5, fill: fill }, g);
+    tx(g, x + w / 2, y + 10.5, label, "s-chip", { "text-anchor": "middle", fill: kind === "mint" ? C.mint : C.text });
+    return { g: g, w: w };
   }
 
   /* Canvas helper: logical size w x h, sharp on any screen */
@@ -119,7 +121,7 @@
     stage.appendChild(c);
     var ctx = c.getContext("2d");
     var bg = document.createElement("canvas");
-    var api = { ctx: ctx, w: w, h: hgt, scale: 1, dirty: true, redraw: null };
+    var api = { ctx: ctx, w: w, h: hgt, scale: 1, redraw: null };
     stage.__canvasApi = api;
     function fit() {
       var r = stage.getBoundingClientRect();
@@ -133,7 +135,6 @@
       b.setTransform(api.scale, 0, 0, api.scale, 0, 0);
       b.fillStyle = "rgba(143,166,176,0.16)";
       for (var x = 1; x < w; x += 16) for (var y = 1; y < hgt; y += 16) b.fillRect(x - 0.6, y - 0.6, 1.2, 1.2);
-      api.dirty = true;
       if (api.redraw) api.redraw();
     }
     fit();
@@ -151,28 +152,40 @@
     return (weight || 400) + " " + size + "px " + fam;
   }
   function spaced(ctx, s, x, y, track) {
-    // letter-spaced text for mono labels on canvas
     for (var i = 0; i < s.length; i++) {
       ctx.fillText(s[i], x, y);
       x += ctx.measureText(s[i]).width + track;
     }
     return x;
   }
+  function roundRect(ctx, x, y, w, hh, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + hh, r);
+    ctx.arcTo(x + w, y + hh, x, y + hh, r);
+    ctx.arcTo(x, y + hh, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
 
   var SCENES = {};
 
-  /* 01 Strategic Project Discovery: scan, collect, score */
+  /* Strategic Project Discovery: scan, collect, score */
   SCENES["strategic-project-discovery"] = {
     dur: 10.6,
     still: 8.4,
     beats: [[0, 0], [3.0, 1], [4.8, 2]],
-    init: function (stage) {
-      var st = svgStage(stage, 600, 375, "spd");
+    size: { wide: [600, 375], tall: [340, 650] },
+    init: function (stage, mode) {
+      var tall = mode === "tall";
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 650 : 375, "spd" + mode);
       var svg = st.svg;
-      gradient(st.defs, "beam-spd", [[0, C.mint, 0], [0.5, C.mint, 0.28], [1, C.mint, 0]]);
-      tx(svg, 24, 30, "676 PROCUREMENT SOURCES", "s-mono");
-      var status = tx(svg, 24, 340, "", "s-mono s-dim");
-      var N = 26, cell = 8, gap = 2, x0 = 24, y0 = 44;
+      gradient(st.defs, "beam-spd" + mode, [[0, C.mint, 0], [0.5, C.mint, 0.28], [1, C.mint, 0]]);
+      var G = tall ? { gx: 40, gy: 44, hx: 40, hy: 28, sy: 328 } : { gx: 24, gy: 44, hx: 24, hy: 30, sy: 340 };
+      var PNL = tall ? { x: 16, y: 344, w: 308, h: 296, cx: 28, cw: 284, ch: 46, pitch: 50, y0: 384 } : { x: 316, y: 20, w: 264, h: 335, cx: 328, cw: 240, ch: 52, pitch: 58, y0: 60 };
+      tx(svg, G.hx, G.hy, "676 PROCUREMENT SOURCES", "s-mono");
+      var status = tx(svg, G.hx, G.sy, "", "s-mono s-dim");
+      var N = 26, pitch = 10, cell = 8;
       var r = rng(11), hits = [];
       while (hits.length < 5) {
         var k = Math.floor(r() * 676);
@@ -180,16 +193,15 @@
       }
       var g = h("g", null, svg), sq = [];
       for (var i = 0; i < 676; i++) {
-        var cx = i % N, cy = Math.floor(i / N);
-        var x = x0 + cx * (cell + gap), y = y0 + cy * (cell + gap);
+        var x = G.gx + (i % N) * pitch, y = G.gy + Math.floor(i / N) * pitch;
         sq.push({ el: h("rect", { x: x, y: y, width: cell, height: cell, rx: 1.6, fill: C.mist, opacity: 0.16 }, g), x: x + cell / 2, y: y + cell / 2, hit: hits.indexOf(i) >= 0 });
       }
-      var gridW = N * (cell + gap);
-      var glow = h("rect", { x: 0, y: y0 - 8, width: 44, height: gridW + 12, fill: "url(#beam-spd)" }, svg);
-      var beam = h("rect", { x: 0, y: y0 - 8, width: 1.5, height: gridW + 12, fill: C.mint }, svg);
+      var gridW = N * pitch;
+      var glow = h("rect", { x: 0, y: G.gy - 8, width: 44, height: gridW + 12, fill: "url(#beam-spd" + mode + ")" }, svg);
+      var beam = h("rect", { x: 0, y: G.gy - 8, width: 1.5, height: gridW + 12, fill: C.mint }, svg);
 
-      h("rect", { x: 316, y: 20, width: 264, height: 335, rx: 12, fill: C.panel, stroke: C.line }, svg);
-      tx(svg, 332, 44, "RESULTS · SAMPLE DATA", "s-mono");
+      h("rect", { x: PNL.x, y: PNL.y, width: PNL.w, height: PNL.h, rx: 12, fill: C.panel, stroke: C.line }, svg);
+      tx(svg, PNL.x + 16, PNL.y + 24, "RESULTS · SAMPLE DATA", "s-mono");
       var data = [
         ["Northern Arc Metro Extension", "MANCHESTER · £1.8BN", 92],
         ["Iberian High Speed Link", "VALENCIA · €640M", 78],
@@ -199,39 +211,39 @@
       ];
       var sorted = data.map(function (d, i) { return i; }).sort(function (a, b) { return data[b][2] - data[a][2]; });
       var hitPts = hits.map(function (k) { return sq[k]; }).sort(function (a, b) { return a.x - b.x; });
+      var mid = PNL.ch / 2;
       var cards = data.map(function (d, i) {
         var cg = h("g", { opacity: 0 }, svg);
-        var bg = h("rect", { x: 328, y: 0, width: 240, height: 52, rx: 8, fill: C.panel2, stroke: C.line }, cg);
-        h("circle", { cx: 352, cy: 26, r: 14, fill: "none", stroke: "rgba(143,166,176,0.25)", "stroke-width": 3 }, cg);
-        var arc = h("circle", { cx: 352, cy: 26, r: 14, fill: "none", stroke: C.mint, "stroke-width": 3, "stroke-linecap": "round", transform: "rotate(-90 352 26)", "stroke-dasharray": "0 88" }, cg);
-        var num = tx(cg, 352, 30, "", "s-num-xs", { "text-anchor": "middle" });
-        tx(cg, 376, 23, d[0], "s-ui");
-        tx(cg, 376, 40, d[1], "s-mono s-dim");
-        var chip = h("g", { opacity: 0 }, cg);
-        h("rect", { x: 496, y: -7, width: 60, height: 15, rx: 7.5, fill: C.mint }, chip);
-        tx(chip, 526, 3.5, "HIGH FIT", "s-chip s-ink", { "text-anchor": "middle" });
+        var bg = h("rect", { x: PNL.cx, y: 0, width: PNL.cw, height: PNL.ch, rx: 8, fill: C.panel2, stroke: C.line }, cg);
+        var rx0 = PNL.cx + 24;
+        h("circle", { cx: rx0, cy: mid, r: 14, fill: "none", stroke: "rgba(143,166,176,0.25)", "stroke-width": 3 }, cg);
+        var arc = h("circle", { cx: rx0, cy: mid, r: 14, fill: "none", stroke: C.mint, "stroke-width": 3, "stroke-linecap": "round", transform: "rotate(-90 " + rx0 + " " + mid + ")", "stroke-dasharray": "0 88" }, cg);
+        var num = tx(cg, rx0, mid + 4, "", "s-num-xs", { "text-anchor": "middle" });
+        tx(cg, PNL.cx + 48, mid - 3, d[0], "s-ui");
+        tx(cg, PNL.cx + 48, mid + 13, d[1], "s-mono s-dim");
+        var tag = h("g", { opacity: 0 }, cg);
+        h("rect", { x: PNL.cx + PNL.cw - 72, y: -7, width: 60, height: 15, rx: 7.5, fill: C.mint }, tag);
+        tx(tag, PNL.cx + PNL.cw - 42, 3.5, "HIGH FIT", "s-chip s-ink", { "text-anchor": "middle" });
         var fly = h("circle", { r: 3.2, fill: C.mint, opacity: 0 }, svg);
-        return { g: cg, bg: bg, arc: arc, num: num, chip: chip, fly: fly, score: d[2], slot: i, rank: sorted.indexOf(i), from: hitPts[i] };
+        return { g: cg, bg: bg, arc: arc, num: num, tag: tag, fly: fly, score: d[2], slot: i, rank: sorted.indexOf(i), from: hitPts[i], rx: rx0 };
       });
 
       return function (t) {
         var fade = 1 - P(t, 9.6, 10.3, E.inOut);
         var sweep = P(t, 0.3, 2.8, E.inOut);
-        var bx = lerp(x0 - 6, x0 + gridW + 4, sweep);
+        var bx = lerp(G.gx - 6, G.gx + gridW + 4, sweep);
         var scanning = t > 0.3 && t < 2.95;
         set(beam, "x", bx.toFixed(1));
         set(glow, "x", (bx - 22).toFixed(1));
         op(beam, scanning ? 1 : 0);
         op(glow, scanning ? 1 : 0);
+        var settle = 1 - P(t, 2.8, 3.3);
         for (var i = 0; i < sq.length; i++) {
           var s = sq[i], o = 0.16, fill = C.mist;
           if (t > 0.3 && bx > s.x) {
             var d = bx - s.x;
-            o = 0.24 + 0.6 * Math.exp((-d * d) / 260) * (1 - P(t, 2.8, 3.3));
-            if (s.hit) {
-              o = 1;
-              fill = C.mint;
-            }
+            o = 0.24 + 0.6 * Math.exp((-d * d) / 260) * settle;
+            if (s.hit) { o = 1; fill = C.mint; }
           }
           set(s.el, "fill", fill);
           op(s.el, o * fade + (1 - fade) * 0.16);
@@ -240,14 +252,11 @@
         cards.forEach(function (c, i) {
           var t0 = 3.0 + i * 0.24;
           var fp = P(t, t0, t0 + 0.7, E.inOut);
-          var slotY = 60 + c.slot * 58, rankY = 60 + c.rank * 58;
-          var y = lerp(slotY, rankY, P(t, 6.5, 7.4, E.inOut));
-          var tx0 = c.from.x, ty0 = c.from.y, tx1 = 352, ty1 = y + 26;
-          var mx = (tx0 + tx1) / 2, my = Math.min(ty0, ty1) - 40;
-          var fx = (1 - fp) * (1 - fp) * tx0 + 2 * (1 - fp) * fp * mx + fp * fp * tx1;
-          var fy = (1 - fp) * (1 - fp) * ty0 + 2 * (1 - fp) * fp * my + fp * fp * ty1;
-          set(c.fly, "cx", fx.toFixed(1));
-          set(c.fly, "cy", fy.toFixed(1));
+          var y = lerp(PNL.y0 + c.slot * PNL.pitch, PNL.y0 + c.rank * PNL.pitch, P(t, 6.5, 7.4, E.inOut));
+          var x0 = c.from.x, y0 = c.from.y, x1 = c.rx, y1 = y + mid;
+          var mx = tall ? x0 + 60 : (x0 + x1) / 2, my = tall ? (y0 + y1) / 2 : Math.min(y0, y1) - 40;
+          set(c.fly, "cx", quad(x0, mx, x1, fp).toFixed(1));
+          set(c.fly, "cy", quad(y0, my, y1, fp).toFixed(1));
           op(c.fly, t > t0 && fp < 1 ? 1 : 0);
           var appear = P(t, t0 + 0.55, t0 + 0.95);
           move(c.g, lerp(14, 0, appear), y);
@@ -257,75 +266,74 @@
           text(c.num, ring > 0 ? String(Math.round(c.score * ring)) : "");
           var top = c.rank === 0 ? P(t, 7.4, 7.8) : 0;
           set(c.bg, "stroke", top > 0.5 ? C.mint : C.line);
-          op(c.chip, top);
+          op(c.tag, top);
         });
       };
     },
   };
 
-  /* 02 GrowthSignal: collect, tag, rank */
+  /* GrowthSignal: collect across update runs, tag, rank */
   SCENES.growthsignal = {
     dur: 11,
     still: 8.8,
     beats: [[0, 0], [3.9, 1], [6.9, 2]],
-    init: function (stage) {
-      var st = svgStage(stage, 600, 375, "gs");
+    size: { wide: [600, 375], tall: [340, 670] },
+    init: function (stage, mode) {
+      var tall = mode === "tall";
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 670 : 375, "gs" + mode);
       var svg = st.svg;
-      tx(svg, 24, 30, "270+ PUBLIC SOURCES", "s-mono");
+      var L = tall ? { hx: 20, hy: 28, sx: 24, sy: 54, sp: 27, dbx: 268, dby: 64, out: 186 } : { hx: 24, hy: 30, sx: 28, sy: 62, sp: 34, dbx: 250, dby: 92, out: 166 };
+      var R = tall ? { x: 16, y: 300, w: 308, h: 360, rx: 28, rw: 284, y0: 340, pitch: 52 } : { x: 330, y: 20, w: 250, h: 335, rx: 342, rw: 226, y0: 58, pitch: 48 };
+      tx(svg, L.hx, L.hy, "270+ PUBLIC SOURCES", "s-mono");
       var sources = ["UK PORTALS", "EU PORTALS", "US PORTALS", "DEVELOPMENT BANKS", "OCDS PUBLISHERS", "PERMITS", "SEC FILINGS", "INDUSTRY NEWS"];
       var srcEls = sources.map(function (s, i) {
-        var y = 62 + i * 34;
-        var dot = h("circle", { cx: 28, cy: y - 3.5, r: 3, fill: C.soft, opacity: 0.4 }, svg);
-        tx(svg, 38, y, s, "s-mono s-dim");
+        var y = L.sy + i * L.sp;
+        var dot = h("circle", { cx: L.sx, cy: y - 3.5, r: 3, fill: C.soft, opacity: 0.4 }, svg);
+        tx(svg, L.sx + 10, y, s, "s-mono s-dim");
         return { dot: dot, y: y - 3.5 };
       });
-      // database
+      var dbx = L.dbx, dby = L.dby;
       var db = h("g", null, svg);
-      var dbx = 246, dby = 128;
-      h("path", { d: "M" + (dbx - 38) + " " + dby + " v86 a38 11 0 0 0 76 0 v-86", fill: C.panel2, stroke: C.line }, db);
-      h("ellipse", { cx: dbx, cy: dby, rx: 38, ry: 11, fill: C.panel, stroke: C.line }, db);
-      h("path", { d: "M" + (dbx - 38) + " " + (dby + 30) + " a38 11 0 0 0 76 0 M" + (dbx - 38) + " " + (dby + 58) + " a38 11 0 0 0 76 0", fill: "none", stroke: C.line }, db);
-      var fillLevel = h("rect", { x: dbx - 37, y: dby + 97, width: 74, height: 0, fill: "rgba(22,255,198,0.10)" }, db);
-      var count = tx(svg, dbx, 262, "0", "s-num", { "text-anchor": "middle" });
-      tx(svg, dbx, 280, "RECORDS", "s-mono s-dim", { "text-anchor": "middle" });
+      h("path", { d: "M" + (dbx - 34) + " " + dby + " v78 a34 10 0 0 0 68 0 v-78", fill: C.panel2, stroke: C.line }, db);
+      var fillLevel = h("rect", { x: dbx - 33, y: dby + 88, width: 66, height: 0, fill: "rgba(22,255,198,0.12)" }, db);
+      h("ellipse", { cx: dbx, cy: dby, rx: 34, ry: 10, fill: C.panel, stroke: C.line }, db);
+      h("path", { d: "M" + (dbx - 34) + " " + (dby + 26) + " a34 10 0 0 0 68 0 M" + (dbx - 34) + " " + (dby + 52) + " a34 10 0 0 0 68 0", fill: "none", stroke: C.line }, db);
+      var count = tx(svg, dbx, dby + 130, "0", "s-num", { "text-anchor": "middle" });
+      tx(svg, dbx, dby + 147, "RECORDS", "s-mono s-dim", { "text-anchor": "middle" });
+      var runs = [], runH = [10, 14, 17, 21, 24, 27, 29, 31];
+      for (var k = 0; k < 8; k++) runs.push(h("rect", { x: dbx - 32 + k * 8.4, y: dby + 196, width: 6, height: 0, rx: 1.5, fill: C.soft }, svg));
+      tx(svg, dbx, dby + 212, "UPDATE RUNS", "s-mono s-dim", { "text-anchor": "middle" });
       var claude = h("g", { opacity: 0 }, svg);
-      h("rect", { x: dbx - 34, y: 300, width: 68, height: 20, rx: 10, fill: "none", stroke: C.mint }, claude);
-      tx(claude, dbx, 314, "CLAUDE", "s-mono", { "text-anchor": "middle", fill: C.mint });
+      h("rect", { x: dbx - 30, y: dby - 40, width: 60, height: 18, rx: 9, fill: "none", stroke: C.mint }, claude);
+      tx(claude, dbx, dby - 27.5, "CLAUDE", "s-chip", { "text-anchor": "middle", fill: C.mint });
 
-      var r = rng(5);
-      var parts = [];
+      var r = rng(5), parts = [];
       for (var i = 0; i < 46; i++) {
         var s = srcEls[Math.floor(r() * srcEls.length)];
-        parts.push({ el: h("rect", { width: 7, height: 4, rx: 1.5, fill: C.soft, opacity: 0 }, svg), y0: s.y, t0: 0.3 + i * 0.07 + r() * 0.12, s: s });
+        parts.push({ el: h("rect", { width: 7, height: 4, rx: 1.5, fill: C.soft, opacity: 0 }, svg), y0: s.y, t0: 0.3 + i * 0.07 + r() * 0.12 });
       }
 
-      h("rect", { x: 330, y: 20, width: 250, height: 335, rx: 12, fill: C.panel, stroke: C.line }, svg);
-      tx(svg, 346, 44, "PIPELINE · RANKED", "s-mono");
+      h("rect", { x: R.x, y: R.y, width: R.w, height: R.h, rx: 12, fill: C.panel, stroke: C.line }, svg);
+      tx(svg, R.x + 16, R.y + 24, "SAMPLE RECORDS · RANKED", "s-mono");
       var rows = [
-        ["INFRASTRUCTURE", "TENDER", "UK", 71],
-        ["ENERGY", "PROGRAMME", "EU", 44],
-        ["RESIDENTIAL", "PIPELINE", "UK", 63],
-        ["INSTITUTIONAL", "TENDER", "US", 86],
-        ["COMMERCIAL", "AWARD", "EU", 92],
-        ["INDUSTRIAL", "PROGRAMME", "US", 55],
+        ["Hospital extension, phase 2", "INSTITUTIONAL", "£95M", 63],
+        ["Water treatment upgrade", "ENERGY", "€410M", 48],
+        ["Office refurbishment", "COMMERCIAL", "£1.2BN", 92],
+        ["Housing estate renewal", "RESIDENTIAL", "£240M", 77],
+        ["Rail depot design-build", "INFRASTRUCTURE", "US$238M", 86],
+        ["Distribution centre", "INDUSTRIAL", "€88M", 41],
       ];
       var order = rows.map(function (d, i) { return i; }).sort(function (a, b) { return rows[b][3] - rows[a][3]; });
       var rowEls = rows.map(function (d, i) {
         var rg = h("g", { opacity: 0 }, svg);
-        var bg = h("rect", { x: 342, y: 0, width: 226, height: 42, rx: 7, fill: C.panel2, stroke: C.line }, rg);
-        h("rect", { x: 354, y: 10, width: 70 + ((i * 37) % 60), height: 5, rx: 2.5, fill: "rgba(230,238,240,0.55)" }, rg);
-        var chips = [];
-        var cx = 354;
-        [d[0], d[1], d[2]].forEach(function (c, j) {
-          var w = c.length * 5.6 + 12;
-          var cg = h("g", { opacity: 0 }, rg);
-          h("rect", { x: cx, y: 21, width: w, height: 14, rx: 7, fill: j === 0 ? "rgba(22,255,198,0.14)" : "rgba(143,166,176,0.16)" }, cg);
-          tx(cg, cx + w / 2, 31, c, "s-chip", { "text-anchor": "middle", fill: j === 0 ? C.mint : C.text });
-          chips.push(cg);
-          cx += w + 5;
-        });
-        var score = tx(rg, 556, 26, "", "s-num-xs", { "text-anchor": "end" });
-        return { g: rg, bg: bg, chips: chips, score: score, val: d[3], slot: i, rank: order.indexOf(i) };
+        var bg = h("rect", { x: R.rx, y: 0, width: R.rw, height: 42, rx: 7, fill: C.panel2, stroke: C.line }, rg);
+        tx(rg, R.rx + 12, 17, d[0], "s-ui s-ui-sm");
+        var a = chip(rg, R.rx + 12, 23, d[1], "mint");
+        var b = chip(rg, R.rx + 16 + a.w, 23, d[2], "value");
+        op(a.g, 0);
+        op(b.g, 0);
+        var score = tx(rg, R.rx + R.rw - 12, 17, "", "s-num-xs", { "text-anchor": "end" });
+        return { g: rg, bg: bg, chips: [a.g, b.g], score: score, val: d[3], slot: i, rank: order.indexOf(i) };
       });
 
       return function (t) {
@@ -335,28 +343,29 @@
         });
         parts.forEach(function (p) {
           var q = P(t, p.t0, p.t0 + 0.9, E.inOut);
-          var x0 = 160, x1 = dbx, y1 = dby + 4;
-          var mx = (x0 + x1) / 2, my = Math.min(p.y0, y1) - 10;
-          var x = (1 - q) * (1 - q) * x0 + 2 * (1 - q) * q * mx + q * q * x1;
-          var y = (1 - q) * (1 - q) * p.y0 + 2 * (1 - q) * q * my + q * q * y1;
+          var y1 = dby + 4;
+          var x = quad(L.out, (L.out + dbx) / 2, dbx, q), y = quad(p.y0, Math.min(p.y0, y1) - 10, y1, q);
           set(p.el, "x", (x - 3.5).toFixed(1));
           set(p.el, "y", (y - 2).toFixed(1));
           op(p.el, t > p.t0 && q < 1 ? 0.9 : 0);
         });
-        var c = P(t, 0.5, 3.9, E.inOut);
-        text(count, fmt(57848 * c * fade + (fade < 1 ? 0 : 0)));
-        set(fillLevel, "height", (86 * c * fade).toFixed(1));
-        set(fillLevel, "y", (dby + 97 - 86 * c * fade).toFixed(1));
-        op(claude, (t > 3.9 && t < 7 ? 0.55 + 0.45 * Math.sin(t * 6) : P(t, 3.9, 4.2) * (t < 7 ? 1 : 1 - P(t, 7, 7.4))) * fade);
+        var c = P(t, 0.5, 3.9, E.inOut) * fade;
+        text(count, fmt(57848 * c));
+        set(fillLevel, "height", (78 * c).toFixed(1));
+        set(fillLevel, "y", (dby + 88 - 78 * c).toFixed(1));
+        runs.forEach(function (bar, k) {
+          var hh = runH[k] * P(t, 0.5 + k * 0.42, 0.9 + k * 0.42) * fade;
+          set(bar, "height", hh.toFixed(1));
+          set(bar, "y", (dby + 196 - hh).toFixed(1));
+        });
+        op(claude, (t > 4.2 && t < 7 ? 0.6 + 0.4 * Math.sin(t * 6) : P(t, 3.9, 4.2) * (1 - P(t, 7, 7.4))) * fade);
         rowEls.forEach(function (row, i) {
           var t0 = 3.9 + i * 0.3;
           var a = P(t, t0, t0 + 0.5);
-          var y = lerp(58 + row.slot * 48, 58 + row.rank * 48, P(t, 6.9, 7.8, E.inOut));
+          var y = lerp(R.y0 + row.slot * R.pitch, R.y0 + row.rank * R.pitch, P(t, 6.9, 7.8, E.inOut));
           move(row.g, lerp(-16, 0, a), y);
           op(row.g, a * fade);
-          row.chips.forEach(function (cg, j) {
-            op(cg, P(t, t0 + 0.35 + j * 0.16, t0 + 0.6 + j * 0.16));
-          });
+          row.chips.forEach(function (cg, j) { op(cg, P(t, t0 + 0.4 + j * 0.2, t0 + 0.65 + j * 0.2)); });
           var sp = P(t, 6.7, 7.2);
           text(row.score, sp > 0 ? String(Math.round(row.val * sp)) : "");
           set(row.bg, "stroke", row.rank === 0 && t > 7.8 ? C.mint : C.line);
@@ -365,17 +374,21 @@
     },
   };
 
-  /* 04 Reference Buildings Explorer: rise, slice, read (canvas) */
+  /* Reference Buildings Explorer: rise, slice, read (canvas) */
   SCENES["reference-buildings-explorer"] = {
     dur: 11,
     still: 8.6,
     beats: [[0, 0], [3.6, 1], [6.6, 2]],
-    init: function (stage) {
-      var cv = canvasStage(stage, 600, 375);
+    size: { wide: [600, 375], tall: [340, 540] },
+    init: function (stage, mode) {
+      var tall = mode === "tall";
+      var cv = canvasStage(stage, tall ? 340 : 600, tall ? 540 : 375);
       var ctx = cv.ctx;
-      var N = 16, s = 10.6, ox = 304, oy = 136, maxH = 104;
-      var r = rng(21);
-      var typeBase = [];
+      var N = 16;
+      var G = tall ? { s: 9.4, ox: 170, oy: 150, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 330, oy: 136, maxH: 104, hx: 24, hy: 30 };
+      var CALL = tall ? { x: 16, y: 418, w: 308, h: 100 } : { x: 24, y: 58, w: 150, h: 92 };
+      var LEG = tall ? { x: 16, y: 386, w: 180 } : { x: 24, y: 334, w: 150 };
+      var r = rng(21), typeBase = [];
       for (var i = 0; i < N; i++) typeBase.push(0.32 + 0.6 * r());
       typeBase[2] = 0.78;
       var v = [];
@@ -392,11 +405,10 @@
       function color(x, k) {
         x = clamp(x, 0, 1) * (vir.length - 1);
         var i0 = Math.floor(x), i1 = Math.min(vir.length - 1, i0 + 1), f = x - i0;
-        var c = vir[i0].map(function (cc, j) { return Math.round((cc + (vir[i1][j] - cc) * f) * k); });
-        return c;
+        return vir[i0].map(function (cc, j) { return Math.round((cc + (vir[i1][j] - cc) * f) * k); });
       }
-      function X(i, j) { return ox + (i - j) * s * 0.866; }
-      function Y(i, j) { return oy + (i + j) * s * 0.5; }
+      function X(i, j) { return G.ox + (i - j) * G.s * 0.866; }
+      function Y(i, j) { return G.oy + (i + j) * G.s * 0.5; }
       function poly(pts, fill, stroke) {
         ctx.beginPath();
         ctx.moveTo(pts[0][0], pts[0][1]);
@@ -405,140 +417,156 @@
         if (fill) { ctx.fillStyle = fill; ctx.fill(); }
         if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
       }
-      function bar(i, j, hh, val, alpha) {
+      function corners(i, j) {
         var i0 = i + 0.14, i1 = i + 0.86, j0 = j + 0.14, j1 = j + 0.86;
-        var A = [X(i0, j0), Y(i0, j0)], B = [X(i1, j0), Y(i1, j0)], Cc = [X(i1, j1), Y(i1, j1)], D = [X(i0, j1), Y(i0, j1)];
-        function up(p) { return [p[0], p[1] - hh]; }
-        var top = color(val, 1), left = color(val, 0.62), right = color(val, 0.8);
+        return [[X(i0, j0), Y(i0, j0)], [X(i1, j0), Y(i1, j0)], [X(i1, j1), Y(i1, j1)], [X(i0, j1), Y(i0, j1)]];
+      }
+      function up(p, hh) { return [p[0], p[1] - hh]; }
+      function bar(i, j, hh, val, alpha, ghost) {
+        var c = corners(i, j), A = c[0], B = c[1], Cc = c[2], D = c[3];
         ctx.globalAlpha = alpha;
-        poly([D, Cc, up(Cc), up(D)], "rgb(" + left + ")");
-        poly([B, Cc, up(Cc), up(B)], "rgb(" + right + ")");
-        poly([up(A), up(B), up(Cc), up(D)], "rgb(" + top + ")");
+        if (ghost) {
+          ctx.lineWidth = 0.6;
+          poly([up(A, hh), up(B, hh), up(Cc, hh), up(D, hh)], null, "rgba(143,166,176,0.9)");
+        } else {
+          poly([D, Cc, up(Cc, hh), up(D, hh)], "rgb(" + color(val, 0.62) + ")");
+          poly([B, Cc, up(Cc, hh), up(B, hh)], "rgb(" + color(val, 0.8) + ")");
+          poly([up(A, hh), up(B, hh), up(Cc, hh), up(D, hh)], "rgb(" + color(val, 1) + ")");
+        }
         ctx.globalAlpha = 1;
       }
       var cells = [];
       for (var ii = 0; ii < N; ii++) for (var jj = 0; jj < N; jj++) cells.push([ii, jj]);
       cells.sort(function (p, q) { return p[0] + p[1] - (q[0] + q[1]) || p[1] - q[1]; });
+      function drawPlane(jp, a) {
+        if (a <= 0) return;
+        var H = G.maxH + 20;
+        ctx.globalAlpha = a;
+        ctx.lineWidth = 1;
+        poly([[X(-0.4, jp), Y(-0.4, jp)], [X(N + 0.4, jp), Y(N + 0.4, jp)], [X(N + 0.4, jp), Y(N + 0.4, jp) - H], [X(-0.4, jp), Y(-0.4, jp) - H]], "rgba(22,255,198,0.07)", "rgba(22,255,198,0.7)");
+        ctx.globalAlpha = 1;
+      }
 
       return function (t) {
         cv.begin();
         var fade = 1 - P(t, 10.2, 10.8, E.inOut);
-        // floor grid
         ctx.lineWidth = 0.6;
         ctx.strokeStyle = "rgba(143,166,176,0.18)";
         for (var k = 0; k <= N; k++) {
           ctx.beginPath(); ctx.moveTo(X(k, 0), Y(k, 0)); ctx.lineTo(X(k, N), Y(k, N)); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(X(0, k), Y(0, k)); ctx.lineTo(X(N, k), Y(N, k)); ctx.stroke();
         }
-        // axis labels
         ctx.fillStyle = C.mist;
-        ctx.font = font(9.5, "mono", 500);
-        ctx.save(); ctx.translate(X(0, N) + 4, Y(0, N) + 26); ctx.rotate(Math.atan2(0.5, 0.866)); spaced(ctx, "16 BUILDING TYPES", 0, 0, 1.2); ctx.restore();
-        ctx.save(); ctx.translate(X(N, N) + 22, Y(N, N) + 14); ctx.rotate(-Math.atan2(0.5, 0.866)); spaced(ctx, "16 CLIMATE ZONES", 0, 0, 1.2); ctx.restore();
+        ctx.font = font(tall ? 10 : 9.5, "mono", 500);
+        ctx.save(); ctx.translate(X(0, N) + 2, Y(0, N) + 26); ctx.rotate(Math.atan2(0.5, 0.866)); spaced(ctx, "16 BUILDING TYPES", 0, 0, 1.2); ctx.restore();
+        ctx.save(); ctx.translate(X(N, N) + 24, Y(N, N) + 14); ctx.rotate(-Math.atan2(0.5, 0.866)); spaced(ctx, "16 CLIMATE ZONES", 0, 0, 1.2); ctx.restore();
 
         var plane = t < 3.6 ? -1 : lerp(0, SEL_J + 0.5, P(t, 3.6, 5.6, E.inOut));
         var slice = P(t, 5.4, 5.9);
         var pick = P(t, 6.6, 7.1);
-        var drawnPlane = false;
+        var planeA = P(t, 3.6, 3.9) * (1 - P(t, 6.6, 7.2)) * fade;
+        var drawn = false;
         for (var c = 0; c < cells.length; c++) {
           var i = cells[c][0], j = cells[c][1];
-          if (plane >= 0 && !drawnPlane && j + 0.5 > plane) {
-            drawPlane(plane, P(t, 3.6, 3.9) * (1 - P(t, 6.6, 7.2)) * fade);
-            drawnPlane = true;
-          }
+          if (plane >= 0 && !drawn && j + 0.5 > plane) { drawPlane(plane, planeA); drawn = true; }
           var t0 = 0.2 + (i + j) * 0.045;
-          var hh = v[i][j] * maxH * E.out(clamp((t - t0) / 0.9, 0, 1)) * (0.15 + 0.85 * fade);
+          var hh = v[i][j] * G.maxH * E.out(clamp((t - t0) / 0.9, 0, 1)) * (0.15 + 0.85 * fade);
           if (hh < 0.5) continue;
-          var alpha = 1;
-          if (j !== SEL_J) alpha -= 0.72 * slice;
-          if (!(i === SEL_I && j === SEL_J)) alpha -= (j === SEL_J ? 0.5 : 0.1) * pick;
-          bar(i, j, hh, v[i][j], clamp(alpha, 0.12, 1) * fade + (1 - fade) * 0.2);
-          if (pick > 0 && i === SEL_I && j === SEL_J) {
-            var i0 = i + 0.14, i1 = i + 0.86, j0 = j + 0.14, j1 = j + 0.86;
+          var inRow = j === SEL_J, isSel = i === SEL_I && j === SEL_J;
+          var ghost = inRow ? 0 : slice;
+          if (pick > 0 && !isSel) ghost = Math.max(ghost, inRow ? pick * 0.6 : 1);
+          if (ghost > 0.5) bar(i, j, hh, v[i][j], 0.22 * fade, true);
+          else bar(i, j, hh, v[i][j], (1 - ghost * 0.7) * fade + (1 - fade) * 0.2, false);
+          if (isSel && pick > 0) {
+            var cs = corners(i, j);
             ctx.globalAlpha = pick * fade;
             ctx.lineWidth = 1.4;
-            poly([[X(i0, j0), Y(i0, j0) - hh], [X(i1, j0), Y(i1, j0) - hh], [X(i1, j1), Y(i1, j1) - hh], [X(i1, j1), Y(i1, j1)], [X(i0, j1), Y(i0, j1)], [X(i0, j1), Y(i0, j1) - hh]], null, C.mint);
+            poly([up(cs[0], hh), up(cs[1], hh), up(cs[2], hh), cs[2], cs[3], up(cs[3], hh)], null, C.mint);
             ctx.globalAlpha = 1;
           }
         }
-        if (plane >= 0 && !drawnPlane) drawPlane(plane, P(t, 3.6, 3.9) * (1 - P(t, 6.6, 7.2)) * fade);
+        if (plane >= 0 && !drawn) drawPlane(plane, planeA);
 
-        // header
         ctx.fillStyle = C.soft;
         ctx.font = font(10, "mono", 500);
-        spaced(ctx, "256 BUILDING AND CLIMATE MODELS", 24, 30, 1.1);
-        if (t >= 3.6 && t < 6.6) {
-          ctx.globalAlpha = P(t, 5.4, 5.9) * fade;
-          ctx.fillStyle = C.mint;
-          spaced(ctx, "SECTION · CLIMATE 5A CHICAGO", 24, 48, 1.1);
-          ctx.globalAlpha = 1;
-        }
-        // callout
+        spaced(ctx, "256 BUILDING AND CLIMATE MODELS", G.hx, G.hy, 1.1);
+        ctx.globalAlpha = slice * (1 - pick) * fade;
+        ctx.fillStyle = C.mint;
+        spaced(ctx, "SECTION · CLIMATE 5A CHICAGO", G.hx, G.hy + 18, 1.1);
+        ctx.globalAlpha = 1;
+
+        var lg = ctx.createLinearGradient(LEG.x, 0, LEG.x + LEG.w, 0);
+        vir.forEach(function (cc, k) { lg.addColorStop(k / (vir.length - 1), "rgb(" + cc + ")"); });
+        ctx.globalAlpha = P(t, 1.2, 1.8) * fade;
+        ctx.fillStyle = C.mist;
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "SITE EUI · MJ/M²", LEG.x, LEG.y - 8, 1);
+        ctx.fillStyle = lg;
+        roundRect(ctx, LEG.x, LEG.y, LEG.w, 5, 2.5); ctx.fill();
+        ctx.fillStyle = C.mist;
+        spaced(ctx, "LOW", LEG.x, LEG.y + 18, 1);
+        ctx.textAlign = "right";
+        ctx.fillText("HIGH", LEG.x + LEG.w, LEG.y + 18);
+        ctx.textAlign = "left";
+        ctx.globalAlpha = 1;
+
         var call = P(t, 6.9, 7.5) * fade;
         if (call > 0) {
-          var bx = X(SEL_I + 0.5, SEL_J + 0.5), by = Y(SEL_I + 0.5, SEL_J + 0.5) - v[SEL_I][SEL_J] * maxH;
+          var bx = X(SEL_I + 0.5, SEL_J + 0.5), by = Y(SEL_I + 0.5, SEL_J + 0.5) - v[SEL_I][SEL_J] * G.maxH;
           ctx.globalAlpha = call;
           ctx.strokeStyle = C.mint;
           ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(bx, by - 4); ctx.lineTo(bx, 120); ctx.lineTo(172, 120); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(bx, by - 4);
+          if (tall) ctx.lineTo(bx, CALL.y);
+          else { ctx.lineTo(bx, CALL.y + 62); ctx.lineTo(CALL.x + CALL.w, CALL.y + 62); }
+          ctx.stroke();
           ctx.fillStyle = C.mint;
           ctx.beginPath(); ctx.arc(bx, by - 4, 3, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = "rgba(19,42,52,0.92)";
+          ctx.fillStyle = "rgba(19,42,52,0.94)";
           ctx.strokeStyle = C.line;
-          roundRect(ctx, 24, 58, 148, 92, 9);
-          ctx.fill(); ctx.stroke();
+          roundRect(ctx, CALL.x, CALL.y, CALL.w, CALL.h, 9); ctx.fill(); ctx.stroke();
           ctx.fillStyle = C.soft;
-          ctx.font = font(9.5, "mono", 500);
-          spaced(ctx, "LARGE OFFICE · 5A", 38, 80, 1);
+          ctx.font = font(10, "mono", 500);
+          spaced(ctx, tall ? "LARGE OFFICE · 5A CHICAGO" : "LARGE OFFICE · 5A", CALL.x + 14, CALL.y + 22, 1);
           ctx.fillStyle = "#ffffff";
           ctx.font = font(34, "serif", 400);
-          ctx.fillText(String(Math.round(575 * P(t, 6.9, 7.9))), 38, 118);
+          var val = String(Math.round(575 * P(t, 6.9, 7.6)));
+          ctx.fillText(val, CALL.x + 14, CALL.y + 60);
+          var vw = ctx.measureText(val).width;
           ctx.fillStyle = C.mist;
-          ctx.font = font(9.5, "mono", 500);
-          spaced(ctx, "MJ/M² SITE EUI", 38, 138, 1);
+          ctx.font = font(10, "mono", 500);
+          if (tall) spaced(ctx, "MJ/M² SITE EUI", CALL.x + 26 + vw, CALL.y + 60, 1);
+          else spaced(ctx, "MJ/M² SITE EUI", CALL.x + 14, CALL.y + 80, 1);
           ctx.globalAlpha = 1;
         }
       };
-      function drawPlane(jp, a) {
-        if (a <= 0) return;
-        var H = 128;
-        ctx.globalAlpha = a;
-        poly([[X(-0.4, jp), Y(-0.4, jp)], [X(N + 0.4, jp), Y(N + 0.4, jp)], [X(N + 0.4, jp), Y(N + 0.4, jp) - H], [X(-0.4, jp), Y(-0.4, jp) - H]], "rgba(22,255,198,0.08)", "rgba(22,255,198,0.7)");
-        ctx.globalAlpha = 1;
-      }
     },
   };
 
-  function roundRect(ctx, x, y, w, hh, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + hh, r);
-    ctx.arcTo(x + w, y + hh, x, y + hh, r);
-    ctx.arcTo(x, y + hh, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  }
-
-  /* 05 MaterialScan: evidence, verdicts, gaps */
+  /* MaterialScan: evidence, verdicts, open issues */
   SCENES.materialscan = {
     dur: 10.6,
     still: 8.6,
     beats: [[0, 0], [1.9, 1], [5.6, 2]],
-    init: function (stage) {
-      var st = svgStage(stage, 600, 375, "ms");
+    size: { wide: [600, 375], tall: [340, 690] },
+    init: function (stage, mode) {
+      var tall = mode === "tall";
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 690 : 375, "ms" + mode);
       var svg = st.svg;
-      tx(svg, 24, 30, "LAB AND WORKPLACE PALETTE", "s-mono");
-      var cols = ["LBC", "WELL", "BRIEF"];
-      cols.forEach(function (c, i) {
-        tx(svg, 236 + i * 52, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
+      var Lg = h("g", tall ? { transform: "translate(-6 0) scale(0.95)" } : null, svg);
+      var Rg = h("g", tall ? { transform: "translate(-238 330) scale(0.98)" } : null, svg);
+      tx(Lg, 24, 30, "LAB AND WORKPLACE PALETTE", "s-mono");
+      ["LBC", "WELL", "BRIEF"].forEach(function (c, i) {
+        tx(Lg, 236 + i * 52, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
       });
       var sections = ["Spandrels", "MEP enclosures", "Bird safety", "Blades", "Facade profiles", "Expressed frame", "Column cladding"];
       var V = [["a", "p", "g"], ["a", "p", "p"], ["p", "p", "g"], ["a", "g", "p"], ["p", "p", "p"], ["a", "p", "g"], ["p", "f", "p"]];
       var col = { p: C.teal, a: C.amber, g: C.grey, f: C.red };
-      var scan = h("rect", { x: 18, y: 0, width: 352, height: 34, rx: 7, fill: "rgba(22,255,198,0.07)", stroke: "rgba(22,255,198,0.4)", opacity: 0 }, svg);
+      var scan = h("rect", { x: 18, y: 0, width: 352, height: 34, rx: 7, fill: "rgba(22,255,198,0.07)", stroke: "rgba(22,255,198,0.4)", opacity: 0 }, Lg);
       var rows = sections.map(function (name, i) {
         var y = 68 + i * 38;
-        var rg = h("g", { opacity: 0 }, svg);
+        var rg = h("g", { opacity: 0 }, Lg);
         h("line", { x1: 24, x2: 364, y1: y + 36, y2: y + 36, stroke: "rgba(143,166,176,0.14)" }, rg);
         tx(rg, 24, y + 21, name, "s-ui");
         var ev = h("g", { opacity: 0 }, rg);
@@ -548,9 +576,8 @@
         });
         var cells = V[i].map(function (code, c) {
           var cx = 216 + c * 52;
-          var cg = h("g", null, rg);
-          var box = h("rect", { x: cx, y: y + 7, width: 40, height: 22, rx: 6, fill: "none", stroke: "rgba(143,166,176,0.3)" }, cg);
-          var mark = h("g", { opacity: 0 }, cg);
+          var box = h("rect", { x: cx, y: y + 7, width: 40, height: 22, rx: 6, fill: "none", stroke: "rgba(143,166,176,0.3)" }, rg);
+          var mark = h("g", { opacity: 0 }, rg);
           var mx = cx + 20, my = y + 18;
           if (code === "p") h("path", { d: "M" + (mx - 5) + " " + my + " l3.5 3.5 6.5-7", fill: "none", stroke: "#fff", "stroke-width": 1.8, "stroke-linecap": "round", "stroke-linejoin": "round" }, mark);
           if (code === "a") h("path", { d: "M" + (mx - 5) + " " + my + " h10", stroke: "#1b1b1b", "stroke-width": 2, "stroke-linecap": "round" }, mark);
@@ -560,32 +587,34 @@
         });
         return { g: rg, ev: ev, cells: cells, y: y };
       });
-      // gaps panel
-      h("rect", { x: 392, y: 20, width: 188, height: 335, rx: 12, fill: C.panel, stroke: C.line }, svg);
-      tx(svg, 408, 44, "VERDICTS", "s-mono");
+      var RW = tall ? 308 : 188;
+      var RX = tall ? 260 : 392;
+      h("rect", { x: RX, y: 20, width: RW, height: 335, rx: 12, fill: C.panel, stroke: C.line }, Rg);
+      tx(Rg, RX + 16, 44, "VERDICTS", "s-mono");
       var totals = { p: 0, a: 0, g: 0, f: 0 };
-      V.forEach(function (r) { r.forEach(function (c) { totals[c]++; }); });
-      var segs = [];
-      var sx = 408;
+      V.forEach(function (row) { row.forEach(function (c) { totals[c]++; }); });
+      var segs = [], sx = RX + 16, barW = RW - 32;
       ["p", "a", "g", "f"].forEach(function (k) {
-        var w = (totals[k] / 21) * 156;
-        segs.push({ el: h("rect", { x: sx, y: 56, width: 0, height: 10, fill: col[k] }, svg), w: w, x: sx });
+        var w = (totals[k] / 21) * barW;
+        segs.push({ el: h("rect", { x: sx, y: 56, width: 0, height: 10, fill: col[k] }, Rg), w: w });
         sx += w;
       });
-      var legend = h("g", { opacity: 0 }, svg);
+      var legend = h("g", { opacity: 0 }, Rg);
       [["p", "PASS"], ["a", "PARTIAL"], ["g", "GAP"], ["f", "FAIL"]].forEach(function (l, i) {
-        var lx = 408 + (i % 2) * 80, ly = 86 + Math.floor(i / 2) * 18;
+        var lx = RX + 16 + (tall ? i * 72 : (i % 2) * 80), ly = tall ? 86 : 86 + Math.floor(i / 2) * 18;
         h("rect", { x: lx, y: ly - 7, width: 8, height: 8, rx: 2, fill: col[l[0]] }, legend);
         tx(legend, lx + 14, ly, l[1] + " " + totals[l[0]], "s-chip", { fill: C.text });
       });
-      tx(svg, 408, 142, "OPEN GAPS · RANKED", "s-mono");
-      var gaps = [["Spandrels", "Client brief"], ["Blades", "WELL v2"], ["Bird safety", "Client brief"], ["Expressed frame", "Client brief"]].map(function (g, i) {
-        var gg = h("g", { opacity: 0 }, svg);
-        var y = 156 + i * 46;
-        h("rect", { x: 404, y: y, width: 164, height: 38, rx: 7, fill: C.panel2, stroke: C.line }, gg);
-        tx(gg, 416, y + 16, "0" + (i + 1), "s-mono");
-        tx(gg, 440, y + 16, g[0], "s-ui");
-        tx(gg, 440, y + 30, g[1].toUpperCase(), "s-chip", { fill: C.mist });
+      var gy0 = tall ? 128 : 142;
+      tx(Rg, RX + 16, gy0, "OPEN ISSUES · RANKED", "s-mono");
+      var gaps = [["Column cladding", "FAIL · WELL V2", C.red], ["Spandrels", "GAP · CLIENT BRIEF", C.grey], ["Blades", "GAP · WELL V2", C.grey], ["Bird safety", "GAP · CLIENT BRIEF", C.grey]].map(function (g, i) {
+        var gg = h("g", { opacity: 0 }, Rg);
+        var y = gy0 + 14 + i * 46;
+        h("rect", { x: RX + 12, y: y, width: RW - 24, height: 38, rx: 7, fill: C.panel2, stroke: C.line }, gg);
+        h("rect", { x: RX + 12, y: y + 8, width: 3, height: 22, rx: 1.5, fill: g[2] }, gg);
+        tx(gg, RX + 24, y + 16, "0" + (i + 1), "s-mono");
+        tx(gg, RX + 48, y + 16, g[0], "s-ui s-ui-sm");
+        tx(gg, RX + 48, y + 30, g[1], "s-chip", { fill: C.mist });
         return gg;
       });
       return function (t) {
@@ -601,34 +630,35 @@
             op(c.mark, p);
           });
         });
-        var sy = 1.9 + Math.min(6, Math.floor(clamp((t - 1.9) / 0.48, 0, 6.99))) * 0.48;
         var row = Math.floor(clamp((t - 1.9) / 0.48, 0, 6.99));
         set(scan, "y", rows[row].y + 1);
         op(scan, t > 1.9 && t < 5.4 ? 1 : 0);
         var b = P(t, 5.6, 6.6, E.inOut);
-        segs.forEach(function (s) {
-          set(s.el, "width", (s.w * b * fade).toFixed(1));
-        });
+        segs.forEach(function (s) { set(s.el, "width", (s.w * b * fade).toFixed(1)); });
         op(legend, P(t, 6.2, 6.6) * fade);
         gaps.forEach(function (g, i) {
           var a = P(t, 6.8 + i * 0.3, 7.2 + i * 0.3);
           move(g, lerp(12, 0, a), 0);
           op(g, a * fade);
         });
-        return sy;
       };
     },
   };
 
-  /* 06 WorkNodesCanvas: references, analyses, deck */
+  /* WorkNodesCanvas: references, analyses, deck */
   SCENES.worknodescanvas = {
     dur: 10.8,
     still: 8.8,
-    beats: [[0, 0], [3.0, 1], [5.8, 2]],
-    init: function (stage) {
-      var st = svgStage(stage, 600, 375, "wn");
+    beats: [[0, 0], [3.0, 1], [5.6, 2]],
+    size: { wide: [600, 375], tall: [340, 660] },
+    init: function (stage, mode) {
+      var tall = mode === "tall";
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 660 : 375, "wn" + mode);
       var svg = st.svg;
       var wires = h("g", null, svg);
+      var LAY = tall
+        ? { refs: [[10, 14], [10, 124], [10, 234]], rw: 156, rh: 96, an: [[184, 40], [184, 212]], aw: 146, ah: 122, pres: [10, 360, 320, 290], cols: 3, tw: 92, th: 56 }
+        : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
         h("rect", { x: x, y: y, width: w, height: hh, rx: 9, fill: C.panel, stroke: C.line }, g);
@@ -636,70 +666,76 @@
         tx(g, x + 12, y + 22, title, "s-ui");
         return g;
       }
-      // references
-      var refs = [
-        { x: 20, y: 34, title: "Building survey" },
-        { x: 20, y: 146, title: "Workshop notes" },
-        { x: 20, y: 258, title: "Energy use 2023–25" },
-      ].map(function (r, i) {
-        var g = node(r.x, r.y, 136, 84, r.title, "r");
-        if (i === 0) { h("rect", { x: r.x + 12, y: r.y + 32, width: 30, height: 40, rx: 2, fill: "none", stroke: "rgba(143,166,176,0.45)" }, g); for (var k = 0; k < 4; k++) h("rect", { x: r.x + 50, y: r.y + 36 + k * 9, width: 70 - k * 9, height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g); }
-        if (i === 1) for (var m = 0; m < 5; m++) h("rect", { x: r.x + 12, y: r.y + 34 + m * 8, width: 108 - (m % 3) * 18, height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
-        if (i === 2) for (var n = 0; n < 9; n++) { var bh = 8 + ((n * 7) % 26); h("rect", { x: r.x + 14 + n * 12, y: r.y + 74 - bh, width: 7, height: bh, rx: 1.5, fill: "rgba(143,220,210,0.55)" }, g); }
-        return { g: g, out: [r.x + 136, r.y + 42] };
+      var refs = ["Building survey", "Workshop notes", "Energy use 2023–25"].map(function (title, i) {
+        var x = LAY.refs[i][0], y = LAY.refs[i][1], w = LAY.rw, hh = LAY.rh;
+        var g = node(x, y, w, hh, title, "r");
+        var inner = w - 24;
+        if (i === 0) {
+          h("rect", { x: x + 12, y: y + 32, width: 30, height: hh - 44, rx: 2, fill: "none", stroke: "rgba(143,166,176,0.45)" }, g);
+          for (var k = 0; k < 4; k++) h("rect", { x: x + 50, y: y + 36 + k * 9, width: (inner - 40) * (1 - k * 0.12), height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
+        }
+        if (i === 1) for (var m = 0; m < 5; m++) h("rect", { x: x + 12, y: y + 34 + m * 8, width: inner * (1 - (m % 3) * 0.16), height: 3.5, rx: 1.7, fill: "rgba(143,166,176,0.35)" }, g);
+        if (i === 2) for (var n = 0; n < 9; n++) { var bh = 8 + ((n * 7) % 26); h("rect", { x: x + 12 + n * (inner / 9), y: y + hh - 10 - bh, width: inner / 9 - 5, height: bh, rx: 1.5, fill: "rgba(143,220,210,0.55)" }, g); }
+        return { g: g, out: [x + w, y + hh / 2] };
       });
-      // analyses
-      var an = [
-        { x: 214, y: 56, title: "Retrofit opportunities" },
-        { x: 214, y: 212, title: "Stakeholder priorities" },
-      ].map(function (a) {
-        var g = node(a.x, a.y, 160, 112, a.title, "a");
-        var run = h("rect", { x: a.x + 12, y: a.y + 32, width: 40, height: 18, rx: 5, fill: "none", stroke: C.mint }, g);
-        var runT = tx(g, a.x + 32, a.y + 45, "Run", "s-chip", { "text-anchor": "middle", fill: C.mint });
-        var spin = h("circle", { cx: a.x + 64, cy: a.y + 41, r: 5, fill: "none", stroke: C.mint, "stroke-width": 1.6, "stroke-dasharray": "18 40", opacity: 0 }, g);
+      var an = ["Retrofit opportunities", "Stakeholder priorities"].map(function (title, i) {
+        var x = LAY.an[i][0], y = LAY.an[i][1], w = LAY.aw;
+        var g = node(x, y, w, LAY.ah, title, "a");
+        var run = h("rect", { x: x + 12, y: y + 32, width: 40, height: 18, rx: 5, fill: "none", stroke: C.mint }, g);
+        var runT = tx(g, x + 32, y + 45, "Run", "s-chip", { "text-anchor": "middle", fill: C.mint });
+        var spin = h("circle", { cx: x + 64, cy: y + 41, r: 5, fill: "none", stroke: C.mint, "stroke-width": 1.6, "stroke-dasharray": "18 40", opacity: 0 }, g);
         var lines = [0, 1, 2, 3].map(function (k) {
-          return h("rect", { x: a.x + 12, y: a.y + 62 + k * 10, width: 0, height: 4, rx: 2, fill: k === 0 ? "rgba(230,238,240,0.8)" : "rgba(143,166,176,0.45)" }, g);
+          return h("rect", { x: x + 12, y: y + 62 + k * 10, width: 0, height: 4, rx: 2, fill: k === 0 ? "rgba(230,238,240,0.8)" : "rgba(143,166,176,0.45)" }, g);
         });
-        return { g: g, run: run, runT: runT, spin: spin, lines: lines, in: [a.x, a.y + 56], out: [a.x + 160, a.y + 56], cx: a.x + 64, cy: a.y + 41 };
+        return { g: g, run: run, runT: runT, spin: spin, lines: lines, w: w - 24, in: [x, y + 56], x: x, y: y, cx: x + 64, cy: y + 41 };
       });
-      // presentation
-      var pres = node(432, 74, 150, 228, "Client update deck", "p");
+      var PX = LAY.pres[0], PY = LAY.pres[1], PW = LAY.pres[2], PH = LAY.pres[3];
+      var pres = node(PX, PY, PW, PH, "Client update deck", "p");
       var tabs = ["PPTX", "DOCX", "HTML"].map(function (f, i) {
-        var g = h("g", null, pres);
-        var r = h("rect", { x: 444 + i * 44, y: 34 + 74, width: 40, height: 16, rx: 4, fill: "none", stroke: "rgba(143,166,176,0.35)" }, g);
-        var tt = tx(g, 464 + i * 44, 34 + 74 + 11.5, f, "s-chip", { "text-anchor": "middle", fill: C.mist });
+        var r = h("rect", { x: PX + 12 + i * 44, y: PY + 34, width: 40, height: 16, rx: 4, fill: "none", stroke: "rgba(143,166,176,0.35)" }, pres);
+        var tt = tx(pres, PX + 32 + i * 44, PY + 45.5, f, "s-chip", { "text-anchor": "middle", fill: C.mist });
         return { r: r, t: tt };
       });
       var slides = [];
       for (var k = 0; k < 6; k++) {
-        var sx = 444 + (k % 2) * 66, sy = 74 + 62 + Math.floor(k / 2) * 46;
+        var sx = PX + 12 + (k % LAY.cols) * (LAY.tw + 8), sy = PY + 62 + Math.floor(k / LAY.cols) * (LAY.th + 8);
         var sg = h("g", { opacity: 0 }, pres);
-        h("rect", { x: sx, y: sy, width: 60, height: 38, rx: 3, fill: k === 0 ? "#0c1b24" : "#eef2f1", stroke: C.line }, sg);
-        if (k === 0) h("rect", { x: sx + 6, y: sy + 24, width: 34, height: 4, rx: 2, fill: C.mint }, sg);
-        else { h("rect", { x: sx + 6, y: sy + 7, width: 30, height: 3.5, rx: 1.7, fill: "#0c1b24" }, sg); h("rect", { x: sx + 6, y: sy + 15, width: 44 - k * 3, height: 12, rx: 2, fill: k % 2 ? "#9fdcd3" : "#c9d4d6" }, sg); }
-        tx(sg, sx + 56, sy + 35, String(k + 1), "s-chip", { "text-anchor": "end", fill: k === 0 ? C.mist : "#4f626b" });
+        h("rect", { x: sx, y: sy, width: LAY.tw, height: LAY.th, rx: 3, fill: k === 0 ? C.ink : "#eef2f1", stroke: C.line }, sg);
+        if (k === 0) h("rect", { x: sx + 6, y: sy + LAY.th - 14, width: LAY.tw * 0.55, height: 4, rx: 2, fill: C.mint }, sg);
+        else { h("rect", { x: sx + 6, y: sy + 7, width: LAY.tw * 0.5, height: 3.5, rx: 1.7, fill: C.ink }, sg); h("rect", { x: sx + 6, y: sy + 15, width: LAY.tw * (0.72 - k * 0.04), height: LAY.th - 24, rx: 2, fill: k % 2 ? "#9fdcd3" : "#c9d4d6" }, sg); }
+        tx(sg, sx + LAY.tw - 4, sy + LAY.th - 3, String(k + 1), "s-chip", { "text-anchor": "end", fill: k === 0 ? C.mist : "#4f626b" });
         slides.push(sg);
       }
       var dl = h("g", { opacity: 0 }, pres);
-      h("rect", { x: 444, y: 74 + 200, width: 126, height: 18, rx: 9, fill: C.sky }, dl);
-      tx(dl, 507, 74 + 212.5, "DOWNLOAD", "s-chip", { "text-anchor": "middle", fill: "#0c1b24" });
+      h("rect", { x: PX + 12, y: PY + PH - 28, width: PW - 24, height: 18, rx: 9, fill: C.sky }, dl);
+      tx(dl, PX + PW / 2, PY + PH - 15.5, "DOWNLOAD PPTX", "s-chip", { "text-anchor": "middle", fill: C.ink });
 
-      function wire(a, b) {
-        var dx = (b[0] - a[0]) * 0.5;
-        var p = h("path", { d: "M" + a[0] + " " + a[1] + " C" + (a[0] + dx) + " " + a[1] + " " + (b[0] - dx) + " " + b[1] + " " + b[0] + " " + b[1], fill: "none", stroke: "rgba(143,220,210,0.55)", "stroke-width": 1.4 }, wires);
+      function wire(d) {
+        var p = h("path", { d: d, fill: "none", stroke: "rgba(143,220,210,0.55)", "stroke-width": 1.4 }, wires);
         var len = p.getTotalLength();
         set(p, "stroke-dasharray", len + " " + len);
-        var pulse = h("circle", { r: 3, fill: C.mint, opacity: 0 }, svg);
-        return { p: p, len: len, pulse: pulse };
+        return { p: p, len: len, pulse: h("circle", { r: 3, fill: C.mint, opacity: 0 }, svg) };
       }
-      var w1 = [wire(refs[0].out, an[0].in), wire(refs[2].out, an[0].in), wire(refs[1].out, an[1].in), wire(refs[0].out, an[1].in)];
-      var w2 = [wire(an[0].out, [432, 150]), wire(an[1].out, [432, 220])];
-
+      function across(a, b) {
+        var dx = (b[0] - a[0]) * 0.5;
+        return "M" + a[0] + " " + a[1] + " C" + (a[0] + dx) + " " + a[1] + " " + (b[0] - dx) + " " + b[1] + " " + b[0] + " " + b[1];
+      }
+      var w1 = [wire(across(refs[0].out, an[0].in)), wire(across(refs[2].out, an[0].in)), wire(across(refs[1].out, an[1].in)), wire(across(refs[0].out, an[1].in))];
+      var w2;
+      if (tall) {
+        var a0 = an[0], a1 = an[1], ex = a0.x + LAY.aw;
+        w2 = [
+          wire("M" + (ex - 20) + " " + (a0.y + LAY.ah) + " C" + (ex - 20) + " " + (a0.y + LAY.ah + 30) + " " + (ex - 2) + " " + (a1.y - 20) + " " + (ex - 2) + " " + (a1.y + 40) + " S" + (PX + PW * 0.82) + " " + (PY - 30) + " " + (PX + PW * 0.82) + " " + PY),
+          wire("M" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah) + " C" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah + 10) + " " + (PX + PW * 0.55) + " " + (PY - 10) + " " + (PX + PW * 0.55) + " " + PY),
+        ];
+      } else {
+        w2 = [wire(across([an[0].x + LAY.aw, an[0].y + 56], [PX, PY + 76])), wire(across([an[1].x + LAY.aw, an[1].y + 56], [PX, PY + 146]))];
+      }
       function runWires(ws, t, t0) {
         ws.forEach(function (w, i) {
           var d = P(t, t0 + i * 0.12, t0 + 0.7 + i * 0.12, E.inOut);
           set(w.p, "stroke-dashoffset", (w.len * (1 - d)).toFixed(1));
-          var q = ((t - (t0 + 0.8 + i * 0.1)) / 0.9);
+          var q = (t - (t0 + 0.8 + i * 0.1)) / 0.9;
           if (q > 0 && q < 1) {
             var pt = w.p.getPointAtLength(w.len * E.inOut(q));
             set(w.pulse, "cx", pt.x.toFixed(1));
@@ -708,26 +744,23 @@
           } else op(w.pulse, 0);
         });
       }
-
       return function (t) {
         var fade = 1 - P(t, 10.0, 10.6, E.inOut);
         op(wires, fade);
         refs.forEach(function (r, i) {
           var a = P(t, 0.2 + i * 0.25, 0.7 + i * 0.25, E.back);
           op(r.g, P(t, 0.2 + i * 0.25, 0.5 + i * 0.25) * fade);
-          set(r.g, "transform", "translate(" + (88 * (1 - a)).toFixed(1) * 0 + " " + (8 * (1 - a)).toFixed(1) + ")");
+          set(r.g, "transform", "translate(0 " + (8 * (1 - a)).toFixed(1) + ")");
         });
         an.forEach(function (a, i) {
           op(a.g, P(t, 1.3 + i * 0.2, 1.7 + i * 0.2) * fade);
           var pressed = t > 3.9 + i * 0.25;
           set(a.run, "fill", pressed ? C.mint : "none");
-          set(a.runT, "fill", pressed ? "#0c1b24" : C.mint);
-          var spinning = t > 3.9 + i * 0.25 && t < 4.6 + i * 0.25;
-          op(a.spin, spinning ? 1 : 0);
+          set(a.runT, "fill", pressed ? C.ink : C.mint);
+          op(a.spin, t > 3.9 + i * 0.25 && t < 4.6 + i * 0.25 ? 1 : 0);
           set(a.spin, "transform", "rotate(" + ((t * 540) % 360).toFixed(0) + " " + a.cx + " " + a.cy + ")");
           a.lines.forEach(function (l, k) {
-            var w = [128, 112, 120, 84][k];
-            set(l, "width", (w * P(t, 4.6 + i * 0.25 + k * 0.16, 5.0 + i * 0.25 + k * 0.16)).toFixed(1));
+            set(l, "width", (a.w * [1, 0.86, 0.94, 0.66][k] * P(t, 4.6 + i * 0.25 + k * 0.16, 5.0 + i * 0.25 + k * 0.16)).toFixed(1));
           });
         });
         runWires(w1, t, 2.3);
@@ -738,77 +771,84 @@
           op(s, P(t, 6.8 + k * 0.2, 7.0 + k * 0.2));
           set(s, "transform", "translate(0 " + (6 * (1 - a)).toFixed(1) + ")");
         });
-        var active = t < 7.6 ? -1 : t < 8.3 ? 0 : t < 9.0 ? 1 : 2;
         tabs.forEach(function (tb, i) {
-          set(tb.r, "fill", i === active ? C.sky : "none");
-          set(tb.r, "stroke", i === active ? C.sky : "rgba(143,166,176,0.35)");
-          set(tb.t, "fill", i === active ? "#0c1b24" : C.mist);
+          var on = i === 0 && t > 7.6;
+          set(tb.r, "fill", on ? C.sky : "none");
+          set(tb.r, "stroke", on ? C.sky : "rgba(143,166,176,0.35)");
+          set(tb.t, "fill", on ? C.ink : C.mist);
         });
         op(dl, P(t, 8.0, 8.4));
       };
     },
   };
 
-  /* 07 Southwark Retrofit Atlas: map, cost, fund (canvas) */
+  /* Southwark Retrofit Atlas: real ward outlines and a sample of real homes (canvas) */
   SCENES["southwark-retrofit-atlas"] = {
     dur: 11.6,
     still: 9.6,
     beats: [[0, 0], [3.2, 1], [6.3, 2]],
-    init: function (stage) {
-      var cv = canvasStage(stage, 600, 375);
+    size: { wide: [600, 375], tall: [340, 700] },
+    init: function (stage, mode) {
+      var tall = mode === "tall";
+      var cv = canvasStage(stage, tall ? 340 : 600, tall ? 700 : 375);
       var ctx = cv.ctx;
-      // a simplified outline of the borough, river to the north
-      var shape = [[54, 52], [96, 34], [150, 40], [204, 30], [250, 50], [268, 92], [258, 136], [246, 180], [238, 222], [222, 262], [204, 300], [182, 336], [160, 356], [142, 338], [130, 300], [116, 258], [96, 216], [78, 176], [60, 134], [48, 92]];
-      function inside(x, y) {
-        var c = false;
-        for (var i = 0, j = shape.length - 1; i < shape.length; j = i++) {
-          var xi = shape[i][0], yi = shape[i][1], xj = shape[j][0], yj = shape[j][1];
-          if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c;
-        }
-        return c;
-      }
-      var r = rng(42);
-      var pts = [];
-      for (var y = 30; y < 360; y += 6.6) {
-        for (var x = 40; x < 275; x += 6.6) {
-          var jx = x + (r() - 0.5) * 3.4, jy = y + (r() - 0.5) * 3.4;
-          if (!inside(jx, jy)) continue;
-          var u = r();
-          var band = u < 0.16 ? 0 : u < 0.62 ? 1 : u < 0.93 ? 2 : u < 0.98 ? 3 : 4;
-          pts.push({ x: jx, y: jy, band: band, pr: r() });
-        }
-      }
+      var data = window.SOUTHWARK;
+      var MAP = tall ? { x: 60, y: 14, w: 220, h: 356 } : { x: 40, y: 14, w: 250, h: 348 };
+      var bw = data.b[0], bh = data.b[1];
+      var sc = Math.min(MAP.w / bw, MAP.h / bh);
+      var ox = MAP.x + (MAP.w - bw * sc) / 2, oy = MAP.y + (MAP.h - bh * sc) / 2;
+      function px(x) { return ox + x * sc; }
+      function py(y) { return oy + (bh - y) * sc; }
+      var wards = data.w.map(function (flat) {
+        var pts = [];
+        for (var i = 0; i < flat.length; i += 2) pts.push([px(flat[i]), py(flat[i + 1])]);
+        return pts;
+      });
+      var r = rng(42), pts = [];
+      for (var i = 0; i < data.p.length; i += 3) pts.push({ x: px(data.p[i]), y: py(data.p[i + 1]), band: data.p[i + 2], pr: r() });
+      var ymin = MAP.y, ymax = MAP.y + MAP.h;
       var below = pts.filter(function (p) { return p.band >= 2; });
       below.sort(function (a, b) { return b.band - a.band || a.pr - b.pr; });
-      var funded = below.slice(0, 30);
+      var funded = below.slice(0, 34);
       funded.sort(function (a, b) { return a.pr - b.pr; });
       funded.forEach(function (p, i) { p.fund = (i + 1) / funded.length; });
       var BAND = ["#1f9d68", "#7fbf4a", "#e5c23a", "#f0a35e", "#e2623f"];
       var LBL = ["A–B", "C", "D", "E", "F–G"];
+      var PN = tall ? { x: 16, y: 384, w: 308, h: 304 } : { x: 312, y: 20, w: 268, h: 335 };
+      function wardPath() {
+        ctx.beginPath();
+        wards.forEach(function (w) {
+          ctx.moveTo(w[0][0], w[0][1]);
+          for (var k = 1; k < w.length; k++) ctx.lineTo(w[k][0], w[k][1]);
+          ctx.closePath();
+        });
+      }
 
       return function (t) {
         cv.begin();
         var fade = 1 - P(t, 10.8, 11.4, E.inOut);
         var b2 = P(t, 3.2, 3.8);
         var slider = P(t, 6.7, 8.9, E.inOut);
-        // river edge
-        ctx.strokeStyle = "rgba(89,199,252,0.35)";
-        ctx.lineWidth = 6;
-        ctx.lineCap = "round";
-        ctx.beginPath(); ctx.moveTo(30, 44); ctx.bezierCurveTo(80, 18, 150, 30, 204, 18); ctx.bezierCurveTo(240, 10, 270, 30, 292, 26); ctx.stroke();
-        ctx.lineCap = "butt";
+        ctx.globalAlpha = P(t, 0.1, 0.9) * fade;
+        wardPath();
+        ctx.fillStyle = "rgba(143,166,176,0.06)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(143,220,210,0.28)";
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
         for (var i = 0; i < pts.length; i++) {
           var p = pts[i];
-          var a = P(t, 0.2 + (p.y / 360) * 1.8, 0.6 + (p.y / 360) * 1.8);
+          var f = (p.y - ymin) / (ymax - ymin);
+          var a = P(t, 0.2 + f * 1.8, 0.6 + f * 1.8);
           if (a <= 0) continue;
-          var alpha = a * fade;
-          var rad = 2.1;
-          if (p.band < 2) alpha *= 1 - 0.55 * b2;
-          else rad = 2.1 + 0.6 * b2 * (t < 6.3 ? 0.5 + 0.5 * Math.sin(t * 5 + p.pr * 6) : 0.4);
+          var alpha = a * fade, rad = 1.7;
+          if (p.band < 2) alpha *= 1 - 0.6 * b2;
+          else rad = 1.7 + 0.5 * b2 * (t < 6.3 ? 0.5 + 0.5 * Math.sin(t * 5 + p.pr * 6) : 0.4);
           var isFunded = p.fund !== undefined && slider >= p.fund;
           ctx.globalAlpha = alpha;
           ctx.fillStyle = isFunded ? C.mint : BAND[p.band];
-          ctx.beginPath(); ctx.arc(p.x, p.y, isFunded ? 2.8 : rad, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, isFunded ? 2.6 : rad, 0, Math.PI * 2); ctx.fill();
           if (isFunded) {
             var ring = clamp((slider - p.fund) * 8, 0, 1);
             ctx.globalAlpha = (1 - ring) * fade;
@@ -816,106 +856,107 @@
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.arc(p.x, p.y, 3 + ring * 9, 0, Math.PI * 2); ctx.stroke();
             ctx.globalAlpha = 0.9 * fade;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 4.6, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(p.x, p.y, 4.4, 0, Math.PI * 2); ctx.stroke();
           }
         }
         ctx.globalAlpha = 1;
 
-        // panel
-        var px = 312;
+        var x0 = PN.x, y0 = PN.y, w = PN.w, L = x0 + 16, sw = w - 32;
         ctx.fillStyle = C.panel;
         ctx.strokeStyle = C.line;
         ctx.lineWidth = 1;
-        roundRect(ctx, px, 20, 268, 335, 12); ctx.fill(); ctx.stroke();
+        roundRect(ctx, x0, y0, w, PN.h, 12); ctx.fill(); ctx.stroke();
         ctx.fillStyle = C.soft;
-        ctx.font = font(9.5, "mono", 500);
-        spaced(ctx, "LONDON BOROUGH OF SOUTHWARK", px + 16, 44, 1.1);
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "LONDON BOROUGH OF SOUTHWARK", L, y0 + 24, 1.1);
         ctx.globalAlpha = fade;
         ctx.fillStyle = "#fff";
-        ctx.font = font(36, "serif", 400);
-        ctx.fillText(fmt(149062 * P(t, 0.3, 2.2, E.inOut)), px + 16, 92);
+        ctx.font = font(34, "serif", 400);
+        ctx.fillText(fmt(149062 * P(t, 0.3, 0.9, E.inOut)), L, y0 + 68);
         ctx.fillStyle = C.mist;
-        ctx.font = font(9.5, "mono", 500);
-        spaced(ctx, "HOMES BY EPC BAND TODAY", px + 16, 110, 1.1);
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "HOMES BY EPC BAND TODAY", L, y0 + 86, 1.1);
+        var gap = sw / 5;
         for (var k = 0; k < 5; k++) {
-          var lx = px + 16 + k * 48;
-          ctx.globalAlpha = P(t, 1.2 + k * 0.1, 1.5 + k * 0.1) * fade * (k < 2 ? 1 - 0.5 * b2 : 1);
+          var lx = L + k * gap;
+          ctx.globalAlpha = P(t, 1.0 + k * 0.1, 1.3 + k * 0.1) * fade * (k < 2 ? 1 - 0.5 * b2 : 1);
           ctx.fillStyle = BAND[k];
-          roundRect(ctx, lx, 124, 10, 10, 2.5); ctx.fill();
+          roundRect(ctx, lx, y0 + 100, 10, 10, 2.5); ctx.fill();
           ctx.fillStyle = C.text;
           ctx.font = font(10, "mono", 500);
-          ctx.fillText(LBL[k], lx + 15, 133);
+          ctx.fillText(LBL[k], lx + 15, y0 + 109);
         }
-        // beat 2 and 3 share the lower half of the panel
         var b3 = P(t, 6.3, 6.8);
-        ctx.globalAlpha = b2 * (1 - b3) * fade;
+        var ry = y0 + 132;
+        ctx.globalAlpha = Math.max(b2 * (1 - b3), b3) * fade;
         ctx.fillStyle = "rgba(143,166,176,0.2)";
-        ctx.fillRect(px + 16, 156, 236, 1);
+        ctx.fillRect(L, ry, sw, 1);
+        ctx.globalAlpha = b2 * (1 - b3) * fade;
         ctx.fillStyle = "#fff";
         ctx.font = font(30, "serif", 400);
-        ctx.fillText(fmt(56873 * P(t, 3.3, 4.6, E.inOut)), px + 16, 200);
+        ctx.fillText(fmt(56873 * P(t, 3.3, 3.9, E.inOut)), L, ry + 44);
         ctx.fillStyle = C.mist;
-        ctx.font = font(9.5, "mono", 500);
-        spaced(ctx, "HOMES BELOW EPC C", px + 16, 218, 1.1);
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "HOMES BELOW EPC C", L, ry + 62, 1.1);
         ctx.globalAlpha = P(t, 4.4, 4.9) * (1 - b3) * fade;
         ctx.fillStyle = "#fff";
         ctx.font = font(30, "serif", 400);
-        ctx.fillText("£570m", px + 16, 266);
+        ctx.fillText("£570m", L, ry + 110);
         ctx.fillStyle = C.mist;
-        ctx.font = font(9.5, "mono", 500);
-        spaced(ctx, "TO LIFT EACH HOME TO ITS", px + 16, 284, 1.1);
-        spaced(ctx, "REACHABLE BAND", px + 16, 298, 1.1);
-
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "TO LIFT EACH HOME TO ITS", L, ry + 128, 1.1);
+        spaced(ctx, "REACHABLE BAND", L, ry + 142, 1.1);
         ctx.globalAlpha = b3 * fade;
-        ctx.fillStyle = "rgba(143,166,176,0.2)";
-        ctx.fillRect(px + 16, 156, 236, 1);
         ctx.fillStyle = C.mist;
-        ctx.font = font(9.5, "mono", 500);
-        spaced(ctx, "BUDGET, NET OF GRANT", px + 16, 180, 1.1);
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "BUDGET, NET OF GRANT", L, ry + 24, 1.1);
         ctx.fillStyle = "#fff";
         ctx.font = font(32, "serif", 400);
-        ctx.fillText("£" + (47 * slider).toFixed(1) + "m", px + 16, 216);
+        ctx.fillText("£" + (47 * slider).toFixed(1) + "m", L, ry + 60);
         ctx.fillStyle = "rgba(143,166,176,0.3)";
-        roundRect(ctx, px + 16, 230, 236, 4, 2); ctx.fill();
+        roundRect(ctx, L, ry + 74, sw, 4, 2); ctx.fill();
         ctx.fillStyle = C.mint;
-        roundRect(ctx, px + 16, 230, Math.max(4, 236 * slider), 4, 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(px + 16 + 236 * slider, 232, 7, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
+        roundRect(ctx, L, ry + 74, Math.max(4, sw * slider), 4, 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(L + sw * slider, ry + 76, 7, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
         ctx.strokeStyle = C.mint; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = "#fff";
         ctx.font = font(26, "serif", 400);
-        ctx.fillText(fmt(4079 * slider), px + 16, 280);
-        ctx.fillText((6.6 * slider).toFixed(1) + " kt", px + 140, 280);
+        ctx.fillText(fmt(4079 * slider), L, ry + 124);
+        ctx.fillText((6.6 * slider).toFixed(1) + " kt", L + sw * 0.52, ry + 124);
         ctx.fillStyle = C.mist;
-        ctx.font = font(9.5, "mono", 500);
-        spaced(ctx, "HOMES FUNDED", px + 16, 298, 1.1);
-        spaced(ctx, "CO2E SAVED A YEAR", px + 140, 298, 1.1);
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "HOMES FUNDED", L, ry + 142, 1.1);
+        spaced(ctx, "CO2E SAVED A YEAR", L + sw * 0.52, ry + 142, 1.1);
         ctx.globalAlpha = 1;
       };
     },
   };
 
-  /* 03 ModelChat: the featured story, an isometric model beside a live chat */
+  /* ModelChat: the featured story, a long, low timber office beside a live chat */
   SCENES.modelchat = {
     dur: 16.4,
-    still: 6.4,
+    still: 6.6,
     beats: [[0, 0], [2.7, 1], [3.6, 2], [8.3, 0], [10.3, 1], [10.9, 2]],
-    init: function (stage) {
+    size: { wide: [560, 420], tall: [560, 700] },
+    keepStage: true,
+    init: function (stage, mode) {
+      var tall = mode === "tall";
       var viewer = stage.querySelector(".mc__viewer");
       var chat = stage.querySelector(".mc__log");
-      var st = svgStage(viewer, 560, 420, "mc");
+      viewer.innerHTML = "";
+      chat.innerHTML = "";
+      var st = svgStage(viewer, 560, tall ? 700 : 420, "mc" + (mode || "wide"));
       var svg = st.svg;
       var cam = h("g", null, svg);
-      var L = 260, W = 90, FH = 13, FLOORS = 10, OX = 206, OY = 184;
-      function iso(x, y, z) {
-        return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z];
-      }
+      // six storeys with columns, from the basement to Level 05
+      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 176 : 168;
+      function iso(x, y, z) { return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z]; }
       function pts(arr) {
         return arr.map(function (p) { var q = iso(p[0], p[1], p[2]); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
       }
-      // ground grid
       var grid = h("g", { stroke: "rgba(143,166,176,0.13)", "stroke-width": 0.8 }, cam);
-      for (var gx = -78; gx <= 338; gx += 52) h("polyline", { points: pts([[gx, -45, 0], [gx, 135, 0]]), fill: "none" }, grid);
-      for (var gy = -45; gy <= 135; gy += 45) h("polyline", { points: pts([[-78, gy, 0], [338, gy, 0]]), fill: "none" }, grid);
+      for (var gx = -100; gx <= 400; gx += 50) h("polyline", { points: pts([[gx, -50, 0], [gx, 150, 0]]), fill: "none" }, grid);
+      for (var gy = -50; gy <= 150; gy += 50) h("polyline", { points: pts([[-100, gy, 0], [400, gy, 0]]), fill: "none" }, grid);
       var floors = [];
       for (var k = 0; k < FLOORS; k++) {
         var z0 = k * FH, z1 = z0 + FH - 3;
@@ -923,33 +964,35 @@
         var left = h("polygon", { points: pts([[0, W, z0], [L, W, z0], [L, W, z1], [0, W, z1]]), fill: "rgba(89,199,252,0.14)", stroke: "rgba(143,220,210,0.45)", "stroke-width": 0.8 }, g);
         var right = h("polygon", { points: pts([[L, 0, z0], [L, W, z0], [L, W, z1], [L, 0, z1]]), fill: "rgba(89,199,252,0.08)", stroke: "rgba(143,220,210,0.45)", "stroke-width": 0.8 }, g);
         var mull = h("g", { stroke: "rgba(143,220,210,0.22)", "stroke-width": 0.6 }, g);
-        for (var mx = 26; mx < L; mx += 26) h("polyline", { points: pts([[mx, W, z0], [mx, W, z1]]), fill: "none" }, mull);
-        for (var my = 22.5; my < W; my += 22.5) h("polyline", { points: pts([[L, my, z0], [L, my, z1]]), fill: "none" }, mull);
-        var top = h("polygon", { points: pts([[0, 0, z1], [L, 0, z1], [L, W, z1], [0, W, z1]]), fill: k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0.0)", stroke: "rgba(143,220,210,0.5)", "stroke-width": 0.8 }, g);
-        var slab = h("polyline", { points: pts([[0, W, z0], [L, W, z0], [L, 0, z0]]), fill: "none", stroke: "rgba(230,238,240,0.5)", "stroke-width": 1 }, g);
-        floors.push({ g: g, left: left, right: right, top: top, mull: mull, slab: slab, k: k });
+        for (var mx = 25; mx < L; mx += 25) h("polyline", { points: pts([[mx, W, z0], [mx, W, z1]]), fill: "none" }, mull);
+        for (var my = 25; my < W; my += 25) h("polyline", { points: pts([[L, my, z0], [L, my, z1]]), fill: "none" }, mull);
+        var top = h("polygon", { points: pts([[0, 0, z1], [L, 0, z1], [L, W, z1], [0, W, z1]]), fill: k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)", stroke: "rgba(143,220,210,0.5)", "stroke-width": 0.8 }, g);
+        floors.push({ g: g, left: left, right: right, top: top, k: k });
       }
-      var cols = h("g", { stroke: C.mint, "stroke-width": 1.4, "stroke-linecap": "round", opacity: 0 }, cam);
+      // a structural grid of 12 x 4 columns on every storey
+      var cols = h("g", { stroke: C.mint, "stroke-width": 1.2, "stroke-linecap": "round", opacity: 0 }, cam);
       var colLines = [];
       for (var f = 0; f < FLOORS; f++) {
-        for (var cx = 0; cx <= L; cx += 52) {
-          for (var cy = 0; cy <= W; cy += 45) {
-            colLines.push({ el: h("polyline", { points: pts([[cx, cy, f * FH], [cx, cy, f * FH + FH - 3]]), fill: "none" }, cols), f: f });
+        for (var cy = 0; cy < 4; cy++) {
+          for (var cx = 0; cx < 12; cx++) {
+            var x = 12 + cx * 25.1, y = 12 + cy * 25.3;
+            colLines.push({ el: h("polyline", { points: pts([[x, y, f * FH], [x, y, f * FH + FH - 3]]), fill: "none" }, cols), f: f });
           }
         }
       }
       var label = h("g", { opacity: 0 }, svg);
-      var lp = iso(L, W, 3 * FH + 5);
-      h("circle", { cx: 0, cy: 0, r: 2.5, fill: C.mint }, label);
-      h("polyline", { points: "0,0 26,24 118,24", fill: "none", stroke: C.mint }, label);
-      var area = tx(label, 30, 18, "", "s-num-sm");
-      tx(label, 30, 40, "LEVEL 03 · GFA", "s-mono");
+      var lp = iso(L, W, 3 * FH + 7);
+      if (!tall) {
+        h("circle", { cx: 0, cy: 0, r: 2.5, fill: C.mint }, label);
+        h("polyline", { points: "0,0 24,22 120,22", fill: "none", stroke: C.mint }, label);
+      }
+      var area = tx(label, tall ? 0 : 28, tall ? 0 : 16, "", tall ? "s-num" : "s-num-sm", tall ? { "text-anchor": "end" } : null);
+      tx(label, tall ? 0 : 28, tall ? 20 : 38, "LEVEL 03 · GFA", "s-mono", tall ? { "text-anchor": "end" } : null);
       var colLabel = h("g", { opacity: 0 }, svg);
-      var colCount = tx(colLabel, 24, 52, "", "s-num");
-      tx(colLabel, 24, 72, "COLUMNS · 10 STOREYS", "s-mono");
-      tx(svg, 24, 404, "TIMBER OFFICE · IFC4 · 10,600 ELEMENTS", "s-mono s-dim");
+      var colCount = tx(colLabel, 24, tall ? 96 : 52, "", "s-num");
+      tx(colLabel, 24, tall ? 116 : 72, "COLUMNS · 6 STOREYS", "s-mono");
+      tx(svg, 24, tall ? 40 : 404, "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
 
-      // chat messages
       function msg(cls, html) {
         var el = document.createElement("div");
         el.className = "mc__msg " + cls;
@@ -970,13 +1013,13 @@
       var q1 = "What is the gross floor area of Level 03? Isolate that floor.";
       var q2 = "Now show only the columns, across the whole building.";
       var u1 = msg("mc__user"), t1 = tools(["query_index", "compute_quantity", "isolate", "focus_camera"]);
-      var a1 = msg("mc__answer", 'Level 03 has a gross floor area of about <b data-n="3621">0</b> m². The floor is isolated and the camera is fitted to it.');
+      var a1 = msg("mc__answer", "Level 03 has a gross floor area of about <b>0</b> m². The floor is isolated and the camera is fitted to it.");
       var u2 = msg("mc__user"), t2 = tools(["query_index", "isolate", "focus_camera"]);
-      var a2 = msg("mc__answer", 'The viewer now shows only the columns, all <b data-n="340">0</b> of them across the building.');
+      var a2 = msg("mc__answer", "The viewer now shows only the columns, all <b>0</b> of them across the building.");
       var n1 = a1.querySelector("b"), n2 = a2.querySelector("b");
-      function show(el, v, dy) {
+      function show(el, v) {
         el.style.opacity = v.toFixed(3);
-        el.style.transform = "translateY(" + ((1 - v) * (dy || 8)).toFixed(1) + "px)";
+        el.style.transform = "translateY(" + ((1 - v) * 8).toFixed(1) + "px)";
         el.style.display = v > 0.001 ? "" : "none";
       }
       function typing(el, s, p) {
@@ -984,65 +1027,60 @@
         var v = s.slice(0, n) + (p > 0 && p < 1 ? "▍" : "");
         if (el.__t !== v) { el.__t = v; el.textContent = v; }
       }
-      function toolState(rows, t0) {
-        var box = rows[rows.length - 1];
-        show(box, P(t0.t, t0.a, t0.a + 0.3));
+      function toolState(rows, t, a0, vis) {
+        show(rows[rows.length - 1], (t >= a0 ? 1 : 0) * vis);
         rows.slice(0, -1).forEach(function (row, i) {
-          var a = t0.a + 0.15 + i * 0.32;
-          row.style.opacity = P(t0.t, a, a + 0.2).toFixed(3);
-          row.classList.toggle("is-done", t0.t > a + 0.28);
+          var a = a0 + 0.15 + i * 0.32;
+          row.style.opacity = P(t, a, a + 0.2).toFixed(3);
+          row.classList.toggle("is-done", t > a + 0.28);
         });
       }
-      var cxs = iso(L / 2, W / 2, 3 * FH + 5);
+      var cxs = iso(L / 2, W / 2, 3 * FH + 7);
 
       return function (t) {
         var e1 = t < 8.0 ? 1 : 1 - P(t, 8.0, 8.3);
         var e2 = P(t, 8.3, 8.4) * (1 - P(t, 15.4, 15.9));
-        // chat, exchange one
         show(u1, P(t, 0.2, 0.5) * e1);
         typing(u1, q1, P(t, 0.4, 2.4, E.lin));
-        toolState(t1, { t: t, a: 2.7 });
-        if (e1 < 1 || t < 2.7) show(t1[t1.length - 1], (t < 2.7 ? 0 : 1) * e1);
-        show(a1, P(t, 4.9, 5.3) * e1);
-        n1.textContent = fmt(3621 * P(t, 5.0, 6.0));
-        // chat, exchange two
+        toolState(t1, t, 2.7, e1);
+        show(a1, P(t, 4.6, 5.0) * e1);
+        // one count drives both the chat answer and the viewer label
+        var areaNow = fmt(3621 * P(t, 4.6, 5.2));
+        n1.textContent = areaNow;
         show(u2, e2 * P(t, 8.3, 8.6));
         typing(u2, q2, P(t, 8.5, 10.1, E.lin));
-        toolState(t2, { t: t, a: 10.3 });
-        if (t < 10.3 || e2 < 1) show(t2[t2.length - 1], (t < 10.3 ? 0 : 1) * e2);
+        toolState(t2, t, 10.3, e2);
         show(a2, P(t, 12.0, 12.4) * e2);
-        n2.textContent = fmt(340 * P(t, 12.1, 13.0));
+        var colsNow = fmt(340 * P(t, 12.0, 12.6));
+        n2.textContent = colsNow;
 
-        // viewer
         var iso1 = P(t, 3.6, 4.6, E.inOut) * (1 - P(t, 10.9, 11.6, E.inOut));
-        var colsOn = P(t, 11.2, 12.2, E.inOut) * (1 - P(t, 15.3, 16.0, E.inOut));
-        var zoom = 1 + 0.32 * iso1;
+        var colsOn = P(t, 11.2, 12.0, E.inOut) * (1 - P(t, 15.3, 16.0, E.inOut));
+        var zoom = 1 + 0.28 * iso1;
         set(cam, "transform", "translate(" + cxs[0].toFixed(1) + " " + cxs[1].toFixed(1) + ") scale(" + zoom.toFixed(3) + ") translate(" + (-cxs[0]).toFixed(1) + " " + (-cxs[1]).toFixed(1) + ")");
         floors.forEach(function (fl) {
-          var isSel = fl.k === 3;
-          var o = isSel ? 1 : 1 - 0.86 * iso1;
-          o *= 1 - 0.9 * colsOn;
-          op(fl.g, o);
-          set(fl.left, "fill", isSel && iso1 > 0.5 ? "rgba(22,255,198,0.30)" : "rgba(89,199,252,0.14)");
-          set(fl.right, "fill", isSel && iso1 > 0.5 ? "rgba(22,255,198,0.20)" : "rgba(89,199,252,0.08)");
-          set(fl.top, "fill", isSel && iso1 > 0.5 ? "rgba(22,255,198,0.38)" : fl.k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)");
-          set(fl.g, "transform", isSel ? "translate(0 " + (-6 * iso1).toFixed(2) + ")" : "");
+          var sel = fl.k === 3;
+          op(fl.g, (sel ? 1 : 1 - 0.86 * iso1) * (1 - 0.9 * colsOn));
+          var hot = sel && iso1 > 0.5;
+          set(fl.left, "fill", hot ? "rgba(22,255,198,0.30)" : "rgba(89,199,252,0.14)");
+          set(fl.right, "fill", hot ? "rgba(22,255,198,0.20)" : "rgba(89,199,252,0.08)");
+          set(fl.top, "fill", hot ? "rgba(22,255,198,0.38)" : fl.k === FLOORS - 1 ? "rgba(143,220,210,0.18)" : "rgba(143,220,210,0)");
+          set(fl.g, "transform", sel ? "translate(0 " + (-6 * iso1).toFixed(2) + ")" : "");
         });
         op(cols, colsOn);
-        colLines.forEach(function (c) {
-          op(c.el, P(t, 11.2 + c.f * 0.08, 11.6 + c.f * 0.08));
-        });
+        colLines.forEach(function (c) { op(c.el, P(t, 11.2 + c.f * 0.1, 11.6 + c.f * 0.1)); });
         var lx = cxs[0] + (lp[0] - cxs[0]) * zoom, ly = cxs[1] + (lp[1] - cxs[1] - 6 * iso1) * zoom;
-        move(label, lx, ly);
+        if (tall) move(label, 536, 90);
+        else move(label, lx, ly);
         op(label, P(t, 4.6, 5.0) * (1 - P(t, 7.8, 8.2)));
-        text(area, fmt(3621 * P(t, 4.7, 5.8)) + " m²");
+        text(area, areaNow + " m²");
         op(colLabel, P(t, 12.0, 12.4) * (1 - P(t, 15.3, 15.8)));
-        text(colCount, fmt(340 * P(t, 12.1, 13.0)));
+        text(colCount, colsNow);
       };
     },
   };
 
-  /* Engine: run each story only while it is on screen */
+  /* Engine: build each story for its width, run it only while it is on screen */
   function initStories() {
     var hosts = Array.prototype.slice.call(document.querySelectorAll("[data-story]"));
     if (!hosts.length) return;
@@ -1051,18 +1089,15 @@
       var def = SCENES[host.getAttribute("data-story")];
       if (!def) return;
       var stage = host.querySelector(".story__stage") || host;
-      var beats = Array.prototype.slice.call((host.closest(".story-card") || host.parentNode).querySelectorAll(".beats > *"));
-      var s = { host: host, def: def, render: null, stage: stage, beats: beats, visible: false, start: 0, t: 0, built: false };
-      live.push(s);
+      var card = host.closest(".story-card") || host.parentNode;
+      var beats = Array.prototype.slice.call(card.querySelectorAll(".beats > *"));
+      live.push({ host: host, def: def, stage: stage, beats: beats, visible: false, start: 0, t: def.still, built: false, mode: null });
       host.classList.add("is-live");
     });
 
-    function build(s) {
-      if (s.built) return;
-      s.render = s.def.init(s.stage);
-      s.built = true;
-      // a resized canvas is cleared, so draw the current frame again
-      if (s.stage.__canvasApi) s.stage.__canvasApi.redraw = function () { s.render(s.t); };
+    function modeFor(s) {
+      if (!s.def.size) return "wide";
+      return s.host.getBoundingClientRect().width < 520 ? "tall" : "wide";
     }
     function beat(s, t) {
       var idx = 0, from = 0, to = s.def.dur;
@@ -1079,18 +1114,47 @@
         if (i === idx) b.style.setProperty("--p", clamp((t - from) / (to - from), 0, 1).toFixed(3));
       });
     }
-    function still(s) {
-      build(s);
-      s.t = s.def.still;
+    function build(s) {
+      var mode = modeFor(s);
+      if (s.built && s.mode === mode) return;
+      if (s.def.size) {
+        var dims = s.def.size[mode];
+        s.host.classList.toggle("is-tall", mode === "tall");
+        s.host.style.setProperty("--ar", dims[0] + " / " + dims[1]);
+        if (!s.def.keepStage) {
+          s.stage.innerHTML = "";
+          s.stage.__canvasApi = null;
+        }
+      }
+      s.mode = mode;
+      s.render = s.def.init(s.stage, mode);
+      s.built = true;
+      if (s.stage.__canvasApi) s.stage.__canvasApi.redraw = function () { s.render(s.t); };
       s.render(s.t);
       beat(s, s.t);
     }
 
-    if (reduce || !("IntersectionObserver" in window)) {
-      live.forEach(still);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { live.forEach(still); });
-      return;
-    }
+    // every story opens on its finished frame
+    live.forEach(build);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { live.forEach(function (s) { s.render(s.t); }); });
+    var resizeTimer = 0;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { live.forEach(build); }, 150);
+    });
+
+    window.BakshiStories = {
+      at: function (slug, t) {
+        live.forEach(function (s) {
+          if (s.host.getAttribute("data-story") !== slug) return;
+          s.visible = false;
+          s.t = t;
+          s.render(t);
+          beat(s, t);
+        });
+      },
+    };
+    if (reduce || !("IntersectionObserver" in window)) return;
 
     var running = false;
     function frame(now) {
@@ -1106,10 +1170,7 @@
       else running = false;
     }
     function kick() {
-      if (!running) {
-        running = true;
-        requestAnimationFrame(frame);
-      }
+      if (!running) { running = true; requestAnimationFrame(frame); }
     }
     var io = new IntersectionObserver(
       function (entries) {
@@ -1117,16 +1178,13 @@
           var s = live.filter(function (x) { return x.host === en.target; })[0];
           if (!s) return;
           if (en.isIntersecting) {
-            build(s);
             if (!s.visible) s.start = performance.now() - s.t * 1000;
             s.visible = true;
-          } else {
-            s.visible = false;
-          }
+          } else s.visible = false;
         });
         kick();
       },
-      { threshold: 0.2 }
+      { threshold: 0.4 }
     );
     live.forEach(function (s) { io.observe(s.host); });
     document.addEventListener("visibilitychange", function () {
@@ -1136,20 +1194,6 @@
         kick();
       }
     });
-
-    // Lets a still frame be inspected: BakshiStories.at("modelchat", 5)
-    window.BakshiStories = {
-      at: function (slug, t) {
-        live.forEach(function (s) {
-          if (s.host.getAttribute("data-story") !== slug) return;
-          build(s);
-          s.visible = false;
-          s.t = t;
-          s.render(t);
-          beat(s, t);
-        });
-      },
-    };
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStories);

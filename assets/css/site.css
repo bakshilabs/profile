@@ -2015,3 +2015,176 @@ button {
     letter-spacing: 0.06em;
   }
 }
+
+.card__media.story.is-tall {
+  aspect-ratio: var(--ar);
+}
+.s-ui-sm {
+  font-size: 11.5px;
+}
+.mc.is-tall {
+  position: relative;
+  display: block;
+}
+.mc.is-tall .mc__viewer {
+  aspect-ratio: 560 / 700;
+}
+.mc.is-tall .mc__chat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 54%;
+  border: 0;
+  background: linear-gradient(180deg, rgba(17, 38, 48, 0) 0%, rgba(17, 38, 48, 0.94) 22%, #112630 40%);
+}
+.mc.is-tall .mc__head {
+  display: none;
+}
+.mc.is-tall .mc__log {
+  padding: 28px 14px 14px;
+}
+
+.fig-doc rect {
+  fill: var(--white);
+  stroke: var(--ink);
+  stroke-width: 1.1;
+}
+.fig-text path {
+  stroke: var(--line);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.fig-key path {
+  stroke: var(--teal);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.fig-spark {
+  stroke: var(--white);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.fig-check {
+  fill: var(--teal);
+  stroke: var(--paper);
+  stroke-width: 2;
+}
+.fig-check-mark {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fig-flow,
+.fig-ring {
+  animation: fig-dash 1.6s linear infinite;
+}
+@keyframes fig-dash {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+.walk__count {
+  display: none;
+}
+.zoom {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #0b161d;
+}
+.zoom::backdrop {
+  background: #0b161d;
+}
+.zoom__scroll {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+}
+.zoom__scroll img {
+  width: 1400px;
+  max-width: none;
+  height: auto;
+}
+.zoom__close {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+}
+.zoom__close svg {
+  width: 18px;
+  height: 18px;
+}
+.reach__link {
+  display: inline;
+}
+.reach__link svg {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-left: 4px;
+}
+
+@media (max-width: 760px) {
+  .walk__steps {
+    -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent);
+    mask-image: linear-gradient(90deg, #000 78%, transparent);
+  }
+  .walk__count {
+    display: block;
+    align-self: flex-end;
+    margin-top: -2px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .walk__stage {
+    cursor: zoom-in;
+  }
+  .walk__stage::after {
+    content: "Tap to enlarge";
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(12, 27, 36, 0.78);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .walk.is-video .walk__stage::after {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .card__foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+.mc__msg {
+  flex-shrink: 0;
+}
