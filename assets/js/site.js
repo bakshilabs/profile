@@ -206,7 +206,8 @@
     if (!dialog || typeof dialog.showModal !== "function") return;
     var img = dialog.querySelector("img");
     document.addEventListener("click", function (e) {
-      var stage = e.target.closest("[data-zoomable]");
+      var btn = e.target.closest("[data-zoom-open]");
+      var stage = btn ? btn.closest(".walk").querySelector("[data-zoomable]") : e.target.closest("[data-zoomable]");
       if (!stage || !window.matchMedia("(max-width: 760px)").matches) return;
       if (stage.closest(".walk").classList.contains("is-video")) return;
       var active = stage.querySelector(".walk__img.is-active");

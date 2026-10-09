@@ -2161,22 +2161,7 @@ button {
   .walk__stage {
     cursor: zoom-in;
   }
-  .walk__stage::after {
-    content: "Tap to enlarge";
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: rgba(12, 27, 36, 0.78);
-    color: var(--white);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-  }
-  .walk.is-video .walk__stage::after {
-    display: none;
-  }
+
 }
 @media (max-width: 560px) {
   .card__foot {
@@ -2187,4 +2172,96 @@ button {
 }
 .mc__msg {
   flex-shrink: 0;
+}
+
+.walk__zoom {
+  display: none;
+}
+@media (max-width: 760px) {
+  .walk__zoom {
+    order: 2;
+    display: inline-flex;
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .walk__steps {
+    -webkit-mask-image: linear-gradient(90deg, #000 64%, transparent);
+    mask-image: linear-gradient(90deg, #000 64%, transparent);
+  }
+}
+.fl-ink rect {
+  fill: var(--paper);
+  stroke: var(--mist);
+  stroke-width: 1;
+}
+.fl-paper rect {
+  fill: var(--white);
+  stroke: var(--ink);
+  stroke-width: 1.1;
+}
+.fl-grey path {
+  stroke: var(--line);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.fl-teal path {
+  stroke: var(--teal);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.fl-tealbox rect {
+  fill: var(--tint);
+  stroke: var(--teal);
+  stroke-width: 1.1;
+}
+.fl-pill rect {
+  fill: var(--white);
+  stroke: var(--ink);
+  stroke-width: 0.9;
+}
+.fl-check {
+  fill: var(--white);
+  stroke: var(--teal);
+  stroke-width: 1.4;
+}
+.fl-checkmark {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.move__fig .fl-mono-in {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  fill: var(--teal-deep);
+  text-anchor: start;
+}
+.move__fig .fl-mono-out {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: var(--teal-deep);
+  text-anchor: middle;
+}
+.move__fig .fig-q {
+  font-size: 10.5px;
+}
+.prompts li {
+  cursor: default;
+}
+.contact {
+  padding-bottom: clamp(56px, 7vw, 88px);
 }

@@ -210,6 +210,13 @@
         ["Pacific Corridor Rail", "PORTLAND · US$380M", 64],
       ];
       var sorted = data.map(function (d, i) { return i; }).sort(function (a, b) { return data[b][2] - data[a][2]; });
+      var skel = data.map(function (d, i) {
+        var g = h("g", null, svg);
+        h("rect", { x: PNL.cx, y: PNL.y0 + i * PNL.pitch, width: PNL.cw, height: PNL.ch, rx: 8, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, g);
+        h("rect", { x: PNL.cx + 48, y: PNL.y0 + i * PNL.pitch + PNL.ch / 2 - 8, width: PNL.cw * 0.5, height: 5, rx: 2.5, fill: "rgba(143,166,176,0.5)" }, g);
+        h("rect", { x: PNL.cx + 48, y: PNL.y0 + i * PNL.pitch + PNL.ch / 2 + 6, width: PNL.cw * 0.3, height: 4, rx: 2, fill: "rgba(143,166,176,0.35)" }, g);
+        return g;
+      });
       var hitPts = hits.map(function (k) { return sq[k]; }).sort(function (a, b) { return a.x - b.x; });
       var mid = PNL.ch / 2;
       var cards = data.map(function (d, i) {
@@ -259,6 +266,7 @@
           set(c.fly, "cy", quad(y0, my, y1, fp).toFixed(1));
           op(c.fly, t > t0 && fp < 1 ? 1 : 0);
           var appear = P(t, t0 + 0.55, t0 + 0.95);
+          op(skel[c.slot], 0.5 * (1 - appear) * fade + 0.5 * (1 - fade));
           move(c.g, lerp(14, 0, appear), y);
           op(c.g, appear * fade);
           var ring = P(t, 4.8 + i * 0.14, 5.9 + i * 0.14, E.inOut);
@@ -324,6 +332,13 @@
         ["Distribution centre", "INDUSTRIAL", "€88M", 41],
       ];
       var order = rows.map(function (d, i) { return i; }).sort(function (a, b) { return rows[b][3] - rows[a][3]; });
+      var skel = rows.map(function (d, i) {
+        var g = h("g", null, svg);
+        h("rect", { x: R.rx, y: R.y0 + i * R.pitch, width: R.rw, height: 42, rx: 7, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, g);
+        h("rect", { x: R.rx + 12, y: R.y0 + i * R.pitch + 11, width: R.rw * 0.55, height: 5, rx: 2.5, fill: "rgba(143,166,176,0.5)" }, g);
+        h("rect", { x: R.rx + 12, y: R.y0 + i * R.pitch + 25, width: 60, height: 10, rx: 5, fill: "rgba(143,166,176,0.3)" }, g);
+        return g;
+      });
       var rowEls = rows.map(function (d, i) {
         var rg = h("g", { opacity: 0 }, svg);
         var bg = h("rect", { x: R.rx, y: 0, width: R.rw, height: 42, rx: 7, fill: C.panel2, stroke: C.line }, rg);
@@ -362,6 +377,7 @@
         rowEls.forEach(function (row, i) {
           var t0 = 3.9 + i * 0.3;
           var a = P(t, t0, t0 + 0.5);
+          op(skel[row.slot], 0.5 * (1 - a) * fade + 0.5 * (1 - fade));
           var y = lerp(R.y0 + row.slot * R.pitch, R.y0 + row.rank * R.pitch, P(t, 6.9, 7.8, E.inOut));
           move(row.g, lerp(-16, 0, a), y);
           op(row.g, a * fade);
@@ -386,7 +402,7 @@
       var ctx = cv.ctx;
       var N = 16;
       var G = tall ? { s: 9.4, ox: 170, oy: 150, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 330, oy: 136, maxH: 104, hx: 24, hy: 30 };
-      var CALL = tall ? { x: 16, y: 418, w: 308, h: 100 } : { x: 24, y: 58, w: 150, h: 92 };
+      var CALL = tall ? { x: 16, y: 418, w: 308, h: 100 } : { x: 24, y: 58, w: 196, h: 92 };
       var LEG = tall ? { x: 16, y: 386, w: 180 } : { x: 24, y: 334, w: 150 };
       var r = rng(21), typeBase = [];
       for (var i = 0; i < N; i++) typeBase.push(0.32 + 0.6 * r());
@@ -518,7 +534,7 @@
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(bx, by - 4);
-          if (tall) ctx.lineTo(bx, CALL.y);
+          if (tall) { ctx.lineTo(8, by - 4); ctx.lineTo(8, CALL.y + 24); ctx.lineTo(CALL.x, CALL.y + 24); }
           else { ctx.lineTo(bx, CALL.y + 62); ctx.lineTo(CALL.x + CALL.w, CALL.y + 62); }
           ctx.stroke();
           ctx.fillStyle = C.mint;
@@ -528,7 +544,7 @@
           roundRect(ctx, CALL.x, CALL.y, CALL.w, CALL.h, 9); ctx.fill(); ctx.stroke();
           ctx.fillStyle = C.soft;
           ctx.font = font(10, "mono", 500);
-          spaced(ctx, tall ? "LARGE OFFICE · 5A CHICAGO" : "LARGE OFFICE · 5A", CALL.x + 14, CALL.y + 22, 1);
+          spaced(ctx, "LARGE OFFICE · 5A CHICAGO", CALL.x + 14, CALL.y + 22, 1);
           ctx.fillStyle = "#ffffff";
           ctx.font = font(34, "serif", 400);
           var val = String(Math.round(575 * P(t, 6.9, 7.6)));
@@ -558,7 +574,7 @@
       var Rg = h("g", tall ? { transform: "translate(-238 330) scale(0.98)" } : null, svg);
       tx(Lg, 24, 30, "LAB AND WORKPLACE PALETTE", "s-mono");
       ["LBC", "WELL", "BRIEF"].forEach(function (c, i) {
-        tx(Lg, 236 + i * 52, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
+        tx(Lg, 247 + i * 48, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
       });
       var sections = ["Spandrels", "MEP enclosures", "Bird safety", "Blades", "Facade profiles", "Expressed frame", "Column cladding"];
       var V = [["a", "p", "g"], ["a", "p", "p"], ["p", "p", "g"], ["a", "g", "p"], ["p", "p", "p"], ["a", "p", "g"], ["p", "f", "p"]];
@@ -567,18 +583,21 @@
       var rows = sections.map(function (name, i) {
         var y = 68 + i * 38;
         var rg = h("g", { opacity: 0 }, Lg);
-        h("line", { x1: 24, x2: 364, y1: y + 36, y2: y + 36, stroke: "rgba(143,166,176,0.14)" }, rg);
+        h("line", { x1: 24, x2: 370, y1: y + 36, y2: y + 36, stroke: "rgba(143,166,176,0.14)" }, rg);
         tx(rg, 24, y + 21, name, "s-ui");
         var ev = h("g", { opacity: 0 }, rg);
-        ["EPD", "HPD"].forEach(function (lbl, k) {
-          h("rect", { x: 132 + k * 34, y: y + 10, width: 30, height: 14, rx: 3, fill: "none", stroke: "rgba(143,220,210,0.5)" }, ev);
-          tx(ev, 147 + k * 34, y + 20.5, lbl, "s-chip", { "text-anchor": "middle", fill: C.soft });
+        var evx = 132;
+        (i % 3 === 1 ? ["EPD", "DECLARE"] : i % 3 === 2 ? ["HPD", "DECLARE"] : ["EPD", "HPD"]).forEach(function (lbl) {
+          var w = lbl.length * 5.7 + 10;
+          h("rect", { x: evx, y: y + 10, width: w, height: 14, rx: 3, fill: "none", stroke: "rgba(143,220,210,0.5)" }, ev);
+          tx(ev, evx + w / 2, y + 20.5, lbl, "s-chip", { "text-anchor": "middle", fill: C.soft });
+          evx += w + 4;
         });
         var cells = V[i].map(function (code, c) {
-          var cx = 216 + c * 52;
-          var box = h("rect", { x: cx, y: y + 7, width: 40, height: 22, rx: 6, fill: "none", stroke: "rgba(143,166,176,0.3)" }, rg);
+          var cx = 228 + c * 48;
+          var box = h("rect", { x: cx, y: y + 7, width: 38, height: 22, rx: 6, fill: "none", stroke: "rgba(143,166,176,0.3)" }, rg);
           var mark = h("g", { opacity: 0 }, rg);
-          var mx = cx + 20, my = y + 18;
+          var mx = cx + 19, my = y + 18;
           if (code === "p") h("path", { d: "M" + (mx - 5) + " " + my + " l3.5 3.5 6.5-7", fill: "none", stroke: "#fff", "stroke-width": 1.8, "stroke-linecap": "round", "stroke-linejoin": "round" }, mark);
           if (code === "a") h("path", { d: "M" + (mx - 5) + " " + my + " h10", stroke: "#1b1b1b", "stroke-width": 2, "stroke-linecap": "round" }, mark);
           if (code === "g") tx(mark, mx, my + 4, "?", "s-ui", { "text-anchor": "middle", fill: "#fff" });
@@ -605,23 +624,28 @@
         h("rect", { x: lx, y: ly - 7, width: 8, height: 8, rx: 2, fill: col[l[0]] }, legend);
         tx(legend, lx + 14, ly, l[1] + " " + totals[l[0]], "s-chip", { fill: C.text });
       });
-      var gy0 = tall ? 128 : 142;
+      var gy0 = 128;
       tx(Rg, RX + 16, gy0, "OPEN ISSUES · RANKED", "s-mono");
-      var gaps = [["Column cladding", "FAIL · WELL V2", C.red], ["Spandrels", "GAP · CLIENT BRIEF", C.grey], ["Blades", "GAP · WELL V2", C.grey], ["Bird safety", "GAP · CLIENT BRIEF", C.grey]].map(function (g, i) {
+      var issueList = [["Column cladding", "FAIL · WELL V2", C.red], ["Spandrels", "GAP · CLIENT BRIEF", C.grey], ["Blades", "GAP · WELL V2", C.grey], ["Bird safety", "GAP · CLIENT BRIEF", C.grey], ["Expressed frame", "GAP · CLIENT BRIEF", C.grey]];
+      var skelR = issueList.map(function (g, i) {
+        return h("rect", { x: RX + 12, y: gy0 + 12 + i * 41, width: RW - 24, height: 35, rx: 7, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, Rg);
+      });
+      var barTrack = h("rect", { x: RX + 16, y: 56, width: RW - 32, height: 10, fill: "rgba(143,166,176,0.18)" }, Rg);
+      var gaps = issueList.map(function (g, i) {
         var gg = h("g", { opacity: 0 }, Rg);
-        var y = gy0 + 14 + i * 46;
-        h("rect", { x: RX + 12, y: y, width: RW - 24, height: 38, rx: 7, fill: C.panel2, stroke: C.line }, gg);
-        h("rect", { x: RX + 12, y: y + 8, width: 3, height: 22, rx: 1.5, fill: g[2] }, gg);
-        tx(gg, RX + 24, y + 16, "0" + (i + 1), "s-mono");
-        tx(gg, RX + 48, y + 16, g[0], "s-ui s-ui-sm");
-        tx(gg, RX + 48, y + 30, g[1], "s-chip", { fill: C.mist });
+        var y = gy0 + 12 + i * 41;
+        h("rect", { x: RX + 12, y: y, width: RW - 24, height: 35, rx: 7, fill: C.panel2, stroke: C.line }, gg);
+        h("rect", { x: RX + 12, y: y + 7, width: 3, height: 21, rx: 1.5, fill: g[2] }, gg);
+        tx(gg, RX + 24, y + 15, "0" + (i + 1), "s-mono");
+        tx(gg, RX + 48, y + 15, g[0], "s-ui s-ui-sm");
+        tx(gg, RX + 48, y + 28, g[1], "s-chip", { fill: C.mist });
         return gg;
       });
       return function (t) {
         var fade = 1 - P(t, 9.8, 10.4, E.inOut);
         rows.forEach(function (r, i) {
           op(r.g, P(t, 0.1 + i * 0.1, 0.5 + i * 0.1) * fade);
-          op(r.ev, P(t, 0.8 + i * 0.12, 1.1 + i * 0.12) * (1 - P(t, 5.6, 6.0) * 0.6));
+          op(r.ev, P(t, 0.8 + i * 0.12, 1.1 + i * 0.12) * fade);
           r.cells.forEach(function (c, k) {
             var t0 = 1.9 + i * 0.48 + k * 0.12;
             var p = P(t, t0, t0 + 0.25);
@@ -637,10 +661,12 @@
         segs.forEach(function (s) { set(s.el, "width", (s.w * b * fade).toFixed(1)); });
         op(legend, P(t, 6.2, 6.6) * fade);
         gaps.forEach(function (g, i) {
-          var a = P(t, 6.8 + i * 0.3, 7.2 + i * 0.3);
+          var a = P(t, 6.8 + i * 0.25, 7.2 + i * 0.25);
           move(g, lerp(12, 0, a), 0);
           op(g, a * fade);
+          op(skelR[i], 0.5 * (1 - a) * fade + 0.5 * (1 - fade));
         });
+        op(barTrack, 1 - b * fade);
       };
     },
   };
@@ -650,14 +676,14 @@
     dur: 10.8,
     still: 8.8,
     beats: [[0, 0], [3.0, 1], [5.6, 2]],
-    size: { wide: [600, 375], tall: [340, 660] },
+    size: { wide: [600, 375], tall: [340, 620] },
     init: function (stage, mode) {
       var tall = mode === "tall";
-      var st = svgStage(stage, tall ? 340 : 600, tall ? 660 : 375, "wn" + mode);
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 620 : 375, "wn" + mode);
       var svg = st.svg;
       var wires = h("g", null, svg);
       var LAY = tall
-        ? { refs: [[10, 14], [10, 124], [10, 234]], rw: 156, rh: 96, an: [[184, 40], [184, 212]], aw: 146, ah: 122, pres: [10, 360, 320, 290], cols: 3, tw: 92, th: 56 }
+        ? { refs: [[10, 14], [10, 124], [10, 234]], rw: 156, rh: 96, an: [[180, 40], [180, 212]], aw: 138, ah: 122, pres: [10, 360, 320, 248], cols: 3, tw: 92, th: 56 }
         : { refs: [[16, 34], [16, 146], [16, 258]], rw: 152, rh: 84, an: [[218, 56], [218, 212]], aw: 160, ah: 112, pres: [430, 74, 154, 228], cols: 2, tw: 60, th: 38 };
       function node(x, y, w, hh, title, kind) {
         var g = h("g", { opacity: 0 }, svg);
@@ -696,7 +722,10 @@
         var tt = tx(pres, PX + 32 + i * 44, PY + 45.5, f, "s-chip", { "text-anchor": "middle", fill: C.mist });
         return { r: r, t: tt };
       });
-      var slides = [];
+      var slides = [], skelS = [];
+      for (var q = 0; q < 6; q++) {
+        skelS.push(h("rect", { x: PX + 12 + (q % LAY.cols) * (LAY.tw + 8), y: PY + 62 + Math.floor(q / LAY.cols) * (LAY.th + 8), width: LAY.tw, height: LAY.th, rx: 3, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, pres));
+      }
       for (var k = 0; k < 6; k++) {
         var sx = PX + 12 + (k % LAY.cols) * (LAY.tw + 8), sy = PY + 62 + Math.floor(k / LAY.cols) * (LAY.th + 8);
         var sg = h("g", { opacity: 0 }, pres);
@@ -725,7 +754,7 @@
       if (tall) {
         var a0 = an[0], a1 = an[1], ex = a0.x + LAY.aw;
         w2 = [
-          wire("M" + (ex - 20) + " " + (a0.y + LAY.ah) + " C" + (ex - 20) + " " + (a0.y + LAY.ah + 30) + " " + (ex - 2) + " " + (a1.y - 20) + " " + (ex - 2) + " " + (a1.y + 40) + " S" + (PX + PW * 0.82) + " " + (PY - 30) + " " + (PX + PW * 0.82) + " " + PY),
+          wire("M" + ex + " " + (a0.y + 56) + " L" + (ex + 12) + " " + (a0.y + 56) + " L" + (ex + 12) + " " + (PY - 14) + " Q" + (ex + 12) + " " + PY + " " + (PX + PW * 0.86) + " " + PY),
           wire("M" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah) + " C" + (a1.x + LAY.aw / 2) + " " + (a1.y + LAY.ah + 10) + " " + (PX + PW * 0.55) + " " + (PY - 10) + " " + (PX + PW * 0.55) + " " + PY),
         ];
       } else {
@@ -768,6 +797,7 @@
         runWires(w2, t, 5.6);
         slides.forEach(function (s, k) {
           var a = P(t, 6.8 + k * 0.2, 7.1 + k * 0.2, E.back);
+          op(skelS[k], 1 - P(t, 6.8 + k * 0.2, 7.0 + k * 0.2));
           op(s, P(t, 6.8 + k * 0.2, 7.0 + k * 0.2));
           set(s, "transform", "translate(0 " + (6 * (1 - a)).toFixed(1) + ")");
         });
@@ -888,6 +918,12 @@
         }
         var b3 = P(t, 6.3, 6.8);
         var ry = y0 + 132;
+        ctx.globalAlpha = (1 - b2) * 0.5 * fade;
+        ctx.setLineDash([3, 4]);
+        ctx.strokeStyle = C.line;
+        roundRect(ctx, L, ry + 18, sw, 56, 8); ctx.stroke();
+        roundRect(ctx, L, ry + 86, sw, 56, 8); ctx.stroke();
+        ctx.setLineDash([]);
         ctx.globalAlpha = Math.max(b2 * (1 - b3), b3) * fade;
         ctx.fillStyle = "rgba(143,166,176,0.2)";
         ctx.fillRect(L, ry, sw, 1);
@@ -974,8 +1010,8 @@
       var colLines = [];
       for (var f = 0; f < FLOORS; f++) {
         for (var cy = 0; cy < 4; cy++) {
-          for (var cx = 0; cx < 12; cx++) {
-            var x = 12 + cx * 25.1, y = 12 + cy * 25.3;
+          for (var cx = 0; cx < 9; cx++) {
+            var x = 10 + cx * 35, y = 8 + cy * 28;
             colLines.push({ el: h("polyline", { points: pts([[x, y, f * FH], [x, y, f * FH + FH - 3]]), fill: "none" }, cols), f: f });
           }
         }
@@ -989,8 +1025,8 @@
       var area = tx(label, tall ? 0 : 28, tall ? 0 : 16, "", tall ? "s-num" : "s-num-sm", tall ? { "text-anchor": "end" } : null);
       tx(label, tall ? 0 : 28, tall ? 20 : 38, "LEVEL 03 · GFA", "s-mono", tall ? { "text-anchor": "end" } : null);
       var colLabel = h("g", { opacity: 0 }, svg);
-      var colCount = tx(colLabel, 24, tall ? 96 : 52, "", "s-num");
-      tx(colLabel, 24, tall ? 116 : 72, "COLUMNS · 6 STOREYS", "s-mono");
+      var colCount = tx(colLabel, 536, 50, "", "s-num", { "text-anchor": "end" });
+      tx(colLabel, 536, 70, "COLUMNS · WHOLE BUILDING", "s-mono", { "text-anchor": "end" });
       tx(svg, 24, tall ? 40 : 404, "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
 
       function msg(cls, html) {
@@ -1060,7 +1096,7 @@
         set(cam, "transform", "translate(" + cxs[0].toFixed(1) + " " + cxs[1].toFixed(1) + ") scale(" + zoom.toFixed(3) + ") translate(" + (-cxs[0]).toFixed(1) + " " + (-cxs[1]).toFixed(1) + ")");
         floors.forEach(function (fl) {
           var sel = fl.k === 3;
-          op(fl.g, (sel ? 1 : 1 - 0.86 * iso1) * (1 - 0.9 * colsOn));
+          op(fl.g, (sel ? 1 : 1 - 0.86 * iso1) * (1 - 0.78 * colsOn));
           var hot = sel && iso1 > 0.5;
           set(fl.left, "fill", hot ? "rgba(22,255,198,0.30)" : "rgba(89,199,252,0.14)");
           set(fl.right, "fill", hot ? "rgba(22,255,198,0.20)" : "rgba(89,199,252,0.08)");
@@ -1070,7 +1106,7 @@
         op(cols, colsOn);
         colLines.forEach(function (c) { op(c.el, P(t, 11.2 + c.f * 0.1, 11.6 + c.f * 0.1)); });
         var lx = cxs[0] + (lp[0] - cxs[0]) * zoom, ly = cxs[1] + (lp[1] - cxs[1] - 6 * iso1) * zoom;
-        if (tall) move(label, 536, 90);
+        if (tall) move(label, 536, 50);
         else move(label, lx, ly);
         op(label, P(t, 4.6, 5.0) * (1 - P(t, 7.8, 8.2)));
         text(area, areaNow + " m²");
