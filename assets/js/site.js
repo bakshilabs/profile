@@ -5,6 +5,13 @@
   document.documentElement.classList.add("js");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Some embedded frames refuse history changes; the page works without them.
+  function setHash(hash) {
+    try {
+      history.replaceState(null, "", hash);
+    } catch (err) {}
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initNav();
     initCases();
@@ -91,7 +98,7 @@
         resetWalk(d.querySelector("[data-walk]"));
         if (!d.dataset.switching) {
           document.body.classList.remove("is-locked");
-          if (location.hash === "#" + d.id) history.replaceState(null, "", "#work");
+          if (location.hash === "#" + d.id) setHash("#work");
           if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
         }
       });
@@ -116,7 +123,7 @@
       d.showModal();
       d.scrollTop = 0;
       document.body.classList.add("is-locked");
-      if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+      if (location.hash !== "#" + id) setHash("#" + id);
       return true;
     }
 
@@ -128,7 +135,7 @@
         opener = null;
         if (openSheet) openSheet.close();
         var target = document.getElementById(to.getAttribute("data-close-to"));
-        history.replaceState(null, "", "#" + to.getAttribute("data-close-to"));
+        setHash("#" + to.getAttribute("data-close-to"));
         if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
         return;
       }

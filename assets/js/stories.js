@@ -276,7 +276,9 @@
           var lit = t > 0.3 && sweep > (k + 0.5) / 36 && fade > 0.5;
           set(cats[k], "fill", lit ? (k === 3 || k === 17 || k === 29 ? C.mint : "rgba(143,220,210,0.55)") : "rgba(143,166,176,0.2)");
         }
-        text(status, t < 0.3 ? "READY TO SCAN" : t < 2.9 ? "SCANNING " + Math.round(676 * sweep) + " / 676" : "5 OPPORTUNITIES FOUND");
+        var landed = 0;
+        for (var n = 0; n < 5; n++) if (t > 3.0 + n * 0.24 + 0.7) landed++;
+        text(status, t < 0.3 ? "READY TO SCAN" : t < 2.9 ? "SCANNING " + Math.round(676 * sweep) + " / 676" : t < 3.7 ? "MATCHING RESULTS" : landed + (landed === 1 ? " OPPORTUNITY FOUND" : " OPPORTUNITIES FOUND"));
         sectorChips.forEach(function (cg, n) { op(cg, n === 0 ? 1 : 0.55 + 0.45 * (1 - fade)); });
         cards.forEach(function (c, i) {
           var t0 = 3.0 + i * 0.24;
@@ -1008,8 +1010,9 @@
         ctx.fillStyle = "rgba(143,166,176,0.3)";
         roundRect(ctx, L, ry + 74, sw, 4, 2); ctx.fill();
         ctx.fillStyle = C.mint;
-        roundRect(ctx, L, ry + 74, Math.max(4, sw * slider), 4, 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(L + sw * slider, ry + 76, 7, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
+        var knob = 0.36 * slider;
+        roundRect(ctx, L, ry + 74, Math.max(4, sw * knob), 4, 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(L + sw * knob, ry + 76, 7, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
         ctx.strokeStyle = C.mint; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = "#fff";
         ctx.font = font(26, "serif", 400);
