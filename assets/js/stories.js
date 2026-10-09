@@ -171,56 +171,74 @@
 
   var SCENES = {};
 
-  /* Strategic Project Discovery: scan, collect, score */
+  /* Strategic Project Discovery: scan the world, pin the matches, score them */
   SCENES["strategic-project-discovery"] = {
     dur: 10.6,
     still: 8.4,
     beats: [[0, 0], [3.0, 1], [4.8, 2]],
-    size: { wide: [600, 375], tall: [340, 650] },
+    size: { wide: [600, 375], tall: [340, 712] },
     init: function (stage, mode) {
       var tall = mode === "tall";
-      var st = svgStage(stage, tall ? 340 : 600, tall ? 650 : 375, "spd" + mode);
+      var st = svgStage(stage, tall ? 340 : 600, tall ? 712 : 375, "spd" + mode);
       var svg = st.svg;
-      gradient(st.defs, "beam-spd" + mode, [[0, C.mint, 0], [0.5, C.mint, 0.28], [1, C.mint, 0]]);
-      var G = tall ? { gx: 40, gy: 44, hx: 40, hy: 28, sy: 328 } : { gx: 24, gy: 44, hx: 24, hy: 30, sy: 340 };
-      var PNL = tall ? { x: 16, y: 344, w: 308, h: 296, cx: 28, cw: 284, ch: 46, pitch: 50, y0: 384 } : { x: 316, y: 20, w: 264, h: 335, cx: 328, cw: 240, ch: 52, pitch: 58, y0: 60 };
-      tx(svg, G.hx, G.hy, "676 PROCUREMENT SOURCES", "s-mono");
-      var status = tx(svg, G.hx, G.sy, "", "s-mono s-dim");
-      var N = 26, pitch = 10, cell = 8;
-      var r = rng(11), hits = [];
-      while (hits.length < 5) {
-        var k = Math.floor(r() * 676);
-        if (hits.indexOf(k) < 0 && k % N > 2 && k % N < 23) hits.push(k);
+      gradient(st.defs, "beam-spd" + mode, [[0, C.mint, 0], [0.5, C.mint, 0.22], [1, C.mint, 0]]);
+      var WD = window.WORLD_DOTS;
+      var M = tall ? { x: 16, y: 58, w: 308 } : { x: 20, y: 66, w: 282 };
+      var pitch = M.w / WD.c;
+      M.h = pitch * WD.r;
+      var K = tall ? { x: 16, y: 216, w: 308 } : { x: 20, y: 228, w: 282 };
+      var SY = tall ? 334 : 340;
+      var PNL = tall ? { x: 16, y: 352, w: 308, h: 350, cx: 28, cw: 284, ch: 46, pitch: 54, y0: 394 } : { x: 316, y: 20, w: 264, h: 335, cx: 328, cw: 240, ch: 52, pitch: 58, y0: 60 };
+      tx(svg, M.x, tall ? 28 : 30, "676 PROCUREMENT SOURCES", "s-mono");
+      tx(svg, M.x, tall ? 44 : 48, "SECTOR · HIGH SPEED RAIL AND METRO", "s-mono s-dim");
+      var g = h("g", null, svg), dots = [];
+      for (var i = 0; i < WD.d.length; i += 2) {
+        var x = M.x + (WD.d[i] + 0.5) * pitch, y = M.y + (WD.d[i + 1] + 0.5) * pitch;
+        dots.push({ el: h("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r: (pitch * 0.32).toFixed(2), fill: C.mist, opacity: 0.3 }, g), x: x });
       }
-      var g = h("g", null, svg), sq = [];
-      for (var i = 0; i < 676; i++) {
-        var x = G.gx + (i % N) * pitch, y = G.gy + Math.floor(i / N) * pitch;
-        sq.push({ el: h("rect", { x: x, y: y, width: cell, height: cell, rx: 1.6, fill: C.mist, opacity: 0.16 }, g), x: x + cell / 2, y: y + cell / 2, hit: hits.indexOf(i) >= 0 });
+      var glow = h("rect", { x: 0, y: M.y - 6, width: 44, height: M.h + 12, fill: "url(#beam-spd" + mode + ")", opacity: 0 }, svg);
+      var beam = h("rect", { x: 0, y: M.y - 6, width: 1.5, height: M.h + 12, fill: C.mint, opacity: 0 }, svg);
+      tx(svg, K.x, K.y - 10, "36 SOURCE CATEGORIES", "s-mono s-dim");
+      var cats = [], cw = (K.w - 17 * 3) / 18;
+      for (var k = 0; k < 36; k++) {
+        cats.push(h("rect", { x: (K.x + (k % 18) * (cw + 3)).toFixed(1), y: K.y + Math.floor(k / 18) * 14, width: cw.toFixed(1), height: 10, rx: 2, fill: "rgba(143,166,176,0.2)" }, svg));
       }
-      var gridW = N * pitch;
-      var glow = h("rect", { x: 0, y: G.gy - 8, width: 44, height: gridW + 12, fill: "url(#beam-spd" + mode + ")" }, svg);
-      var beam = h("rect", { x: 0, y: G.gy - 8, width: 1.5, height: gridW + 12, fill: C.mint }, svg);
+      var Z = { x: K.x, y: K.y + 50, w: K.w };
+      tx(svg, Z.x, Z.y - 10, "7 SECTORS", "s-mono s-dim");
+      var sectors = ["RAIL AND METRO", "TRANSIT", "REGENERATION", "DATA CENTRES", "PORTS", "MEGA PROJECTS", "ENERGY"];
+      var zx = Z.x, zy = Z.y, sectorChips = [];
+      sectors.forEach(function (name, n) {
+        var w = name.length * chipK + 12;
+        if (zx + w > Z.x + Z.w) { zx = Z.x; zy += 20; }
+        var c = chip(svg, zx, zy, name, n === 0 ? "mint" : "grey");
+        sectorChips.push(c.g);
+        zx += w + 5;
+      });
+      var status = tx(svg, M.x, SY, "", "s-mono s-dim");
 
       h("rect", { x: PNL.x, y: PNL.y, width: PNL.w, height: PNL.h, rx: 12, fill: C.panel, stroke: C.line }, svg);
       tx(svg, PNL.x + 16, PNL.y + 24, "RESULTS · SAMPLE DATA", "s-mono");
       var data = [
-        ["Northern Arc Metro Extension", "MANCHESTER · £1.8BN", 92],
-        ["Iberian High Speed Link", "VALENCIA · €640M", 78],
-        ["Gulf Coast Light Rail", "DOHA · QAR 4.2BN", 88],
-        ["Eastern Suburbs Metro", "SYDNEY · A$2.1BN", 81],
-        ["Pacific Corridor Rail", "PORTLAND · US$380M", 64],
+        ["Northern Arc Metro Extension", "MANCHESTER · £1.8BN", 92, "Manchester"],
+        ["Iberian High Speed Link", "VALENCIA · €640M", 78, "Valencia"],
+        ["Gulf Coast Light Rail", "DOHA · QAR 4.2BN", 88, "Doha"],
+        ["Eastern Suburbs Metro", "SYDNEY · A$2.1BN", 81, "Sydney"],
+        ["Pacific Corridor Rail", "PORTLAND · US$380M", 64, "Portland"],
       ];
       var sorted = data.map(function (d, i) { return i; }).sort(function (a, b) { return data[b][2] - data[a][2]; });
       var skel = data.map(function (d, i) {
-        var g = h("g", null, svg);
-        h("rect", { x: PNL.cx, y: PNL.y0 + i * PNL.pitch, width: PNL.cw, height: PNL.ch, rx: 8, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, g);
-        h("rect", { x: PNL.cx + 48, y: PNL.y0 + i * PNL.pitch + PNL.ch / 2 - 8, width: PNL.cw * 0.5, height: 5, rx: 2.5, fill: "rgba(143,166,176,0.5)" }, g);
-        h("rect", { x: PNL.cx + 48, y: PNL.y0 + i * PNL.pitch + PNL.ch / 2 + 6, width: PNL.cw * 0.3, height: 4, rx: 2, fill: "rgba(143,166,176,0.35)" }, g);
-        return g;
+        var sg = h("g", null, svg);
+        h("rect", { x: PNL.cx, y: PNL.y0 + i * PNL.pitch, width: PNL.cw, height: PNL.ch, rx: 8, fill: "none", stroke: C.line, "stroke-dasharray": "3 4" }, sg);
+        h("rect", { x: PNL.cx + 48, y: PNL.y0 + i * PNL.pitch + PNL.ch / 2 - 8, width: PNL.cw * 0.5, height: 5, rx: 2.5, fill: "rgba(143,166,176,0.5)" }, sg);
+        h("rect", { x: PNL.cx + 48, y: PNL.y0 + i * PNL.pitch + PNL.ch / 2 + 6, width: PNL.cw * 0.3, height: 4, rx: 2, fill: "rgba(143,166,176,0.35)" }, sg);
+        return sg;
       });
-      var hitPts = hits.map(function (k) { return sq[k]; }).sort(function (a, b) { return a.x - b.x; });
       var mid = PNL.ch / 2;
       var cards = data.map(function (d, i) {
+        var c = WD.cities[d[3]];
+        var pxy = { x: M.x + (c[0] + 0.5) * pitch, y: M.y + (c[1] + 0.5) * pitch };
+        var ripple = h("circle", { cx: pxy.x, cy: pxy.y, r: 3, fill: "none", stroke: C.mint, "stroke-width": 1, opacity: 0 }, svg);
+        var pin = h("circle", { cx: pxy.x, cy: pxy.y, r: 0, fill: C.mint }, svg);
         var cg = h("g", { opacity: 0 }, svg);
         var bg = h("rect", { x: PNL.cx, y: 0, width: PNL.cw, height: PNL.ch, rx: 8, fill: C.panel2, stroke: C.line }, cg);
         var rx0 = PNL.cx + 24;
@@ -232,37 +250,45 @@
         var tag = h("g", { opacity: 0 }, cg);
         h("rect", { x: PNL.cx + PNL.cw - 72, y: -7, width: 60, height: 15, rx: 7.5, fill: C.mint }, tag);
         tx(tag, PNL.cx + PNL.cw - 42, 3.5, "HIGH FIT", "s-chip s-ink", { "text-anchor": "middle" });
-        var fly = h("circle", { r: 3.2, fill: C.mint, opacity: 0 }, svg);
-        return { g: cg, bg: bg, arc: arc, num: num, tag: tag, fly: fly, score: d[2], slot: i, rank: sorted.indexOf(i), from: hitPts[i], rx: rx0 };
+        var fly = h("circle", { r: 3, fill: C.mint, opacity: 0 }, svg);
+        return { g: cg, bg: bg, arc: arc, num: num, tag: tag, fly: fly, pin: pin, ripple: ripple, p: pxy, score: d[2], slot: i, rank: sorted.indexOf(i), rx: rx0 };
       });
 
       return function (t) {
         var fade = 1 - P(t, 9.6, 10.3, E.inOut);
         var sweep = P(t, 0.3, 2.8, E.inOut);
-        var bx = lerp(G.gx - 6, G.gx + gridW + 4, sweep);
+        var bx = lerp(M.x - 4, M.x + M.w + 4, sweep);
         var scanning = t > 0.3 && t < 2.95;
         set(beam, "x", bx.toFixed(1));
         set(glow, "x", (bx - 22).toFixed(1));
         op(beam, scanning ? 1 : 0);
         op(glow, scanning ? 1 : 0);
         var settle = 1 - P(t, 2.8, 3.3);
-        for (var i = 0; i < sq.length; i++) {
-          var s = sq[i], o = 0.16, fill = C.mist;
-          if (t > 0.3 && bx > s.x) {
-            var d = bx - s.x;
-            o = 0.24 + 0.6 * Math.exp((-d * d) / 260) * settle;
-            if (s.hit) { o = 1; fill = C.mint; }
+        for (var i = 0; i < dots.length; i++) {
+          var d = dots[i], o = 0.3;
+          if (t > 0.3 && bx > d.x) {
+            var dd = bx - d.x;
+            o = 0.42 + 0.55 * Math.exp((-dd * dd) / 300) * settle;
           }
-          set(s.el, "fill", fill);
-          op(s.el, o * fade + (1 - fade) * 0.16);
+          op(d.el, o * fade + 0.3 * (1 - fade));
+        }
+        for (var k = 0; k < 36; k++) {
+          var lit = t > 0.3 && sweep > (k + 0.5) / 36 && fade > 0.5;
+          set(cats[k], "fill", lit ? (k === 3 || k === 17 || k === 29 ? C.mint : "rgba(143,220,210,0.55)") : "rgba(143,166,176,0.2)");
         }
         text(status, t < 0.3 ? "READY TO SCAN" : t < 2.9 ? "SCANNING " + Math.round(676 * sweep) + " / 676" : "5 OPPORTUNITIES FOUND");
+        sectorChips.forEach(function (cg, n) { op(cg, n === 0 ? 1 : 0.55 + 0.45 * (1 - fade)); });
         cards.forEach(function (c, i) {
           var t0 = 3.0 + i * 0.24;
+          var pinA = P(t, t0 - 0.25, t0 + 0.05, E.back);
+          set(c.pin, "r", (3.2 * pinA * fade).toFixed(2));
+          var rp = clamp((t - t0) / 0.9, 0, 1);
+          set(c.ripple, "r", (3 + 11 * rp).toFixed(1));
+          op(c.ripple, t > t0 && rp < 1 ? (1 - rp) * fade : 0);
           var fp = P(t, t0, t0 + 0.7, E.inOut);
           var y = lerp(PNL.y0 + c.slot * PNL.pitch, PNL.y0 + c.rank * PNL.pitch, P(t, 6.5, 7.4, E.inOut));
-          var x0 = c.from.x, y0 = c.from.y, x1 = c.rx, y1 = y + mid;
-          var mx = tall ? x0 + 60 : (x0 + x1) / 2, my = tall ? (y0 + y1) / 2 : Math.min(y0, y1) - 40;
+          var x0 = c.p.x, y0 = c.p.y, x1 = c.rx, y1 = y + mid;
+          var mx = tall ? (x0 + x1) / 2 + 40 : (x0 + x1) / 2, my = tall ? (y0 + y1) / 2 : Math.min(y0, y1) - 30;
           set(c.fly, "cx", quad(x0, mx, x1, fp).toFixed(1));
           set(c.fly, "cy", quad(y0, my, y1, fp).toFixed(1));
           op(c.fly, t > t0 && fp < 1 ? 1 : 0);
@@ -308,7 +334,7 @@
       h("ellipse", { cx: dbx, cy: dby, rx: 34, ry: 10, fill: C.panel, stroke: C.line }, db);
       h("path", { d: "M" + (dbx - 34) + " " + (dby + 26) + " a34 10 0 0 0 68 0 M" + (dbx - 34) + " " + (dby + 52) + " a34 10 0 0 0 68 0", fill: "none", stroke: C.line }, db);
       var count = tx(svg, dbx, dby + 130, "0", "s-num", { "text-anchor": "middle" });
-      tx(svg, dbx, dby + 147, "RECORDS", "s-mono s-dim", { "text-anchor": "middle" });
+      tx(svg, dbx, dby + 147, "RECORDS ON THE MAP", "s-mono s-dim", { "text-anchor": "middle" });
       var runs = [], runH = [10, 14, 17, 21, 24, 27, 29, 31];
       for (var k = 0; k < 8; k++) runs.push(h("rect", { x: dbx - 32 + k * 8.4, y: dby + 196, width: 6, height: 0, rx: 1.5, fill: C.soft }, svg));
       tx(svg, dbx, dby + 212, "UPDATE RUNS", "s-mono s-dim", { "text-anchor": "middle" });
@@ -366,7 +392,7 @@
           op(p.el, t > p.t0 && q < 1 ? 0.9 : 0);
         });
         var c = P(t, 0.5, 3.9, E.inOut) * fade;
-        text(count, fmt(57848 * c));
+        text(count, fmt(57840 * c));
         set(fillLevel, "height", (78 * c).toFixed(1));
         set(fillLevel, "y", (dby + 88 - 78 * c).toFixed(1));
         runs.forEach(function (bar, k) {
@@ -402,8 +428,8 @@
       var cv = canvasStage(stage, tall ? 340 : 600, tall ? 540 : 375);
       var ctx = cv.ctx;
       var N = 16;
-      var G = tall ? { s: 9.4, ox: 170, oy: 238, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 372, oy: 136, maxH: 104, hx: 24, hy: 30 };
-      var CALL = tall ? { x: 16, y: 44, w: 308, h: 80 } : { x: 24, y: 58, w: 190, h: 92 };
+      var G = tall ? { s: 9.4, ox: 170, oy: 238, maxH: 92, hx: 16, hy: 28 } : { s: 10.6, ox: 390, oy: 136, maxH: 104, hx: 24, hy: 30 };
+      var CALL = tall ? { x: 16, y: 44, w: 308, h: 80 } : { x: 24, y: 58, w: 206, h: 92 };
       var LEG = tall ? { x: 16, y: 470, w: 180 } : { x: 24, y: 334, w: 150 };
       var r = rng(21), typeBase = [];
       for (var i = 0; i < N; i++) typeBase.push(0.32 + 0.6 * r());
@@ -574,7 +600,7 @@
       var svg = st.svg;
       var Lg = h("g", tall ? { transform: "translate(-4 0) scale(0.92)" } : null, svg);
       var Rg = h("g", tall ? { transform: "translate(-238 330) scale(0.98)" } : null, svg);
-      tx(Lg, 24, 30, "LAB AND WORKPLACE PALETTE", "s-mono");
+      tx(Lg, 24, 30, "SAMPLE PALETTE · LAB AND WORKPLACE", "s-mono");
       ["LBC", "WELL", "BRIEF"].forEach(function (c, i) {
         tx(Lg, 247 + i * 48, 58, c, "s-mono s-dim", { "text-anchor": "middle" });
       });
@@ -622,7 +648,7 @@
       });
       var legend = h("g", { opacity: 0 }, Rg);
       [["p", "PASS"], ["a", "PARTIAL"], ["g", "GAP"], ["f", "FAIL"]].forEach(function (l, i) {
-        var lx = RX + 16 + (tall ? i * 72 : (i % 2) * 80), ly = tall ? 86 : 86 + Math.floor(i / 2) * 18;
+        var lx = RX + 16 + (i % 2) * (tall ? 120 : 80), ly = 86 + Math.floor(i / 2) * 18;
         h("rect", { x: lx, y: ly - 7, width: 8, height: 8, rx: 2, fill: col[l[0]] }, legend);
         tx(legend, lx + 14, ly, l[1] + " " + totals[l[0]], "s-chip", { fill: C.text });
       });
@@ -825,7 +851,7 @@
       var cv = canvasStage(stage, tall ? 340 : 600, tall ? 700 : 375);
       var ctx = cv.ctx;
       var data = window.SOUTHWARK;
-      var MAP = tall ? { x: 60, y: 14, w: 220, h: 356 } : { x: 40, y: 14, w: 250, h: 348 };
+      var MAP = tall ? { x: 60, y: 10, w: 220, h: 352 } : { x: 40, y: 10, w: 250, h: 336 };
       var bw = data.b[0], bh = data.b[1];
       var sc = Math.min(MAP.w / bw, MAP.h / bh);
       var ox = MAP.x + (MAP.w - bw * sc) / 2, oy = MAP.y + (MAP.h - bh * sc) / 2;
@@ -846,7 +872,7 @@
       funded.forEach(function (p, i) { p.fund = (i + 1) / funded.length; });
       var BAND = ["#1f9d68", "#7fbf4a", "#e5c23a", "#f0a35e", "#e2623f"];
       var LBL = ["A–B", "C", "D", "E", "F–G"];
-      var PN = tall ? { x: 16, y: 384, w: 308, h: 304 } : { x: 312, y: 20, w: 268, h: 335 };
+      var PN = tall ? { x: 16, y: 392, w: 308, h: 296 } : { x: 312, y: 38, w: 268, h: 300 };
       function wardPath() {
         ctx.beginPath();
         wards.forEach(function (w) {
@@ -891,6 +917,10 @@
             ctx.beginPath(); ctx.arc(p.x, p.y, 3.7, 0, Math.PI * 2); ctx.stroke();
           }
         }
+        ctx.globalAlpha = P(t, 0.4, 1.0) * fade;
+        ctx.fillStyle = C.mist;
+        ctx.font = font(10, "mono", 500);
+        spaced(ctx, "1,700 SAMPLE HOMES SHOWN", tall ? 16 : 24, tall ? 378 : 362, 1.1);
         ctx.globalAlpha = 1;
 
         var x0 = PN.x, y0 = PN.y, w = PN.w, L = x0 + 16, sw = w - 32;
@@ -959,8 +989,8 @@
         ctx.strokeStyle = C.mint; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = "#fff";
         ctx.font = font(26, "serif", 400);
-        ctx.fillText(fmt(4079 * slider), L, ry + 124);
-        ctx.fillText((6.6 * slider).toFixed(1) + " kt", L + sw * 0.52, ry + 124);
+        ctx.fillText(fmt(4160 * slider), L, ry + 124);
+        ctx.fillText((7.1 * slider).toFixed(1) + " kt/yr", L + sw * 0.52, ry + 124);
         ctx.fillStyle = C.mist;
         ctx.font = font(10, "mono", 500);
         ctx.strokeStyle = C.mint;
@@ -970,7 +1000,7 @@
         ctx.beginPath(); ctx.arc(L + 4, ry + 138.5, 1.8, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = C.mist;
         spaced(ctx, "HOMES FUNDED", L + 13, ry + 142, 1.1);
-        spaced(ctx, "CO₂E SAVED A YEAR", L + sw * 0.52, ry + 142, 1.1);
+        spaced(ctx, "CO₂E SAVED", L + sw * 0.52, ry + 142, 1.1);
         ctx.globalAlpha = 1;
       };
     },
@@ -981,7 +1011,7 @@
     dur: 16.4,
     still: 6.6,
     beats: [[0, 0], [2.7, 1], [3.6, 2], [8.3, 0], [10.3, 1], [10.9, 2]],
-    size: { wide: [560, 420], tall: [560, 700] },
+    size: { wide: [560, 420], tall: [560, 860] },
     keepStage: true,
     init: function (stage, mode) {
       var tall = mode === "tall";
@@ -989,11 +1019,11 @@
       var chat = stage.querySelector(".mc__log");
       viewer.innerHTML = "";
       chat.innerHTML = "";
-      var st = svgStage(viewer, 560, tall ? 700 : 420, "mc" + (mode || "wide"));
+      var st = svgStage(viewer, 560, tall ? 860 : 420, "mc" + (mode || "wide"));
       var svg = st.svg;
       var cam = h("g", null, svg);
       // six storeys with columns, from the basement to Level 05
-      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 132 : 168;
+      var L = 300, W = 100, FH = 18, FLOORS = 6, OX = 193, OY = tall ? 152 : 168;
       function iso(x, y, z) { return [OX + (x - y) * 0.866, OY + (x + y) * 0.5 - z]; }
       function pts(arr) {
         return arr.map(function (p) { var q = iso(p[0], p[1], p[2]); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
@@ -1035,7 +1065,7 @@
       var colLabel = h("g", { opacity: 0 }, svg);
       var colCount = tx(colLabel, 536, 50, "", "s-num", { "text-anchor": "end" });
       tx(colLabel, 536, 70, "COLUMNS · WHOLE BUILDING", "s-mono", { "text-anchor": "end" });
-      tx(svg, 24, tall ? 40 : 404, tall ? "TIMBER OFFICE · IFC4" : "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
+      tx(svg, 24, tall ? 26 : 404, tall ? "TIMBER OFFICE · IFC4" : "NORDICLCA TIMBER OFFICE · IFC4", "s-mono s-dim");
 
       function msg(cls, html) {
         var el = document.createElement("div");

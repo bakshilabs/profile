@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="assets/css/site.css" />
     <script src="assets/js/site.js" defer></script>
     <script src="assets/js/southwark-data.js" defer></script>
+    <script src="assets/js/world-data.js" defer></script>
     <script src="assets/js/stories.js" defer></script>
   </head>
   <body>
@@ -53,7 +54,7 @@
           <div class="hero__copy">
             <p class="kicker">Claude training and tool building for AEC teams</p>
             <h1 class="hero__title" id="hero-title">I teach architecture and engineering teams to use Claude on their own projects, then <em>build the tools they ask&nbsp;for.</em></h1>
-            <p class="hero__sub">Until 2026 I was an Associate Partner at Foster + Partners, where I led a technology team that built digital tools for the firm’s design and consulting work.</p>
+            <p class="hero__sub">Until 2026 I was an Associate Partner at Foster + Partners, where I led a technology team in the engineering and sustainability group.</p>
             <div class="hero__actions">
               <a class="btn btn--dark" href="#contact">Start a conversation <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
               <a class="btn btn--line" href="#work">See the seven tools</a>
@@ -79,7 +80,7 @@
           <header class="head">
             <p class="label">Work</p>
             <h2 class="head__title" id="work-title">I have built seven tools that search tenders, query BIM models, check materials and rank retrofits.</h2>
-            <p class="head__lede">Each one takes over a task that AEC teams still do by hand, from checking procurement portals to reading certification PDFs. Five open in your browser, the other two have recorded walkthroughs, and the code for all seven is on <a href="https://github.com/bakshi-labs" target="_blank" rel="noopener">GitHub</a>.</p>
+            <p class="head__lede">Each one takes over a task that AEC teams still do by hand, from checking procurement portals to reading certification PDFs. Five of them open in your browser and two have recorded walkthroughs. The code for all seven is on <a href="https://github.com/bakshi-labs" target="_blank" rel="noopener">GitHub</a>.</p>
           </header>
 
           <article class="feature story-card">
@@ -111,20 +112,20 @@
                 <span class="card__meta">Win work · Bid-intelligence database</span>
                 <span class="card__name">GrowthSignal</span>
                 <span class="card__text">It collects public tenders, programmes, deals and news from more than 270 sources into one database, and Claude tags each record with sector, stage, value, location and contacts.</span>
-                <span class="card__foot"><span class="card__stat"><b>57,848</b>records from tenders, programmes, deals and news</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+                <span class="card__foot"><span class="card__stat"><b>57,840</b>records plotted on its world map</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
               </span>
             </a>
           </li>
           <li class="card story-card">
             <a class="card__link" href="#strategic-project-discovery" data-case="strategic-project-discovery">
               <span class="card__visual">
-                <span class="card__media story" data-story="strategic-project-discovery" role="img" aria-label="A scan sweeps across 676 procurement sources, five matches move into a results list, and each is scored and ranked for fit."><span class="story__stage"></span><noscript><img src="assets/img/cards/strategic-project-discovery.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+                <span class="card__media story" data-story="strategic-project-discovery" role="img" aria-label="A scan sweeps a world map of 676 procurement sources, pins drop on five matching projects, and each is scored and ranked for fit."><span class="story__stage"></span><noscript><img src="assets/img/cards/strategic-project-discovery.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
                 <span class="beats" aria-hidden="true"><span>Search 676 sources</span><span>Collect the matches</span><span>Score each for fit</span></span>
               </span>
               <span class="card__body">
                 <span class="card__meta">Win work · Live project search</span>
                 <span class="card__name">Strategic Project Discovery</span>
-                <span class="card__text">It searches up to 676 procurement sources for opportunities in seven infrastructure sectors and scores each result for sector, scale and geography fit. It runs on Gemini with Google Search, so it needs only a web page and an API key.</span>
+                <span class="card__text">It searches up to 676 procurement sources for opportunities in seven infrastructure sectors and scores each result for sector, scale and geography fit. It needs only a web page and an API key.</span>
                 <span class="card__foot"><span class="card__stat"><b>36</b>source categories, each one selectable</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
               </span>
             </a>
@@ -152,8 +153,8 @@
               <span class="card__body">
                 <span class="card__meta">Design · Material compliance</span>
                 <span class="card__name">MaterialScan</span>
-                <span class="card__text">It scores every product in a lab and workplace palette against LBC 4.1, WELL v2 and the client brief, and shows the evidence beside each verdict.</span>
-                <span class="card__foot"><span class="card__stat"><b>3</b>evidence types: EPD, HPD and Declare</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+                <span class="card__text">It scores each section of a lab and workplace palette against LBC 4.1, WELL v2 and the client brief, and links each verdict to the EPD, HPD or Declare label behind it.</span>
+                <span class="card__foot"><span class="card__stat"><b>4</b>verdicts: pass, partial, evidence gap and fail</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
               </span>
             </a>
           </li>
@@ -174,14 +175,14 @@
           <li class="card story-card card--wide">
             <a class="card__link" href="#southwark-retrofit-atlas" data-case="southwark-retrofit-atlas">
               <span class="card__visual">
-                <span class="card__media story" data-story="southwark-retrofit-atlas" role="img" aria-label="Southwark’s homes appear coloured by EPC band, the 56,873 below band C are costed, and a £47.0m budget funds 4,079 homes in priority order."><span class="story__stage"></span><noscript><img src="assets/img/cards/southwark-retrofit-atlas.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
+                <span class="card__media story" data-story="southwark-retrofit-atlas" role="img" aria-label="A sample of Southwark’s homes appears coloured by EPC band, the 56,873 below band C are costed, and a £47.0m budget funds 4,160 homes in priority order."><span class="story__stage"></span><noscript><img src="assets/img/cards/southwark-retrofit-atlas.jpg" width="1400" height="875" alt="" loading="lazy" /></noscript></span>
                 <span class="beats" aria-hidden="true"><span>Map every home</span><span>Cost each package</span><span>Fund the best first</span></span>
               </span>
               <span class="card__body">
                 <span class="card__meta">Portfolio · Housing retrofit</span>
                 <span class="card__name">Southwark Retrofit Atlas</span>
                 <span class="card__text">It costs a retrofit package for each of Southwark’s 149,062 homes, ranks them on carbon, need and deliverability, and shows how far a fixed budget goes.</span>
-                <span class="card__foot"><span class="card__stat"><b>4,079</b>homes funded by a £47.0m budget, net of grant</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+                <span class="card__foot"><span class="card__stat"><b>4,160</b>homes funded by a £47.0m budget, net of grant</span><span class="card__more">Case study <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
               </span>
             </a>
           </li>
@@ -211,11 +212,11 @@
                 <circle class="mf-pulse" r="2.6"><animateMotion dur="3.2s" begin="0.25s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear"><mpath href="#mf1w1"/></animateMotion></circle>
                 <circle class="mf-pulse" r="2.6"><animateMotion dur="3.2s" begin="0.5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear"><mpath href="#mf1w2"/></animateMotion></circle>
                 <circle class="mf-pulse" r="2.6"><animateMotion dur="3.2s" begin="1.5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear"><mpath href="#mf1w3"/></animateMotion></circle>
-                <text class="mf-cap" x="64" y="168">DOCUMENTS</text><text class="mf-cap" x="181" y="168">CLAUDE</text><text class="mf-cap" x="272" y="168">CONSULTANT</text>
+                <text class="mf-cap" x="64" y="168">DOCUMENTS</text><text class="mf-cap" x="181" y="168">CLAUDE</text><text class="mf-cap" x="272" y="168">REVIEWER</text>
                 </svg>
               <p class="move__n">01</p>
               <h3 class="move__title">Train on the team’s own work</h3>
-              <p>I build each session around documents the team already produces, such as stage reports, specifications and meeting minutes. In a typical exercise Claude pulls the key points out of all three, and the consultant checks the summary before it is shared.</p>
+              <p>I build each session around documents the team already produces, such as stage reports, specifications and meeting minutes. In a typical exercise Claude pulls the key points out of all three, and someone from the team checks the summary before it is shared.</p>
             </li>
             <li class="move">
               <svg class="move__fig mf" viewBox="0 0 320 180" aria-hidden="true">
@@ -225,16 +226,16 @@
                 <path id="mf2w0" class="mf-wire" d="M192 27 C202 27 198 52 208 52"/>
                 <path id="mf2w1" class="mf-wire" d="M192 67 C202 67 198 52 208 52"/>
                 <path id="mf2w2" class="mf-wire" d="M192 131 H208"/>
-                <g class="mf-node"><rect x="208" y="28" width="98" height="48" rx="7"/><rect class="mf-bar mf-bar--mint" x="208" y="28" width="98" height="2.5" rx="1.25"/><text class="mf-title" x="218" y="46">Document</text><text class="mf-title" x="218" y="64">review</text></g>
-                <g class="mf-node"><rect x="208" y="107" width="98" height="48" rx="7"/><rect class="mf-bar mf-bar--mint" x="208" y="107" width="98" height="2.5" rx="1.25"/><text class="mf-title" x="218" y="125">Knowledge</text><text class="mf-title" x="218" y="143">assistant</text></g>
+                <g class="mf-node"><rect x="208" y="28" width="98" height="48" rx="7"/><rect class="mf-bar mf-bar--mint" x="208" y="28" width="98" height="2.5" rx="1.25"/><text class="mf-title" x="218" y="46">Document</text><text class="mf-title" x="218" y="64">reviewer</text></g>
+                <g class="mf-node"><rect x="208" y="107" width="98" height="48" rx="7"/><rect class="mf-bar mf-bar--mint" x="208" y="107" width="98" height="2.5" rx="1.25"/><text class="mf-title" x="218" y="125">Project search</text><text class="mf-title" x="218" y="143">assistant</text></g>
                 <circle class="mf-pulse" r="2.6"><animateMotion dur="3s" begin="0.0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear"><mpath href="#mf2w0"/></animateMotion></circle>
                 <circle class="mf-pulse" r="2.6"><animateMotion dur="3s" begin="0.4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear"><mpath href="#mf2w1"/></animateMotion></circle>
                 <circle class="mf-pulse" r="2.6"><animateMotion dur="3s" begin="0.8s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear"><mpath href="#mf2w2"/></animateMotion></circle>
-                <text class="mf-cap" x="102" y="168">QUESTIONS FROM TRAINING</text><text class="mf-cap" x="257" y="168">WORKFLOWS</text>
+                <text class="mf-cap" x="102" y="168">QUESTIONS FROM TRAINING</text><text class="mf-cap" x="257" y="168">TOOLS</text>
                 </svg>
               <p class="move__n">02</p>
               <h3 class="move__title">Collect the questions people ask</h3>
-              <p>During training people ask questions such as “Can it compare these two specs?” and “Where did I solve this before?” Grouped together, those questions show which workflows are worth changing, for example document review or a knowledge assistant for past projects.</p>
+              <p>During training people ask questions such as “Can it compare these two specs?” and “Where did I solve this before?” Grouped together, those questions show which tools are worth building, such as a document reviewer or an assistant that searches past projects.</p>
             </li>
             <li class="move">
               <svg class="move__fig mf" viewBox="0 0 320 180" aria-hidden="true">
@@ -283,7 +284,7 @@
                 <p class="offer__when">Choose this when you already know which task you want to fix.</p>
               </div>
               <p class="offer__body">I build one narrowly defined use case with agreed data and users, then test whether it works in practice.</p>
-              <p class="offer__out">You leave with a working prototype, an evaluation against the agreed test and a decision to scale it or stop.</p>
+              <p class="offer__out">You leave with a working prototype like the seven tools in <a href="#work">Work</a>, an evaluation against the agreed test and a decision to scale it or stop.</p>
             </li>
             <li class="offer">
               <p class="offer__n">03</p>
@@ -300,7 +301,7 @@
                 <h3 class="offer__title">Embedded architect or engineer</h3>
                 <p class="offer__when">Choose this when a larger team has a steady stream of workflows to improve.</p>
               </div>
-              <p class="offer__body">An architect or engineer from my team works inside yours two or three days a week. Each week follows the build loop above, from studying a workflow to prototyping, testing and improving it, and ends with teaching the team to run it.</p>
+              <p class="offer__body">An architect or engineer from my team works inside yours two or three days a week and follows the build loop above, from studying a workflow to prototyping, testing and improving it.</p>
               <p class="offer__out">You leave with tools built inside the team’s own process, and people who know how to run them.</p>
             </li>
           </ol>
@@ -327,8 +328,8 @@
           </div>
           <div class="about__bio">
             <p class="about__lead">I have spent eighteen years working on buildings, first on their environmental performance and now on the tools and habits of the teams who design them.</p>
-            <p>At Foster + Partners from 2015 to 2026 I managed environmental strategy, microclimate analytics and computational modelling on international projects. As Associate Partner I led a technology team within the engineering and sustainability group, co-created a strategic advisory service line and won a multi-year contract to write a sustainability vision plan for a global pharmaceutical company’s property portfolio.</p>
-            <p>In 2026 I co-founded Atlas Learn. Its hands-on workshops in Central London have trained more than 250 senior professionals to use Claude Code and Cowork, and I have designed AI training for a consultancy’s leadership team and a FinTech board. At Bakshi Labs I run the same training for AEC teams and build the tools they ask for.</p>
+            <p>At Foster + Partners from 2015 to 2026 I managed environmental strategy, microclimate analytics and computational modelling on international projects. As Associate Partner I ran that technology team, which built digital tools for the firm’s design and consulting work, and I co-created a strategic advisory service line and won a multi-year contract to write a sustainability vision plan for a global pharmaceutical company’s property portfolio.</p>
+            <p>In 2026 I co-founded Atlas Learn. Its hands&#8209;on workshops in Central London have trained more than 250 senior professionals to use Claude Code and Cowork, and I have designed AI training for a consultancy’s leadership team and a FinTech board. At Bakshi Labs I run the same training for AEC teams and build the tools they ask for.</p>
           </div>
         </div>
       </section>
@@ -453,7 +454,7 @@
             <div class="walk__bar">
               <ol class="walk__steps" aria-label="GrowthSignal walkthrough steps">
               <li><button class="walk__step" type="button" aria-pressed="true" data-desc="Tenders, programmes, deals and news sit on one screen and refresh on every ingest run."><span class="walk__n">01</span><span class="walk__t">Dashboard</span></button></li>
-              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Every record with a location is plotted on a world map, 57,848 in all."><span class="walk__n">02</span><span class="walk__t">Map</span></button></li>
+              <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Every record with a location is plotted on a world map, 57,840 in all."><span class="walk__n">02</span><span class="walk__t">Map</span></button></li>
               <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Scrolling zooms the map, and records without a resolved city are spread across their country."><span class="walk__n">03</span><span class="walk__t">Zoom in</span></button></li>
               <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Each construction sector shows its tenders, programmes, news and total value."><span class="walk__n">04</span><span class="walk__t">Sectors</span></button></li>
               <li><button class="walk__step" type="button" aria-pressed="false" data-desc="Every record carries its source, status, dates and description, with a link to the original notice."><span class="walk__n">05</span><span class="walk__t">Record detail</span></button></li>
@@ -470,7 +471,7 @@
             </section>
             <section class="case__built">
               <h3 class="case__h">What I built</h3>
-              <p>I built a self-hosted database of 57,848 tenders, programmes, deals and news items from more than 270 public sources in the UK, EU and US. Claude tags each record with sector, stage, value, location and contacts, and writes a daily briefing that leads with deals.</p>
+              <p>I built a self-hosted database of tenders, programmes, deals and news items from more than 270 public sources in the UK, EU and US, with 57,840 records on its world map. Claude tags each record with sector, stage, value, location and contacts, and writes a daily briefing that leads with deals.</p>
               <p>Records are ranked on sector fit, project stage, value and corroborating sources against the firm’s own target sectors, stages and countries. Search combines keywords with local embeddings across every table.</p>
             </section>
             <aside class="case__facts">
@@ -486,7 +487,7 @@
             <table>
               <thead><tr><th scope="col"><span class="sr-only">Criterion</span></th><th scope="col">Strategic Project Discovery</th><th scope="col">GrowthSignal</th></tr></thead>
               <tbody>
-              <tr><th scope="row">How it works</th><td data-label="Strategic Project Discovery">It runs a live web search across up to 676 procurement sources on each scan.</td><td data-label="GrowthSignal">Connectors pull from 270+ sources on every update run into one database of 57,848 records.</td></tr>
+              <tr><th scope="row">How it works</th><td data-label="Strategic Project Discovery">It runs a live web search across up to 676 procurement sources on each scan.</td><td data-label="GrowthSignal">Connectors pull from 270+ sources on every update run into one database, with 57,840 records on its map.</td></tr>
               <tr><th scope="row">Setup</th><td data-label="Strategic Project Discovery">It needs one web page and an API key.</td><td data-label="GrowthSignal">It needs a server, a SQLite database and a Claude login.</td></tr>
               <tr><th scope="row">Coverage</th><td data-label="Strategic Project Discovery">It reaches anything web search can find, including portals without a connector.</td><td data-label="GrowthSignal">It covers connected sources only, with every record complete and de-duplicated.</td></tr>
               <tr><th scope="row">Memory</th><td data-label="Strategic Project Discovery">Each scan stands alone and saves as a JSON file.</td><td data-label="GrowthSignal">It keeps a full history, with record updates, notes and duplicate merging.</td></tr>
@@ -548,7 +549,7 @@
             </section>
             <section class="case__built">
               <h3 class="case__h">What I built</h3>
-              <p>I built a single web page that runs a live search across 676 procurement sources in 36 categories. Each result is plotted on a world map with a fit assessment for sector, scale and geography, an estimated win probability and a one-line verdict.</p>
+              <p>I built a single web page that runs a live search across up to 676 procurement sources in 36 categories. Each result is plotted on a world map with a fit assessment for sector, scale and geography, an estimated win probability and a one-line verdict.</p>
               <p>It needs no server or database. The hosted version opens in demo mode with fictional opportunities, and a Gemini API key switches it to live searches.</p>
             </section>
             <aside class="case__facts">
@@ -564,7 +565,7 @@
             <table>
               <thead><tr><th scope="col"><span class="sr-only">Criterion</span></th><th scope="col">Strategic Project Discovery</th><th scope="col">GrowthSignal</th></tr></thead>
               <tbody>
-              <tr><th scope="row">How it works</th><td data-label="Strategic Project Discovery">It runs a live web search across up to 676 procurement sources on each scan.</td><td data-label="GrowthSignal">Connectors pull from 270+ sources on every update run into one database of 57,848 records.</td></tr>
+              <tr><th scope="row">How it works</th><td data-label="Strategic Project Discovery">It runs a live web search across up to 676 procurement sources on each scan.</td><td data-label="GrowthSignal">Connectors pull from 270+ sources on every update run into one database, with 57,840 records on its map.</td></tr>
               <tr><th scope="row">Setup</th><td data-label="Strategic Project Discovery">It needs one web page and an API key.</td><td data-label="GrowthSignal">It needs a server, a SQLite database and a Claude login.</td></tr>
               <tr><th scope="row">Coverage</th><td data-label="Strategic Project Discovery">It reaches anything web search can find, including portals without a connector.</td><td data-label="GrowthSignal">It covers connected sources only, with every record complete and de-duplicated.</td></tr>
               <tr><th scope="row">Memory</th><td data-label="Strategic Project Discovery">Each scan stands alone and saves as a JSON file.</td><td data-label="GrowthSignal">It keeps a full history, with record updates, notes and duplicate merging.</td></tr>
@@ -761,7 +762,7 @@
             </section>
             <section class="case__built">
               <h3 class="case__h">What I built</h3>
-              <p>I built a canvas with three kinds of node. Reference nodes preview PDFs, images, Markdown, Office files and web pages. Analysis nodes send an objective and the wired references to Claude. Presentation nodes turn the analyses into a PPTX deck, a DOCX document or an HTML page.</p>
+              <p>I built a canvas with three kinds of node. Reference nodes preview PDFs, images, Markdown, Office files and web pages. Analysis nodes send an objective and the wired references to Claude. Presentation nodes turn the analyses into a PPTX deck, a DOCX report or an HTML page.</p>
               <p>Every node keeps its previous runs, so a team can compare answers before a deck goes out.</p>
             </section>
             <aside class="case__facts">
@@ -825,7 +826,7 @@
             <section class="case__built">
               <h3 class="case__h">What I built</h3>
               <p>I built an atlas that joins the GLA building stock model, the national EPC register and ONS boundaries. It costs a retrofit package for each of Southwark’s 149,062 homes and ranks them on carbon, need and deliverability. Changing the budget or a weighting re-ranks every home in under a second.</p>
-              <p>The analysis finds 56,873 homes below EPC C, and 86% of them can reach it for a median cost of £5.8k. It also checks 7,045 commercial buildings against the minimum energy efficiency standard.</p>
+              <p>The analysis finds 56,873 homes below EPC C, and 86% of them can reach it for a median cost of £5.8k. At the default weights a £47.0m budget, net of grant, funds 4,160 homes and saves 7.1 kt of CO₂e a year. It also checks 7,045 commercial buildings against the minimum energy efficiency standard.</p>
             </section>
             <aside class="case__facts">
               <div><h3 class="case__h">Tools and data</h3><ul class="case__stack"><li>D3</li><li>Canvas map</li><li>GLA LBSM 2 and the MHCLG EPC register</li></ul></div>

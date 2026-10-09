@@ -2573,3 +2573,42 @@ button {
   -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 36px);
   mask-image: linear-gradient(180deg, transparent 0, #000 36px);
 }
+
+.mc.is-tall .mc__viewer {
+  aspect-ratio: 560 / 860;
+}
+.mc.is-tall .mc__chat {
+  height: 58%;
+}
+/* Contact prompts read as prompts */
+.prompts {
+  border-top: 0;
+  gap: 8px 48px;
+}
+.prompts li,
+.prompts li:nth-child(even) {
+  padding: 18px 0 0;
+  border: 0;
+  border-top: 1px solid var(--ink-line);
+}
+/* Tighter pacing between the light sections */
+.section--rule {
+  padding-top: clamp(64px, 7vw, 104px);
+}
+#method {
+  padding-bottom: clamp(56px, 6vw, 88px);
+}
+@media (min-width: 1001px) {
+  .about__side {
+    position: static;
+  }
+  .about__bio {
+    position: sticky;
+    top: calc(var(--nav-h) + 40px);
+    align-self: start;
+  }
+}
+.offer__out a {
+  color: var(--teal-deep);
+  text-underline-offset: 3px;
+}
