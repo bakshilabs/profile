@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aviva Stadium Digital Twin</title>
+<meta name="description" content="The Aviva Stadium in its surroundings, with the sun and shadows for any date, using open map data and satellite imagery.">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%2359c7fc'/%3E%3Cstop offset='1' stop-color='%2316ffc6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M7 24L16 7.5L25.5 21.5Z' fill='none' stroke='url(%23g)' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cg fill='url(%23g)'%3E%3Ccircle cx='7' cy='24' r='4.2'/%3E%3Ccircle cx='16' cy='7.5' r='4.2'/%3E%3Ccircle cx='25.5' cy='21.5' r='4.2'/%3E%3C/g%3E%3C/svg%3E">
+  <script type="module" crossorigin src="./assets/twin-C1-FJ_kZ.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/meshopt_decoder.module-ByCVv9ZF.js">
+  <link rel="stylesheet" crossorigin href="./assets/twin-BqeK5uEX.css">
+</head>
+<body>
+<div id="app"></div>
+<div id="loading" role="status"><div class="box"><h2>Aviva Stadium digital twin</h2><div id="status">Loading</div><div id="bar"><div id="fill"></div></div></div></div>
+
+<details id="controls" class="card" open>
+  <summary><a class="brand" href="../" aria-label="Bakshi Labs home">Bakshi Labs</a></summary>
+  <h1>Aviva Stadium digital twin</h1>
+  <p class="sub">The stadium in its surroundings, with the sun and shadows for any date.</p>
+
+  <span class="label">Layers</span>
+  <div class="pills">
+    <label class="pill"><input type="checkbox" data-layer="stadium" checked>Stadium</label>
+    <label class="pill"><input type="checkbox" data-layer="context_buildings" checked>Buildings</label>
+    <label class="pill"><input type="checkbox" data-layer="context_roads" checked>Roads</label>
+    <label class="pill"><input type="checkbox" data-layer="context_rail" checked>Railway</label>
+    <label class="pill"><input type="checkbox" data-layer="context_green" checked>Green space</label>
+    <label class="pill"><input type="checkbox" data-layer="context_water" checked>Water</label>
+    <label class="pill"><input type="checkbox" data-layer="imagery" checked>Satellite imagery</label>
+    <label class="pill"><input type="checkbox" data-layer="northArrow" checked>North arrow</label>
+  </div>
+
+  <span class="label">Sun</span>
+  <div class="pills"><label class="pill"><input type="checkbox" id="shadows" checked>Shadows</label></div>
+  <input type="range" id="day" min="1" max="365" value="171" aria-label="Day of year">
+  <input type="range" id="hour" min="6" max="20" step="0.25" value="15" aria-label="Hour of day, UTC">
+  <div id="sunText"></div>
+
+  <span class="label">View</span>
+  <div class="pills">
+    <button class="pill" type="button" data-view="overview">Overview</button>
+    <button class="pill" type="button" data-view="plan">Plan</button>
+    <button class="pill" type="button" data-view="south">From the south</button>
+    <button class="pill" type="button" data-view="pitch">Pitch level</button>
+  </div>
+
+  <div class="links">
+    <a class="pill" href="./">Analysis</a>
+    <button class="pill" type="button" id="themeBtn" aria-label="Switch between light and dark">Theme</button>
+  </div>
+</details>
+
+<canvas id="compass" class="card" width="184" height="184"></canvas>
+<div id="credits" class="card">
+  <p id="info"></p>
+  <p>Stadium model by S.Gandini, <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>, compressed for the web. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database Licence. Imagery: contains modified Copernicus Sentinel data 2026, at 10 m resolution. Building heights come from map tags where present, otherwise 3 m per storey with a default of 2 storeys.</p>
+</div>
+
+</body>
+</html>

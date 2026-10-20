@@ -276,7 +276,7 @@ function buildAbout() {
       h('li', {}, `Weather is the ${D.station.name} typical year for 2011 to 2025. Times are Greenwich Mean Time, so Irish summer time is one hour ahead.`)),
     h('h3', {}, 'What it leaves out'),
     h('ul', {}, h('li', {}, 'Roof panels are treated as opaque, although the real roof lets some light through.'),
-      h('li', {}, 'Nearby buildings and trees are not in the model, so low winter sun is shaded by the stadium only.'),
+      h('li', {}, 'Nearby buildings and trees are not in the model, so low winter sun is shaded by the stadium only. A check on 21 December using the surrounding buildings from the digital twin found no change to the pitch.'),
       h('li', {}, 'Wind is the weather-station value and is not reduced for shelter inside the bowl.'),
       h('li', {}, 'A typical year has ordinary days, including cloudy ones. The clear-day buttons jump to the clearest day within a week of the solstices and the March equinox.'),
       h('li', {}, 'The compass direction of the model was found from satellite imagery and is accurate to about 2 degrees.')),
