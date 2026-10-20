@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aviva Stadium Analysis</title>
+    <meta name="description" content="Modelled sun exposure and outdoor thermal comfort for the pitch and seating bowl of the Aviva Stadium, for every hour of a typical year." />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div id="loading" class="loading" role="status">
+      <div>
+        <h1>Aviva Stadium analysis</h1>
+        <p id="loadText">Loading the results</p>
+        <div class="loadbar"><i id="loadBar"></i></div>
+      </div>
+    </div>
+
+    <div class="app viz-root" id="app" hidden>
+      <header class="topbar">
+        <div>
+          <h1>Aviva Stadium: sun and thermal comfort</h1>
+          <p id="subtitle" class="sub"></p>
+        </div>
+        <div class="topbar-tools">
+          <a class="ghost linkbtn" id="filmLink" href="film/aviva-solar-comfort.mp4">Watch the film</a>
+          <button class="ghost" id="aboutBtn" type="button">About this analysis</button>
+          <button class="ghost" id="themeBtn" type="button" aria-label="Switch between light and dark">Theme</button>
+        </div>
+      </header>
+
+      <section class="filters" aria-label="Filters. They apply to everything below."></section>
+
+      <section class="kpis" id="kpis" aria-label="Headline figures for the selected period"></section>
+
+      <main class="grid">
+        <section class="card view-card" id="viewCard" aria-label="3D view of the stadium">
+          <div class="view-tools" id="viewTools"></div>
+          <div class="view-stage" id="stage">
+            <div class="view-label" id="labelA"></div>
+            <div class="view-label right" id="labelB" hidden></div>
+            <div class="view-divider" id="divider" hidden></div>
+            <div class="view-hint">Drag to orbit, scroll to zoom, click a seat or the pitch to inspect it.</div>
+          </div>
+          <div class="legend-row" id="legendRow"></div>
+          <div class="time-tools" id="timeTools"></div>
+        </section>
+
+        <aside class="side" id="side"></aside>
+      </main>
+
+      <section class="charts" id="charts"></section>
+
+      <footer class="foot" id="foot"></footer>
+    </div>
+
+    <dialog id="about" class="about" aria-labelledby="aboutTitle"></dialog>
+    <script type="module" src="/src/analysis/main.js"></script>
+  </body>
+</html>
