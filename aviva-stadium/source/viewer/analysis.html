@@ -18,24 +18,25 @@
 
     <div class="app viz-root" id="app" hidden>
       <header class="topbar">
-        <div>
+        <div class="titles">
           <h1>Aviva Stadium: sun and thermal comfort</h1>
           <p id="subtitle" class="sub"></p>
         </div>
         <div class="topbar-tools">
+          <button class="ghost filter-btn" id="filterBtn" type="button" aria-expanded="false" aria-controls="filters"></button>
           <a class="ghost linkbtn" id="filmLink" href="film/aviva-solar-comfort.mp4">Watch the film</a>
-          <button class="ghost" id="aboutBtn" type="button">About this analysis</button>
+          <button class="ghost" id="aboutBtn" type="button">About</button>
           <button class="ghost" id="themeBtn" type="button" aria-label="Switch between light and dark">Theme</button>
         </div>
+        <section class="filters" id="filters" hidden aria-label="Filters. They apply to everything on the page."></section>
       </header>
 
-      <section class="filters" aria-label="Filters. They apply to everything below."></section>
-
-      <section class="kpis" id="kpis" aria-label="Headline figures for the selected period"></section>
-
-      <main class="grid">
-        <section class="card view-card" id="viewCard" aria-label="3D view of the stadium">
-          <div class="view-tools" id="viewTools"></div>
+      <div class="workspace">
+        <section class="stage-col" id="viewCard" aria-label="3D view of the stadium">
+          <details class="toolbar" id="toolbar" open>
+            <summary>Controls</summary>
+            <div class="view-tools" id="viewTools"></div>
+          </details>
           <div class="view-stage" id="stage">
             <div class="view-label" id="labelA"></div>
             <div class="view-label right" id="labelB" hidden></div>
@@ -46,12 +47,17 @@
           <div class="time-tools" id="timeTools"></div>
         </section>
 
-        <aside class="side" id="side"></aside>
-      </main>
-
-      <section class="charts" id="charts"></section>
-
-      <footer class="foot" id="foot"></footer>
+        <aside class="panel" aria-label="Results">
+          <section class="kpis" id="kpis" aria-label="Headline figures for the selected period"></section>
+          <nav class="tabs" id="tabs" role="tablist" aria-label="Results"></nav>
+          <div class="panes" id="panes">
+            <div class="pane" id="side" role="tabpanel"></div>
+            <div class="pane" id="paneYear" role="tabpanel" hidden></div>
+            <div class="pane" id="paneSections" role="tabpanel" hidden></div>
+          </div>
+          <footer class="foot" id="foot"></footer>
+        </aside>
+      </div>
     </div>
 
     <dialog id="about" class="about" aria-labelledby="aboutTitle"></dialog>

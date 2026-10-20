@@ -68,12 +68,20 @@ function commonUniforms() {
   };
 }
 
+// Camera angles. The distance is worked out so the whole stadium fits the view; the factor trims it.
 const PRESETS = {
-  aerial: { bearing: 160, elevation: 36, distance: 330 },
-  plan: { bearing: 180, elevation: 88, distance: 400 },
-  south: { bearing: 180, elevation: 17, distance: 230 },
-  west: { bearing: 270, elevation: 20, distance: 230 },
+  aerial: { bearing: 160, elevation: 36, factor: 1.0 },
+  plan: { bearing: 180, elevation: 88, factor: 1.0 },
+  south: { bearing: 180, elevation: 17, factor: 1.0 },
+  west: { bearing: 270, elevation: 20, factor: 1.0 },
 };
+const FIT_POINTS = (() => {
+  const pts = [];
+  for (const x of [-100, 100]) for (const z of [-100, 100]) for (const y of [0, 40]) pts.push(new THREE.Vector3(x, y, z));
+  for (let b = 0; b < 360; b += 15) pts.push(compassToModel(b).multiplyScalar(112).setY(0.4));
+  pts.push(compassToModel(0).multiplyScalar(128).setY(9));
+  return pts;
+})();
 
 export class Scene3D {
   constructor(container, D, theme) {
@@ -81,6 +89,7 @@ export class Scene3D {
     this.dirty = true; this.compare = false;
     this.views = [this.blankView(), this.blankView()];
     this.tween = null; this.selected = -1; this.sunVisible = true;
+    this.preset = 'aerial'; this.autoFit = true;
 
     const canvas = document.createElement('canvas');
     canvas.className = 'gl';
@@ -102,6 +111,8 @@ export class Scene3D {
     this.controls.minDistance = 60; this.controls.maxDistance = 900;
     this.controls.maxPolarAngle = Math.PI * 0.495;
     this.controls.addEventListener('change', () => { this.dirty = true; });
+    this.controls.addEventListener('start', () => { this.autoFit = false; this.tween = null; });
+    this.w = container.clientWidth || 800; this.h = container.clientHeight || 500;
     this.setPreset('aerial', false);
     new ResizeObserver(() => this.resize()).observe(container);
     this.loop = this.loop.bind(this);
@@ -315,7 +326,7 @@ export class Scene3D {
     north.renderOrder = 5;
     o.add(north);
     this.sunMarker = new THREE.Mesh(new THREE.SphereGeometry(5, 20, 10), new THREE.MeshBasicMaterial({ color: 0xffc400 }));
-    this.sunPath = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xffc400, transparent: true, opacity: 0.5 }));
+    this.sunPath = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xffc400, transparent: true, opacity: 0.22 }));
     o.add(this.sunMarker, this.sunPath);
     // Marker for the selected sample point.
     this.pointMarker = new THREE.Group();
@@ -353,10 +364,11 @@ export class Scene3D {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(w, h, false);
     this.w = w; this.h = h;
+    if (this.autoFit) this.setPreset(this.preset, false);
     this.dirty = true;
   }
 
-  setCompare(on) { this.compare = on; this.dirty = true; }
+  setCompare(on) { this.compare = on; if (this.autoFit) this.setPreset(this.preset, false); this.dirty = true; }
   setRoofVisible(on) { for (const m of this.roofMeshes) m.visible = on; this.dirty = true; }
   setSunVisible(on) { this.sunVisible = on; this.dirty = true; }
   requestRender() { this.dirty = true; }
@@ -382,11 +394,32 @@ export class Scene3D {
   }
 
   // --- camera ---
-  presetPose({ bearing, elevation, distance }) {
+  // Smallest distance at which the stadium outline (corners of its box and the compass ring) sits inside the
+  // view with a small margin, for a camera looking at the target from the given bearing and elevation.
+  fitDistanceFor(bearing, elevation) {
     const dir = compassToModel(bearing), el = THREE.MathUtils.degToRad(elevation);
+    const unit = new THREE.Vector3(dir.x * Math.cos(el), Math.sin(el), dir.z * Math.cos(el));
+    const aspect = (this.w / (this.compare ? 2 : 1)) / Math.max(1, this.h);
+    const cam = new THREE.PerspectiveCamera(this.camera.fov, aspect, 1, 6000), v = new THREE.Vector3();
+    let lo = 60, hi = 2500;
+    for (let i = 0; i < 28; i++) {
+      const d = (lo + hi) / 2;
+      cam.position.copy(unit).multiplyScalar(d).add(TARGET);
+      cam.lookAt(TARGET); cam.updateMatrixWorld(true);
+      let m = 0;
+      for (const p of FIT_POINTS) { v.copy(p).project(cam); m = Math.max(m, Math.abs(v.x), Math.abs(v.y)); }
+      if (m > 0.92) lo = d; else hi = d;
+    }
+    return hi;
+  }
+  presetPose({ bearing, elevation, factor }) {
+    const dir = compassToModel(bearing), el = THREE.MathUtils.degToRad(elevation), distance = this.fitDistanceFor(bearing, elevation) * factor;
     return new THREE.Vector3(dir.x * Math.cos(el) * distance, Math.sin(el) * distance + TARGET.y, dir.z * Math.cos(el) * distance);
   }
   setPreset(name, animate = true) {
+    this.preset = name; this.autoFit = true;
+    this.controls.maxDistance = this.fitDistanceFor(PRESETS.aerial.bearing, PRESETS.aerial.elevation) * 2.4;
+    this.controls.minDistance = 50;
     const to = this.presetPose(PRESETS[name]);
     if (!animate) { this.camera.position.copy(to); this.controls.target.copy(TARGET); this.controls.update(); this.dirty = true; return; }
     this.tween = { from: this.camera.position.clone(), to, t: 0, start: performance.now() };
@@ -418,7 +451,7 @@ export class Scene3D {
     renderer.clear();
     const count = this.compare ? 2 : 1;
     camera.aspect = (w / count) / h;
-    camera.zoom = this.compare ? Math.min(1, (w / count / h)) * 0.74 : 1;
+    camera.zoom = 1;
     camera.updateProjectionMatrix();
     camera.updateMatrixWorld(true);
     for (let i = 0; i < count; i++) {
@@ -437,7 +470,7 @@ export class Scene3D {
       const sun = v.sun;
       this.sunMarker.visible = this.sunPath.visible = !!sun && this.sunVisible && sun.alt > 0;
       if (sun) {
-        this.sunMarker.position.copy(sunDirection(sun.alt, sun.az)).multiplyScalar(260);
+        this.sunMarker.position.copy(sunDirection(sun.alt, sun.az)).multiplyScalar(190);
         if (sun.pathKey !== this.pathKey) { this.setPath(sun.path); this.pathKey = sun.pathKey; }
       }
       renderer.render(this.scene, camera);
@@ -446,8 +479,8 @@ export class Scene3D {
 
   setPath(path) {
     this.sunPath.geometry.dispose();
-    const pts = path.map(([alt, az]) => sunDirection(alt, az).multiplyScalar(260));
-    this.sunPath.geometry = pts.length > 2 ? new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.6, 5, false) : new THREE.BufferGeometry();
+    const pts = path.map(([alt, az]) => sunDirection(alt, az).multiplyScalar(190));
+    this.sunPath.geometry = pts.length > 2 ? new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.35, 5, false) : new THREE.BufferGeometry();
   }
 
   // --- picking ---
@@ -477,7 +510,7 @@ export class Scene3D {
     const count = this.compare ? 2 : 1, vw = rect.width / count;
     const local = px % vw;
     this.camera.aspect = vw / rect.height;
-    this.camera.zoom = this.compare ? Math.min(1, (vw / rect.height)) * 0.74 : 1;
+    this.camera.zoom = 1;
     this.camera.updateProjectionMatrix(); this.camera.updateMatrixWorld(true);
     const D = this.D, v = new THREE.Vector3(), cand = [];
     for (let i = 0; i < D.n; i++) {

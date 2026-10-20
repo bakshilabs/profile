@@ -24,11 +24,11 @@ chartState.theme = S.theme;
 const METRICS = {
   utci: { kind: 'now', label: 'Thermal stress', title: 'Thermal stress (UTCI)' },
   sun: { kind: 'now', label: 'Sun and shade', title: 'Sun and shade' },
-  energy: { kind: 'now', label: 'Energy so far today', title: 'Solar energy so far today' },
-  radiant: { kind: 'now', label: 'Effect of sun and surroundings', title: 'UTCI minus air temperature' },
-  sunhours: { kind: 'period', label: 'Direct sun hours', title: 'Direct sun hours' },
+  energy: { kind: 'now', label: 'Energy so far', title: 'Solar energy so far today', hint: 'Solar energy since midnight on the chosen date' },
+  radiant: { kind: 'now', label: 'Sun effect', title: 'UTCI minus air temperature', hint: 'How many degrees the sun, sky and surroundings add to or take from the air temperature' },
+  sunhours: { kind: 'period', label: 'Sun hours', title: 'Direct sun hours', hint: 'Hours in direct sun over the chosen period' },
   energyPeriod: { kind: 'period', label: 'Solar energy', title: 'Solar energy over the period' },
-  comfort: { kind: 'period', label: 'Time without thermal stress', title: 'Share of hours with no thermal stress' },
+  comfort: { kind: 'period', label: 'No-stress share', title: 'Share of hours with no thermal stress', hint: 'Share of the chosen hours with no thermal stress' },
 };
 const GROUPS = { both: 'Seats and pitch', seats: 'Seats', pitch: 'Pitch' };
 const tk = () => TOKENS[S.theme];
@@ -165,18 +165,17 @@ function buildFilters() {
 
 function buildViewTools() {
   const tools = $('viewTools');
-  const nowSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Show for the time chosen below' }, Object.entries(METRICS).filter(([, m]) => m.kind === 'now').map(([k, m]) => h('button', { type: 'button', 'data-metric': k, 'aria-pressed': String(S.metric === k), onclick: () => setMetric(k) }, m.label)));
-  const perSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Show for the period chosen above' }, Object.entries(METRICS).filter(([, m]) => m.kind === 'period').map(([k, m]) => h('button', { type: 'button', 'data-metric': k, 'aria-pressed': String(S.metric === k), onclick: () => setMetric(k) }, m.label)));
+  const nowSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Show for the time chosen below' }, Object.entries(METRICS).filter(([, m]) => m.kind === 'now').map(([k, m]) => h('button', { type: 'button', 'data-metric': k, title: m.hint ?? m.title, 'aria-pressed': String(S.metric === k), onclick: () => setMetric(k) }, m.label)));
+  const perSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Show for the period chosen above' }, Object.entries(METRICS).filter(([, m]) => m.kind === 'period').map(([k, m]) => h('button', { type: 'button', 'data-metric': k, title: m.hint ?? m.title, 'aria-pressed': String(S.metric === k), onclick: () => setMetric(k) }, m.label)));
   const camSeg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Camera' }, [['aerial', 'Aerial'], ['plan', 'Plan'], ['south', 'South end'], ['west', 'West side']].map(([k, label]) => h('button', { type: 'button', onclick: () => scene.setPreset(k) }, label)));
-  els.compareBtn = chip('Compare two moments', false, () => { S.compare = !S.compare; applyCompare(); });
+  els.compareBtn = chip('Compare', false, () => { S.compare = !S.compare; applyCompare(); });
   els.sunBtn = chip('Sun', true, () => { S.showSun = !S.showSun; els.sunBtn.setAttribute('aria-pressed', String(S.showSun)); scene.setSunVisible(S.showSun); });
   els.roofBtn = chip('Roof', true, () => { S.showRoof = !S.showRoof; els.roofBtn.setAttribute('aria-pressed', String(S.showRoof)); scene.setRoofVisible(S.showRoof); });
   els.nowSeg = nowSeg; els.perSeg = perSeg;
+  const label = (t) => h('span', { class: 'tlabel' }, t);
   tools.replaceChildren(
-    h('div', { class: 'fgroup' }, h('span', { class: 'flabel' }, 'At the time chosen below'), nowSeg),
-    h('div', { class: 'fgroup' }, h('span', { class: 'flabel' }, 'Over the period chosen above'), perSeg),
-    h('div', { class: 'fgroup' }, h('span', { class: 'flabel' }, 'Camera'), camSeg),
-    h('div', { class: 'fgroup' }, h('span', { class: 'flabel' }, 'Display'), h('div', { class: 'seg' }, els.compareBtn, els.sunBtn, els.roofBtn)),
+    h('div', { class: 'trow' }, label('At the time'), nowSeg, label('Over the period'), perSeg),
+    h('div', { class: 'trow' }, label('Camera'), camSeg, label('Show'), h('div', { class: 'seg' }, els.compareBtn, els.sunBtn, els.roofBtn)),
   );
 }
 
@@ -218,20 +217,20 @@ function buildSide() {
   charts.sun = new DayChart(sunCard, { unit: '%', height: 150, onScrub: scrubTime });
   charts.sky = new DayChart(skyCard, { unit: '', height: 150, onScrub: scrubTime });
   charts.point = null;
-  $('side').replaceChildren(els.momentCard.root, els.pointCard.root, tempsCard.root, sunCard.root, skyCard.root);
+  $('side').replaceChildren(els.pointCard.root, els.momentCard.root, tempsCard.root, sunCard.root, skyCard.root);
   els.pointCardRef = els.pointCard;
 }
 
 function buildCharts() {
   const heatTabs = h('div', { class: 'seg', role: 'group', 'aria-label': 'Heat map measure' }, [['sun', 'Direct sun'], ['utci', 'UTCI'], ['comfort', 'No thermal stress']].map(([k, label]) => h('button', { type: 'button', 'data-heat': k, 'aria-pressed': String(S.heatMetric === k), onclick: () => { S.heatMetric = k; refreshHeat(); } }, label)));
-  const heatCard = card('The year hour by hour', 'Each column is a day and each row an hour. Click to move the moment there.', { tabs: heatTabs, className: 'wide' });
+  const heatCard = card('The year hour by hour', 'Each column is a day and each row an hour. Click to move the moment there.', { tabs: heatTabs });
   charts.heat = new Heatmap(heatCard, { onPick: (day, time) => { Object.assign(activeMoment(), { day, time }); syncSliders(); onMomentChange(true); } });
   const monthCard = card('Thermal stress by month', 'Share of the hours in the window, by UTCI class', {});
   charts.month = new MonthlyClasses(monthCard, {});
   const secTabs = h('div', { class: 'seg', role: 'group', 'aria-label': 'Measure for the sections' }, [['comfort', 'No stress'], ['sunhours', 'Sun hours'], ['energyPeriod', 'Energy']].map(([k, label]) => h('button', { type: 'button', 'data-sec': k, 'aria-pressed': String(S.secMetric === k), onclick: () => { S.secMetric = k; refreshSections(); } }, label)));
   const secCard = card('Stand sections compared', 'Mean of the seats in each section. Click a bar to filter.', { tabs: secTabs });
   charts.sections = new HBars(secCard, { onPick: (id) => { if (id === 'pitch') { S.group = 'pitch'; S.sector = -1; } else { S.group = S.group === 'pitch' ? 'seats' : S.group; S.sector = S.sector === id ? -1 : id; } onSelectionChange(); } });
-  const dataCard = card('Numbers behind the charts', 'Means over the period and hours chosen above', { className: 'wide' });
+  const dataCard = card('Numbers behind the charts', 'Means over the period and hours chosen above', {});
   els.dataBody = h('div', {});
   els.dataActions = h('div', { class: 'actions' },
     h('button', { class: 'ghost', type: 'button', onclick: () => downloadCsv('sections.csv', sectionsCsv()) }, 'Download sections (CSV)'),
@@ -240,8 +239,26 @@ function buildCharts() {
   dataCard.body.append(els.dataBody, els.dataActions);
   dataCard.root.querySelector('.card-tools button').remove();
   els.secCard = secCard;
-  $('charts').replaceChildren(heatCard.root, monthCard.root, secCard.root, dataCard.root);
+  $('paneYear').replaceChildren(heatCard.root, monthCard.root);
+  $('paneSections').replaceChildren(secCard.root, dataCard.root);
   els.heatCard = heatCard;
+}
+
+function toggleFilters(force) {
+  const f = $('filters'), open = force ?? f.hidden;
+  f.hidden = !open;
+  els.filterBtn.setAttribute('aria-expanded', String(open));
+}
+
+const TABS = [['side', 'Moment'], ['paneYear', 'Year'], ['paneSections', 'Sections']];
+function buildTabs() {
+  const nav = $('tabs');
+  nav.replaceChildren(...TABS.map(([id, label], i) => h('button', { class: 'tab', type: 'button', role: 'tab', 'aria-selected': String(i === 0), 'aria-controls': id, 'data-tab': id, onclick: () => showTab(id) }, label)));
+}
+function showTab(id) {
+  for (const [pane] of TABS) $(pane).hidden = pane !== id;
+  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', String(b.dataset.tab === id));
+  $('panes').scrollTop = 0;
 }
 
 function buildAbout() {
@@ -274,7 +291,12 @@ function buildAbout() {
 
 function buildUI() {
   $('subtitle').textContent = `Hourly results for a typical year in Dublin, for ${(D.n - D.nPitch).toLocaleString('en-GB')} seat points and ${D.nPitch.toLocaleString('en-GB')} pitch points.`;
-  buildFilters(); buildViewTools(); buildTimeTools(); buildSide(); buildCharts(); buildAbout();
+  buildFilters(); buildViewTools(); buildTimeTools(); buildSide(); buildCharts(); buildTabs(); buildAbout();
+  els.filterBtn = $('filterBtn');
+  els.filterBtn.addEventListener('click', () => toggleFilters());
+  document.addEventListener('pointerdown', (e) => { const f = $('filters'); if (!f.hidden && !f.contains(e.target) && !els.filterBtn.contains(e.target)) toggleFilters(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleFilters(false); });
+  $('toolbar').open = matchMedia('(min-width: 980px)').matches;
   $('aboutBtn').addEventListener('click', () => $('about').showModal());
   $('themeBtn').addEventListener('click', () => setTheme(S.theme === 'dark' ? 'light' : 'dark'));
   $('foot').replaceChildren('Stadium model by S.Gandini, ', h('a', { href: 'https://creativecommons.org/licenses/by/4.0/', rel: 'noopener' }, 'CC BY 4.0'), ' (compressed for the web, colours changed). Weather: Dublin Airport typical year 2011 to 2025, TMYx from ', h('a', { href: 'https://climate.onebuilding.org/', rel: 'noopener' }, 'Climate.OneBuilding'), '. Times are Greenwich Mean Time. The results come from a model.');
@@ -321,15 +343,15 @@ function updateAB() { for (const b of els.abSeg.querySelectorAll('button')) b.se
 function onPeriodChange() { periodDebounce(); refreshFilterLabels(); }
 let periodTimer = 0;
 function periodDebounce() {
-  document.getElementById('charts').style.opacity = '0.6'; $('kpis').style.opacity = '0.6';
+  $('panes').style.opacity = '0.6'; $('kpis').style.opacity = '0.6';
   clearTimeout(periodTimer);
-  periodTimer = setTimeout(() => { refreshPeriodDependent(); $('charts').style.opacity = ''; $('kpis').style.opacity = ''; }, 60);
+  periodTimer = setTimeout(() => { refreshPeriodDependent(); $('panes').style.opacity = ''; $('kpis').style.opacity = ''; }, 60);
 }
 function onSelectionChange() {
   for (const b of els.groupSeg.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.group === S.group));
   for (const b of els.secSeg.querySelectorAll('button')) { b.setAttribute('aria-pressed', String(Number(b.dataset.sector) === S.sector)); b.disabled = S.group === 'pitch'; }
-  document.getElementById('charts').style.opacity = '0.6';
-  setTimeout(() => { getAggSeats(S.sector); refreshAll(); document.getElementById('charts').style.opacity = ''; }, 20);
+  $('panes').style.opacity = '0.6';
+  setTimeout(() => { getAggSeats(S.sector); refreshAll(); $('panes').style.opacity = ''; }, 20);
 }
 function onMomentChange(dayChanged) {
   syncSliders(false);
@@ -373,6 +395,8 @@ function refreshAll() {
 }
 
 function refreshFilterLabels() {
+  const sec = S.sector >= 0 && S.group !== 'pitch' ? `, ${SECTOR_NAMES[S.sector].toLowerCase()} stand` : '';
+  if (els.filterBtn) els.filterBtn.textContent = `Filters: ${periodLabel()}, ${hoursLabel()}, ${GROUPS[S.group].toLowerCase()}${sec}`;
   els.periodLabel.textContent = S.period.from > S.period.to ? `${dayLabel(S.period.from)} to ${dayLabel(S.period.to)}, across the new year` : `${dayLabel(S.period.from)} to ${dayLabel(S.period.to)}`;
   els.hoursLabel.textContent = `${String(S.hours[0]).padStart(2, '0')}:00 to ${String(S.hours[1]).padStart(2, '0')}:00`;
   const seasons = { 'Whole year': [0, 364], Spring: [59, 150], Summer: [151, 242], Autumn: [243, 333], Winter: [334, 58] };
@@ -524,15 +548,15 @@ function refreshPeriodDependent() {
   const p = getPeriod(), mk = mask(), agg = combinedAgg();
   // KPI tiles
   const okPct = meanOver(p.ok, mk), cold = meanOver(p.cold, mk), heat = meanOver(p.heat, mk), sunH = meanOver(p.sunHours, mk), en = meanOver(p.energy, mk);
-  const tile = (cls, label, value, unit, note) => h('div', { class: `tile ${cls}` }, h('span', { class: 'label' }, label), h('span', { class: 'value' }, value, unit ? h('small', {}, unit) : null), h('span', { class: 'note' }, note));
+  const tile = (cls, label, value, unit, note) => h('div', { class: `tile ${cls}`, title: cls.includes('hero') ? null : note }, h('span', { class: 'label' }, label), h('span', { class: 'value' }, value, unit ? h('small', {}, unit) : null), cls.includes('hero') ? h('span', { class: 'note' }, note) : null);
   const scope = `${GROUPS[S.group]}${S.sector >= 0 && S.group !== 'pitch' ? `, ${SECTOR_NAMES[S.sector].toLowerCase()} stand` : ''}, ${periodLabel()}, ${hoursLabel()}`;
   const range = (arr, unit, digits = 0) => { let lo = Infinity, hi = -Infinity; for (let i = 0; i < arr.length; i++) if (mk[i]) { lo = Math.min(lo, arr[i]); hi = Math.max(hi, arr[i]); } return `Points range from ${lo.toFixed(digits)} to ${hi.toFixed(digits)}${unit}`; };
   $('kpis').replaceChildren(
     tile('hero', 'Hours with no thermal stress', okPct.toFixed(0), '%', scope),
-    tile('', 'Direct sun, mean per point', sunH.toFixed(0), 'hours', range(p.sunHours, ' h')),
-    tile('', 'Solar energy, mean per point', en.toFixed(0), 'kWh/m²', range(p.energy, '', 0)),
-    tile('', 'Hours with cold stress', cold.toFixed(0), '%', 'UTCI below 9 °C'),
-    tile(heat < 0.05 ? 'dim' : '', 'Hours with heat stress', heat < 0.05 ? '0' : heat.toFixed(1), '%', 'UTCI above 26 °C'));
+    tile('', 'Direct sun per point', sunH.toFixed(0), 'h', range(p.sunHours, ' h')),
+    tile('', 'Solar energy per point', en.toFixed(0), 'kWh/m²', range(p.energy, '', 0)),
+    tile('', 'Cold stress', cold.toFixed(0), '% of hours', 'UTCI below 9 °C'),
+    tile(heat < 0.05 ? 'dim' : '', 'Heat stress', heat < 0.05 ? '0' : heat.toFixed(1), '% of hours', 'UTCI above 26 °C'));
   if (METRICS[S.metric].kind === 'period') { refreshScene(); refreshLegend(); refreshLabels(); }
   // Monthly classes, sections and data table
   const active = monthActive();
