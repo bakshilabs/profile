@@ -172,11 +172,10 @@ function buildViewTools() {
   els.sunBtn = chip('Sun', true, () => { S.showSun = !S.showSun; els.sunBtn.setAttribute('aria-pressed', String(S.showSun)); scene.setSunVisible(S.showSun); });
   els.roofBtn = chip('Roof', true, () => { S.showRoof = !S.showRoof; els.roofBtn.setAttribute('aria-pressed', String(S.showRoof)); scene.setRoofVisible(S.showRoof); });
   els.nowSeg = nowSeg; els.perSeg = perSeg;
-  const label = (t) => h('span', { class: 'tlabel' }, t);
-  tools.replaceChildren(
-    h('div', { class: 'trow' }, label('At the time'), nowSeg, label('Over the period'), perSeg),
-    h('div', { class: 'trow' }, label('Camera'), camSeg, label('Show'), h('div', { class: 'seg' }, els.compareBtn, els.sunBtn, els.roofBtn)),
-  );
+  const group = (t, node) => h('div', { class: 'tgroup' }, h('span', { class: 'tlabel' }, t), node);
+  tools.replaceChildren(h('div', { class: 'trow' },
+    group('At the time', nowSeg), group('Over the period', perSeg), group('Camera', camSeg),
+    group('Show', h('div', { class: 'seg' }, els.compareBtn, els.sunBtn, els.roofBtn))));
 }
 
 function buildTimeTools() {
@@ -552,7 +551,7 @@ function refreshPeriodDependent() {
   const scope = `${GROUPS[S.group]}${S.sector >= 0 && S.group !== 'pitch' ? `, ${SECTOR_NAMES[S.sector].toLowerCase()} stand` : ''}, ${periodLabel()}, ${hoursLabel()}`;
   const range = (arr, unit, digits = 0) => { let lo = Infinity, hi = -Infinity; for (let i = 0; i < arr.length; i++) if (mk[i]) { lo = Math.min(lo, arr[i]); hi = Math.max(hi, arr[i]); } return `Points range from ${lo.toFixed(digits)} to ${hi.toFixed(digits)}${unit}`; };
   $('kpis').replaceChildren(
-    tile('hero', 'Hours with no thermal stress', okPct.toFixed(0), '%', scope),
+    tile('hero', 'No thermal stress', okPct.toFixed(0), '%', `Share of hours. ${scope}`),
     tile('', 'Direct sun per point', sunH.toFixed(0), 'h', range(p.sunHours, ' h')),
     tile('', 'Solar energy per point', en.toFixed(0), 'kWh/m²', range(p.energy, '', 0)),
     tile('', 'Cold stress', cold.toFixed(0), '% of hours', 'UTCI below 9 °C'),

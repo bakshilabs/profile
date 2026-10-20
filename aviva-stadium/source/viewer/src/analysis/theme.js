@@ -2,21 +2,22 @@
 // Categorical hues follow a fixed order and each entity keeps its colour in every chart.
 
 export const TOKENS = {
+  // Surfaces and ink follow the Bakshi Labs site: warm paper and white cards, or deep ink and raised ink.
   light: {
-    page: '#f9f9f7', surface: '#fcfcfb', ink: '#0b0b0b', ink2: '#52514e', muted: '#898781',
-    grid: '#e1e0d9', axis: '#c3c2b7', neutral: '#f0efec', border: 'rgba(11,11,11,0.10)',
+    page: '#f6f5f0', surface: '#ffffff', stage: '#f1efe8', ink: '#0c1b24', ink2: '#46585f', muted: '#5d7079',
+    grid: '#e6e5dd', axis: '#d9d8cf', neutral: '#eceae2', border: '#d9d8cf',
     series: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'],
     blue: ['#cde2fb', '#b7d3f6', '#9ec5f4', '#86b6ef', '#6da7ec', '#5598e7', '#3987e5', '#2a78d6', '#256abf', '#1c5cab', '#184f95', '#104281', '#0d366b'],
     red: '#e34948',
-    scene: { ground: 0xe6e5df, structure: 0xb8bdc4, ghost: 0x7b8794, ghostOpacity: 0.16, empty: 0xdcdbd4 },
+    scene: { ground: 0xe4e2d9, structure: 0xaab6bb, ghost: 0x5d7079, ghostOpacity: 0.16, emptyHex: '#dcdad0' },
   },
   dark: {
-    page: '#0d0d0d', surface: '#1a1a19', ink: '#f0efec', ink2: '#c3c2b7', muted: '#898781',
-    grid: '#2c2c2a', axis: '#383835', neutral: '#383835', border: 'rgba(255,255,255,0.10)',
+    page: '#0c1b24', surface: '#122630', stage: '#0a1720', ink: '#f2f6f6', ink2: '#b4c4ca', muted: '#8fa4ad',
+    grid: '#223a47', axis: '#3a5260', neutral: '#2c4350', border: '#28404d',
     series: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'],
     blue: ['#cde2fb', '#b7d3f6', '#9ec5f4', '#86b6ef', '#6da7ec', '#5598e7', '#3987e5', '#2a78d6', '#256abf', '#1c5cab', '#184f95', '#104281', '#0d366b'],
     red: '#e66767',
-    scene: { ground: 0x232322, structure: 0x3a3f46, ghost: 0x9fb2c6, ghostOpacity: 0.1, empty: 0x2a2a28 },
+    scene: { ground: 0x16303c, structure: 0x2c4654, ghost: 0x93a7b0, ghostOpacity: 0.1, emptyHex: '#1c3643' },
   },
 };
 

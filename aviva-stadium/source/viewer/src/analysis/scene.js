@@ -353,8 +353,8 @@ export class Scene3D {
     g.fillStyle = tk.series[7]; g.font = '700 84px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText('N', 64, 68);
     this.northTex.needsUpdate = true;
-    this.renderer.setClearColor(new THREE.Color(tk.surface), 1);
-    for (const m of [this.seatMaterial, this.pitchMaterial]) m.uniforms.uEmpty.value.set(...hexToRgb(tk.surface === '#1a1a19' ? '#2a2a28' : '#e4e3dc'));
+    this.renderer.setClearColor(new THREE.Color(tk.stage), 1);
+    for (const m of [this.seatMaterial, this.pitchMaterial]) m.uniforms.uEmpty.value.set(...hexToRgb(sc.emptyHex));
     this.dirty = true;
   }
 

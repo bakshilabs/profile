@@ -60,6 +60,8 @@ npm install
 npx vite --open /analysis.html
 ```
 
+The page uses the typefaces from the Bakshi Labs site. To see them in development, copy that site's `assets/fonts` folder to `source/viewer/public/fonts`.
+
 ## Credits
 
 - Stadium model by S.Gandini, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). [Original model](https://sketchfab.com/3d-models/aviva-stadium-d62b3a640ccb421487a650e9074609be). The model was compressed for the web, and its colours and transparency were changed.
