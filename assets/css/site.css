@@ -2802,44 +2802,6 @@ button {
   border-color: #16ffc6;
   background: #183441;
 }
-.mail {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "label label" "address actions";
-  gap: 12px 32px;
-  align-items: end;
-  margin-top: clamp(48px, 6vw, 72px);
-  padding: clamp(24px, 3vw, 36px);
-  border: 1px solid var(--ink-line);
-  border-radius: 16px;
-  background: #112630;
-}
-.mail .label {
-  grid-area: label;
-  margin: 0;
-}
-.mail__address {
-  grid-area: address;
-  min-width: 0;
-  font-family: var(--display);
-  font-size: clamp(26px, 4.2vw, 52px);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  color: var(--white);
-  text-decoration: none;
-  overflow-wrap: anywhere;
-  user-select: all;
-}
-.mail__address:hover {
-  color: #16ffc6;
-}
-.mail__actions {
-  grid-area: actions;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
 .btn--ghostdark {
   border-color: rgba(143, 166, 176, 0.45);
   background: transparent;
@@ -2875,10 +2837,6 @@ button {
   .ask {
     grid-template-columns: 1fr;
     gap: 10px;
-  }
-  .mail {
-    grid-template-columns: 1fr;
-    grid-template-areas: "label" "address" "actions";
   }
 }
 /* The case study link always sits on its own line */
@@ -2936,13 +2894,6 @@ button {
 @media (max-width: 520px) {
   .hero__actions .btn {
     flex: 1 1 100%;
-  }
-  .mail {
-    padding: 20px;
-  }
-  .mail__address {
-    font-size: clamp(19px, 6vw, 56px);
-    letter-spacing: -0.02em;
   }
 }
 .card__stat--text {
