@@ -17,7 +17,7 @@
     code: { label: "Code step", cls: "code" },
     tool: { label: "Connector", cls: "code" },
     data: { label: "Data", cls: "data" },
-    doc: { label: "Contract", cls: "data" },
+    doc: { label: "Build plan", cls: "data" },
     ui: { label: "Interface", cls: "ui" },
     ext: { label: "External source", cls: "ext" },
     out: { label: "Output", cls: "out" }
@@ -263,12 +263,16 @@
     sl.nodes.forEach(function (n, i) {
       byId[n.id] = n;
       var r = rect(sl, n);
+      (sl.groups || []).forEach(function (g) {
+        if (g.id && r.x >= g.x && r.y >= g.y && r.x + r.w <= g.x + g.w && r.y + r.h <= g.y + g.h) n._group = g.id;
+      });
       var kind = KINDS[n.k];
       kindsUsed[n.k] = true;
       var wide = r.w > 600;
       var b = el("button", "node node--" + kind.cls + (wide ? " node--wide" : "") + (sl.small || n.tray ? " node--sm" : "") + (n.tray ? " node--tray" : ""));
       b.type = "button";
       b.dataset.node = n.id;
+      if (n._group) b.dataset.group = n._group;
       b.style.cssText = "left:" + r.x + "px;top:" + r.y + "px;width:" + r.w + "px;height:" + r.h + "px;--i:" + i;
       b.setAttribute("aria-label", n.n + ", " + kind.label + ". " + n.s + " Open details.");
       var inner = el("span", "node__inner");
@@ -280,8 +284,13 @@
       front.appendChild(el("span", "node__name", n.n));
       front.appendChild(el("span", "node__short", n.s));
       var back = el("span", "node__face node__back");
+      var bh = el("span", "node__hint");
+      bh.appendChild(el("span", "node__hname", n.n));
+      var arrow = el("span", "node__harrow");
+      arrow.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      bh.appendChild(arrow);
+      back.appendChild(bh);
       back.appendChild(el("span", "node__btext", n.b));
-      back.appendChild(el("span", "node__hint", touch.matches ? "Tap for details" : "Click for details"));
       inner.appendChild(front);
       inner.appendChild(back);
       b.appendChild(inner);
@@ -298,16 +307,16 @@
         openModal(sl, n, b);
       });
       b.addEventListener("mouseenter", function () {
-        focusNode(canvas, n.id, true);
+        if (!touch.matches) focusNode(canvas, n.id, true);
       });
       b.addEventListener("mouseleave", function () {
-        focusNode(canvas, n.id, false);
+        if (!touch.matches) focusNode(canvas, n.id, false);
       });
       b.addEventListener("focus", function () {
-        focusNode(canvas, n.id, true);
+        if (!touch.matches) focusNode(canvas, n.id, true);
       });
       b.addEventListener("blur", function () {
-        focusNode(canvas, n.id, false);
+        if (!touch.matches) focusNode(canvas, n.id, false);
       });
       canvas.appendChild(b);
     });
@@ -321,7 +330,7 @@
       wires.appendChild(p);
       var dur = Math.max(1.6, pathLength(pts) / 110).toFixed(2);
       var len = pathLength(pts);
-      var trim = Math.min(0.3, 15 / len).toFixed(3);
+      var trim = Math.min(0.3, 22 / len).toFixed(3);
       // Short or shared connectors carry one dot, so the motion stays calm.
       if (!o.quiet) {
         addPulse(wires, d, dur, j, false, e, trim);
@@ -385,9 +394,11 @@
     canvas.classList.toggle("is-focus", on);
     var linked = {};
     linked[id] = true;
+    var card = canvas.querySelector('[data-node="' + id + '"]');
+    var group = card && card.dataset.group;
     canvas.querySelectorAll(".wire, .pulse, .wire-label").forEach(function (w) {
       var a = w.getAttribute("data-a"), b = w.getAttribute("data-b");
-      var hot = on && (a === id || b === id);
+      var hot = on && (a === id || b === id || (group && (a === group || b === group)));
       w.classList.toggle("is-hot", hot);
       if (hot) {
         linked[a] = true;
@@ -510,7 +521,7 @@
     var edges = parseInt(slides[i].dataset.edges || "0", 10);
     drawTimer = setTimeout(function () {
       slides[i].classList.add("is-drawn");
-    }, reduce ? 0 : 200 + Math.min(edges * 30, 400) + 480);
+    }, reduce ? 0 : 150 + Math.min(edges * 20, 240) + 500);
     slides.forEach(function (s) {
       s.querySelectorAll(".node.is-flipped").forEach(function (o) {
         o.classList.remove("is-flipped");
@@ -538,18 +549,30 @@
       t.style.webkitLineClamp = "unset";
       var base = parseFloat(getComputedStyle(t).fontSize);
       var limit;
-      if (t.classList.contains("node__btext")) limit = face.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - t.nextSibling.offsetHeight - 6;
-      else limit = face.clientHeight - parseFloat(cs.paddingBottom) - t.offsetTop;
+      limit = face.clientHeight - parseFloat(cs.paddingBottom) - t.offsetTop;
       var size = base;
-      while (t.scrollHeight > limit + 1 && size > 13) {
+      while (t.scrollHeight > limit + 3 && size > 13) {
         size -= 0.5;
         t.style.fontSize = size + "px";
       }
-      t.toggleAttribute("data-clamped", t.scrollHeight > limit + 1);
-      if (t.scrollHeight > limit + 1) {
+      t.dataset.fit = size;
+      t.toggleAttribute("data-clamped", t.scrollHeight > limit + 3);
+      if (t.scrollHeight > limit + 3) {
         var lh = parseFloat(getComputedStyle(t).lineHeight) || 18;
         t.style.webkitLineClamp = String(Math.max(1, Math.floor(limit / lh)));
       }
+    });
+    // Cards of one size on a slide share one text size, so none looks out of place.
+    slides.forEach(function (sl) {
+      [".node:not(.node--tray):not(.node--wide) .node__short", ".node--tray .node__short", ".node:not(.node--tray) .node__btext", ".node--tray .node__btext"].forEach(function (sel) {
+        var els = sl.querySelectorAll(sel), min = Infinity;
+        els.forEach(function (t) {
+          min = Math.min(min, parseFloat(getComputedStyle(t).fontSize));
+        });
+        if (min < Infinity) els.forEach(function (t) {
+          t.style.fontSize = min + "px";
+        });
+      });
     });
   }
 
@@ -648,6 +671,16 @@
     } else if (/^[1-9]$/.test(e.key)) {
       go(parseInt(e.key, 10) - 1);
     }
+  });
+
+  stage.addEventListener("click", function (e) {
+    if (!touch.matches || e.target.closest(".node")) return;
+    var c = stage.querySelector(".slide.is-active .canvas");
+    if (!c) return;
+    c.querySelectorAll(".node.is-flipped").forEach(function (o) {
+      o.classList.remove("is-flipped");
+    });
+    focusNode(c, "", false);
   });
 
   var sx = null, sy = null;

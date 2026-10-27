@@ -48,7 +48,7 @@
 .deck__progress span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #59c7fc, var(--teal));
+  background: linear-gradient(90deg, var(--teal-deep), var(--teal));
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.6s var(--ease);
@@ -200,17 +200,17 @@
   padding: 66px 64px 0;
   visibility: hidden;
   opacity: 0;
-  transform: translateX(48px);
-  transition: opacity 0.5s var(--ease), transform 0.6s var(--ease), visibility 0s linear 0.6s;
-}
-.slide.is-before {
-  transform: translateX(-48px);
+  transform: translateY(-8px);
+  transition: opacity 0.18s ease-in, transform 0.18s ease-in, visibility 0s linear 0.18s;
 }
 .slide.is-active {
   visibility: visible;
   opacity: 1;
   transform: none;
-  transition: opacity 0.5s var(--ease), transform 0.6s var(--ease), visibility 0s;
+  transition: opacity 0.32s var(--ease) 0.12s, transform 0.45s var(--ease) 0.12s, visibility 0s;
+}
+.slide:not(.is-active):not(.is-before) {
+  transform: translateY(12px);
 }
 .slide__grid {
   position: absolute;
@@ -380,11 +380,11 @@
   stroke-width: 1.6;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  transition: stroke-dashoffset 0.6s var(--ease), stroke 0.25s var(--ease), stroke-width 0.25s var(--ease), opacity 0.25s var(--ease);
+  transition: stroke-dashoffset 0.5s var(--ease), stroke 0.25s var(--ease), stroke-width 0.25s var(--ease), opacity 0.25s var(--ease);
 }
 .is-active .wire {
   stroke-dashoffset: 0;
-  transition-delay: calc(min(var(--j) * 30ms, 400ms) + 0.2s), 0s, 0s, 0s;
+  transition-delay: calc(min(var(--j) * 20ms, 240ms) + 0.15s), 0s, 0s, 0s;
 }
 .is-drawn .wire {
   marker-end: url(#arr);
@@ -469,7 +469,7 @@
 .is-active .node {
   opacity: 1;
   transform: none;
-  transition-delay: calc(min(var(--i) * 30ms, 450ms) + 0.1s);
+  transition-delay: calc(min(var(--i) * 20ms, 240ms) + 0.15s);
 }
 .node:focus-visible {
   outline: none;
@@ -497,11 +497,10 @@
   transform: rotateY(180deg);
 }
 .canvas.is-focus .node:not(.is-linked) .node__face {
-  opacity: 0.5;
-  filter: saturate(0.3);
+  opacity: 0.35;
 }
 .canvas.is-focus .node--agent:not(.is-linked) .node__face {
-  opacity: 0.26;
+  opacity: 0.22;
 }
 .node__face {
   position: absolute;
@@ -522,8 +521,8 @@
   box-shadow: var(--shadow);
 }
 .node__back {
-  justify-content: space-between;
-  background: var(--ink);
+  justify-content: flex-start;
+  background: var(--teal-deep);
   color: var(--white);
   transform: rotateY(180deg);
   box-shadow: 0 24px 40px -22px rgba(12, 27, 36, 0.6);
@@ -558,7 +557,7 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.36;
   color: var(--muted);
 }
@@ -567,8 +566,8 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: 14.5px;
+  line-height: 1.38;
   color: rgba(255, 255, 255, 0.92);
 }
 .node__hint {
@@ -589,10 +588,10 @@
   font-size: 18.5px;
 }
 .node--sm .node__short {
-  font-size: 15px;
+  font-size: 14.5px;
 }
 .node--sm .node__btext {
-  font-size: 14.5px;
+  font-size: 14px;
   -webkit-line-clamp: 5;
 }
 .node--sm .node__kind {
@@ -631,12 +630,7 @@
 .node--agent .node__short {
   color: #b5c4ca;
 }
-.node--agent .node__back {
-  background: var(--teal-deep);
-}
-.node--agent .node__hint {
-  color: var(--white);
-}
+
 @keyframes ring {
   0% {
     box-shadow: 0 0 0 0 rgba(14, 156, 142, 0.45);
@@ -1093,13 +1087,7 @@
 
 /* Featured case study */
 
-.slide--featured::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 6px;
-  background: linear-gradient(90deg, #59c7fc, #16ffc6);
-}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -1119,9 +1107,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #16ffc6;
-  box-shadow: 0 0 0 0 rgba(22, 255, 198, 0.6);
-  animation: ring 2.4s var(--ease) infinite;
+  background: var(--teal-soft);
 }
 .slide__stats {
   display: grid;
@@ -1166,14 +1152,14 @@
   margin-left: 10px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(22, 255, 198, 0.14);
+  background: rgba(143, 220, 210, 0.16);
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   vertical-align: 4px;
-  color: #16ffc6;
+  color: var(--teal-soft);
 }
 .cover__tiles {
   gap: 8px;
@@ -1279,4 +1265,45 @@
 .deck.is-side .deck__btn {
   width: 40px;
   height: 40px;
+}
+
+.node__hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--white);
+}
+.node__hname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.node__harrow svg {
+  width: 14px;
+  height: 14px;
+}
+.node:hover .node__harrow svg {
+  animation: nudge 1.2s var(--ease) infinite;
+}
+@keyframes nudge {
+  0%, 100% { transform: none; }
+  50% { transform: translateX(3px); }
+}
+@media (max-width: 700px) and (orientation: portrait) {
+  .deck {
+    justify-content: flex-start;
+    padding-top: calc(var(--nav-h) + 24px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .node:hover .node__harrow svg {
+    animation: none;
+  }
+}
+.deck__bar {
+  justify-content: center;
+}
+.node--tray .node__hname {
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
