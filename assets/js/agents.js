@@ -17,7 +17,7 @@
     code: { label: "Code step", cls: "code" },
     tool: { label: "Connector", cls: "code" },
     data: { label: "Data", cls: "data" },
-    doc: { label: "Build plan", cls: "data" },
+    doc: { label: "Document", cls: "data" },
     ui: { label: "Interface", cls: "ui" },
     person: { label: "Person", cls: "ui" },
     ext: { label: "External source", cls: "ext" },

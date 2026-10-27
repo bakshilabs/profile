@@ -233,7 +233,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Published records",
           "s": "Holds the records every visitor sees.",
-          "b": "It also holds 101 scans and a firm profile for every visitor.",
+          "b": "It also holds the 101 scans and the default firm profile.",
           "f": [
             [
               "Records",
@@ -312,7 +312,7 @@ window.AGENT_DECK = {
             ]
           ],
           "a": [
-            "Weights are 35 for sector, 20 for scale, 15 for location, 20 for win probability and 10 for timing. The firm's thresholds then set each verdict."
+            "The verdict calculator weights sector at 35, scale and win probability at 20 each, location at 15 and timing at 10. The firm's thresholds then set each verdict."
           ]
         },
         {
@@ -694,7 +694,7 @@ window.AGENT_DECK = {
           "y": 20,
           "n": "Local helper",
           "s": "Relays between the browser and Claude.",
-          "b": "It passes each message to Claude on the same computer and sends the reply back as it is written.",
+          "b": "It runs on the user's computer and carries messages and replies to and from Claude.",
           "f": [
             [
               "Runs in",
@@ -826,7 +826,7 @@ window.AGENT_DECK = {
           "y": 450,
           "n": "Model loading",
           "s": "Prepares the model before the first question.",
-          "b": "A known model loads from a saved copy. A new one is read once and its index sent to the helper.",
+          "b": "A model opened before loads from a saved copy. A new one is read once and indexed.",
           "f": [
             [
               "Trigger",
@@ -1016,7 +1016,7 @@ window.AGENT_DECK = {
           "s": "Turns raw records into facts and scores.",
           "b": "It reads each new tender or project and returns its key facts, fit scores and a verdict.",
           "a": [
-            "The enrichment analyst reads raw tender and project records, with the firms that won earlier work, and returns one structured record of facts.",
+            "The enrichment analyst fills in the facts a raw record lacks. It reads raw tender and project records, with the firms that won earlier work, and returns one structured record of facts.",
             "The facts cover stage, sub-sector, owner, design team, contractor, storeys, floor area, value in US dollars, start and end dates, funding and city, with a one-sentence summary. It also scores fit for the practice from 0 to 100 on sector, scale, location and win probability, and writes a one-sentence verdict.",
             "Every call is logged with a fingerprint of its instructions. When the instructions change, the records they affect can be enriched again."
           ],
@@ -1161,7 +1161,7 @@ window.AGENT_DECK = {
           "a": [
             "The deal analyst reads takeover and investment records and pulls out the buyer, target, value, deal type, status and reason for the deal.",
             "It then decides what kind of construction the deal points to, such as data centres or ports, and scores sector, scale and location fit and win probability from 0 to 100. Its verdict opens with \"Pursue actively\", \"Monitor\" or \"Deprioritise\".",
-            "The nightly run enriches tenders and projects only, so this agent runs only when someone starts it for deals."
+            "The nightly run enriches tenders and projects, so deals are scored only when someone starts this agent by hand."
           ],
           "f": [
             [
@@ -1232,7 +1232,7 @@ window.AGENT_DECK = {
           "y": 400,
           "n": "Filings extractor",
           "s": "Finds projects in US company filings.",
-          "b": "It reads spending paragraphs in large US companies' reports and lists named building projects.",
+          "b": "It lists named building projects from the spending sections of US company reports.",
           "a": [
             "The script pulls the latest annual report and four quarterly reports that large US companies file with the regulator, and keeps the spending paragraphs that contain a figure.",
             "The agent lists named projects tied to a specific building, site, campus or facility, with at least a location, value, floor area, year or developer. General spending totals, share buybacks and takeovers are left out."
@@ -1265,12 +1265,12 @@ window.AGENT_DECK = {
           "k": "agent",
           "x": 875,
           "y": 400,
-          "n": "Campus re-scorer",
-          "s": "Re-scores campus-type records.",
-          "b": "Two scripts re-score headquarters, healthcare and education records under a looser rule.",
+          "n": "Campus rescorer",
+          "s": "Rescores campus-type records.",
+          "b": "Two scripts rescore headquarters, healthcare and education records under a looser rule.",
           "a": [
             "Two scripts select records that look like campuses, headquarters, healthcare or education buildings and enrich them again.",
-            "The second pass uses a looser definition of the campuses sector that accepts single flagship buildings, so the sector fills faster."
+            "The second pass uses a looser definition of the campuses sector that accepts single flagship buildings, so more records qualify for it."
           ],
           "f": [
             [
@@ -1440,7 +1440,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Sector",
           "s": "Picks one sector or all seven.",
-          "b": "Seven sectors sit in the sidebar. Scan All runs each in turn, 4 seconds apart.",
+          "b": "Scan All runs the seven sectors in turn, 4 seconds apart.",
           "f": [
             [
               "Sectors",
@@ -1586,7 +1586,7 @@ window.AGENT_DECK = {
           "y": 236,
           "n": "Reply reader",
           "s": "Tries three ways to read the reply.",
-          "b": "It tries the whole reply, a trimmed reply, then one result at a time.",
+          "b": "If the reply is untidy, it falls back to reading one result at a time.",
           "f": [
             [
               "Retries",
@@ -1604,8 +1604,8 @@ window.AGENT_DECK = {
           "x": 1000,
           "y": 236,
           "n": "Results by sector",
-          "s": "A new scan replaces that sector's results.",
-          "b": "Each sector keeps its own results, and duplicates are not merged.",
+          "s": "Holds the latest results for each sector.",
+          "b": "A new scan replaces that sector's results. Duplicates are not merged.",
           "f": [
             [
               "Held in",
@@ -1760,7 +1760,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Presentation nodes",
           "s": "Holds a brief and its inputs.",
-          "b": "Each one uses the results its wired analyses hold now, without rerunning them."
+          "b": "Each one uses the saved results of its wired analyses and does not rerun them."
         },
         {
           "id": "chat",
@@ -1880,10 +1880,10 @@ window.AGENT_DECK = {
           "y": 356,
           "n": "Timeout rescue planner",
           "s": "Splits an answer that timed out.",
-          "b": "It splits a long answer into parts. The helper asks Claude for each part and joins them.",
+          "b": "It splits a long answer into parts, then the app asks Claude for each and joins them.",
           "a": [
             "The timeout rescue planner takes over when an analysis run hits its 10-minute limit.",
-            "It plans the answer as a header, a footer and a list of items in batches of 1 to 10. The helper asks Claude for each batch, up to 40 times, and joins them.",
+            "It plans the answer as a header, a footer and a list of items in batches of 1 to 10. The app asks Claude for each batch, up to 40 times, and joins them.",
             "Totals that depend on the finished table are left as placeholders and filled in after the parts are joined. Only analyses get this rescue."
           ],
           "f": [
@@ -2042,8 +2042,8 @@ window.AGENT_DECK = {
           "s": "Recovered the data and led the build.",
           "b": "It sorted the models, wrote the plan, and built the page frame and the bundler.",
           "a": [
-            "The main agent did the research and recovery. It checked 64 download addresses, downloaded all 64 archives, compared file fingerprints to remove duplicates and sorted 864 files by building type.",
-            "It wrote the build plan so the four subagents could work on their own, and built the dashboard frame, the side panels and the bundler.",
+            "The main agent, running in Claude Code, Anthropic's coding tool, did the research and recovery. It checked 64 download addresses, downloaded all 64 archives, compared file fingerprints to remove duplicates and sorted 864 files by building type.",
+            "It wrote the build plan so the four subagents could work on their own, and built the page frame, the side panels and the bundler.",
             "After the subagents finished, it bundled their work and tested every tab in an automated browser at desktop and phone widths, fixing the layout problems it found."
           ],
           "f": [
@@ -2063,7 +2063,7 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 480,
           "n": "Model library",
-          "s": "Holds 864 files by building type.",
+          "s": "Held 864 files by building type.",
           "b": "It holds models for two versions of the simulation software, their results and 16 weather files.",
           "f": [
             [
@@ -2105,7 +2105,7 @@ window.AGENT_DECK = {
           "x": 303,
           "y": 330,
           "n": "Page frame",
-          "s": "Holds the tabs, menus and side panels.",
+          "s": "Held the tabs, menus and side panels.",
           "b": "The main agent built this page frame first, so each view had a fixed place to plug in."
         },
         {
@@ -2184,7 +2184,7 @@ window.AGENT_DECK = {
           "b": "It built the monthly surfaces, the climate carpet and the operating schedules.",
           "a": [
             "View agent C built three views: Monthly Surfaces, Climate Carpet with 365 × 24 hours of weather as terrain, and Operating Schedules that morph between weekday and weekend.",
-            "It added made-up fields to the sample data while it worked and checked each view with screenshots."
+            "It added placeholder fields to the sample data while it worked and checked each view with screenshots."
           ],
           "f": [
             [
@@ -2199,7 +2199,7 @@ window.AGENT_DECK = {
           "x": 922,
           "y": 240,
           "n": "Bundler",
-          "s": "Joins every part into one page.",
+          "s": "Joined every part into one page.",
           "b": "It drops the data and the three views into the page frame and writes the finished dashboard."
         },
         {
@@ -2359,8 +2359,8 @@ window.AGENT_DECK = {
           "x": 606,
           "y": 0,
           "n": "Hand-written verdicts",
-          "s": "Gives every sample a written verdict.",
-          "b": "Each sample carries a verdict line per standard, with a reason and a source link.",
+          "s": "Gives every product a written verdict.",
+          "b": "Each product carries a verdict line per standard, with a reason and a source link.",
           "f": [
             [
               "Files",
@@ -2622,7 +2622,7 @@ window.AGENT_DECK = {
           "y": 464,
           "n": "Lettings check",
           "s": "Checks 7,045 commercial buildings.",
-          "b": "It flags each building's risk under the lettings standard and costs the work to reach band B."
+          "b": "It flags each building's lettings risk and costs the work to reach energy band B."
         },
         {
           "id": "score",
@@ -2648,8 +2648,8 @@ window.AGENT_DECK = {
           "x": 1212,
           "y": 464,
           "n": "Views and tables",
-          "s": "Shows the Prioritise, Portfolio and Areas views.",
-          "b": "The Prioritise charts and tables come from the run's totals, and the other views redraw too."
+          "s": "Shows the three main views.",
+          "b": "Prioritise, Portfolio and Areas all redraw from the latest run's totals."
         }
       ],
       "edges": [
