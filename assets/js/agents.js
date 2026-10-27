@@ -15,7 +15,7 @@
     sub: { label: "Subagent", cls: "agent" },
     maybe: { label: "Possible agent", cls: "maybe" },
     code: { label: "Code step", cls: "code" },
-    tool: { label: "Tool server", cls: "code" },
+    tool: { label: "Connector", cls: "code" },
     data: { label: "Data", cls: "data" },
     doc: { label: "Contract", cls: "data" },
     ui: { label: "Interface", cls: "ui" },

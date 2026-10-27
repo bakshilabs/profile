@@ -16,11 +16,11 @@ window.AGENT_DECK = {
       ],
       [
         "6",
-        "build agents made two of the others"
+        "build agents wrote two of the other tools"
       ],
       [
         "0",
-        "agents call another agent directly"
+        "agents call another agent while a tool runs"
       ]
     ]
   },
@@ -31,7 +31,7 @@ window.AGENT_DECK = {
       "featured": true,
       "kicker": "01 · Win work · Opportunity intelligence",
       "title": "Prospecht",
-      "lede": "Prospecht finds projects worth bidding for. Claude reads tender notices, code checks every quote, and a formula picks what to pursue.",
+      "lede": "Prospecht finds projects worth bidding for. Claude reads tender notices, the app checks every quote, and a formula picks what to pursue.",
       "tag": "9 agents · 8,972 records",
       "stats": [
         [
@@ -84,7 +84,7 @@ window.AGENT_DECK = {
             ]
           ],
           "a": [
-            "Tender portals and development bank project lists are downloaded directly. No AI is involved at this step."
+            "A script downloads notices from national tender portals and development bank project lists, and adds records already held in GrowthSignal's database. No AI is involved at this step."
           ]
         },
         {
@@ -94,7 +94,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Feed sorter",
           "s": "Sorts notices in batches of 40.",
-          "b": "It sets aside non-design work and tags each notice it keeps with a quote.",
+          "b": "It sets aside non-design work and scores the rest, quoting each notice.",
           "a": [
             "The feed sorter reads official notices in batches of 40. It first sets aside anything that is not architecture, engineering or design work.",
             "For each notice it keeps, it gives a sector, a sector fit score, a win probability, a stage, an English title and an exact quote from the notice. It uses the same judgement rules as the scan analyst, so imported and scanned records are scored the same way.",
@@ -130,7 +130,7 @@ window.AGENT_DECK = {
           "y": 150,
           "n": "Live web",
           "s": "Supplies search results and whole pages.",
-          "b": "Scans search the web and read whole pages, never private addresses.",
+          "b": "Scans search the web and open public pages to read them in full.",
           "f": [
             [
               "Tools",
@@ -193,7 +193,7 @@ window.AGENT_DECK = {
           "y": 75,
           "n": "Quote check",
           "s": "Matches every quote to its source page.",
-          "b": "Each record is marked Verified, Sourced or Unconfirmed.",
+          "b": "Each record gets a status and a count of the websites behind it.",
           "f": [
             [
               "Published result",
@@ -322,7 +322,7 @@ window.AGENT_DECK = {
           "y": 300,
           "n": "Verdict calculator",
           "s": "Decides the verdict for each record.",
-          "b": "It adds Claude's two scores to computed scale, place and timing.",
+          "b": "It combines Claude's two scores with its own for scale, place and timing.",
           "f": [
             [
               "Verdicts",
@@ -616,7 +616,7 @@ window.AGENT_DECK = {
       "app": "ModelChat",
       "kicker": "02 · Design · BIM model queries",
       "title": "ModelChat",
-      "lede": "One Claude agent answers questions about a BIM model. Its 14 tools either look up the model's contents or move the 3D view in the browser.",
+      "lede": "One Claude agent answers questions about a 3D building model. Its 14 tools either look up the model's contents or move the view in the browser.",
       "tag": "1 agent · 14 tools",
       "cw": 320,
       "ch": 128,
@@ -645,7 +645,7 @@ window.AGENT_DECK = {
           "y": 20,
           "n": "Chat panel",
           "s": "Sends each message and shows the reply.",
-          "b": "The panel sends each message to the helper. The reply and a chip for each tool Claude uses appear as they arrive.",
+          "b": "The reply appears as it is written, with a label for each tool Claude uses.",
           "f": [
             [
               "Runs in",
@@ -1109,7 +1109,7 @@ window.AGENT_DECK = {
           "h": 112,
           "n": "SQLite database",
           "s": "Every agent reads from and writes to this one store. It holds tenders, projects, deals, news, search passages, briefings and chat history.",
-          "b": "No agent hands work to another directly. Rows added by the news and SEC scripts are enriched the next night.",
+          "b": "No agent hands work to another directly. Records added by hand-run scripts are enriched the next night.",
           "a": [
             "The database is the only thing the seven agents share. Each one reads its inputs from these tables and writes its results back to them.",
             "Rows that the news and SEC scripts add have no enrichment yet, so the next nightly enrichment run picks them up. The next search index run adds them too."
@@ -1207,7 +1207,7 @@ window.AGENT_DECK = {
           "y": 400,
           "n": "Company filings extractor",
           "s": "Finds named projects in US annual reports.",
-          "b": "It reads spending paragraphs in US company filings and lists named building projects.",
+          "b": "It reads spending paragraphs in US company filings to the SEC and lists named building projects.",
           "a": [
             "The script pulls the latest annual report and four quarterly reports that large US companies file with the regulator, and keeps the spending paragraphs that contain a figure.",
             "The agent lists named projects tied to a specific building, site, campus or facility, with at least a location, value, floor area, year or developer. General spending totals, share buybacks and takeovers are left out."
@@ -1240,7 +1240,7 @@ window.AGENT_DECK = {
           "k": "agent",
           "x": 750,
           "y": 400,
-          "n": "Campus re-enrichment",
+          "n": "Campus re-scorer",
           "s": "Re-scores campus-type records.",
           "b": "Two scripts give headquarters, healthcare and education records a second pass under a looser campuses definition.",
           "a": [
@@ -1617,9 +1617,9 @@ window.AGENT_DECK = {
           "k": "out",
           "x": 1250,
           "y": 472,
-          "n": "JSON files",
+          "n": "Saved files",
           "s": "Saves scans as files.",
-          "b": "Live scans download one JSON file per sector. Save keeps the last 10 scans in the browser."
+          "b": "Live scans download one file per sector. Save keeps the last 10 scans in the browser."
         }
       ],
       "edges": [
@@ -1711,7 +1711,7 @@ window.AGENT_DECK = {
       "app": "WorkNodesCanvas",
       "kicker": "05 · Deliver · Document workbench",
       "title": "WorkNodesCanvas",
-      "lede": "Four Claude agents run from cards, called nodes, on a canvas. They pass work to each other only through the results saved on each node.",
+      "lede": "Four Claude agents run from cards, called nodes, on a canvas. A helper program starts them, and they share work only through saved node results.",
       "tag": "4 agents · 1 canvas",
       "cw": 300,
       "ch": 120,
@@ -2044,7 +2044,17 @@ window.AGENT_DECK = {
           "y": 480,
           "n": "Model library",
           "s": "Holds 864 files by building type.",
-          "b": "It holds the models in two EnergyPlus versions, their results, 16 weather files and the original 64 downloads."
+          "b": "It holds models for two versions of the simulation software, their results and 16 weather files.",
+          "f": [
+            [
+              "Software",
+              "EnergyPlus 5.0 and 7.2"
+            ],
+            [
+              "Files",
+              "864"
+            ]
+          ]
         },
         {
           "id": "spec",
@@ -2076,7 +2086,7 @@ window.AGENT_DECK = {
           "y": 360,
           "n": "Shell and bundler",
           "s": "Holds the frame, side panels and bundler.",
-          "b": "The main agent wrote shell.html, with the top bar and side panels, and the bundler that joins every part into one page."
+          "b": "The main agent built this page frame first, so each view had a fixed place to plug in."
         },
         {
           "id": "data",
@@ -2346,7 +2356,7 @@ window.AGENT_DECK = {
       "app": "MaterialScan",
       "kicker": "07 · Design · Material compliance",
       "title": "MaterialScan",
-      "lede": "MaterialScan checks product evidence against LBC and WELL. People wrote the verdicts by hand, and a Python script turns them into web pages.",
+      "lede": "MaterialScan checks product evidence against two green building standards, LBC and WELL. People wrote the verdicts, and a script turns them into web pages.",
       "tag": "No agents",
       "cw": 260,
       "ch": 136,
@@ -2357,8 +2367,14 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 0,
           "n": "Product documents",
-          "s": "Supplies EPDs, HPDs and Declare labels.",
-          "b": "Manufacturer evidence lives on the web. The notes say it was gathered by searching the web and reading each document."
+          "s": "Supplies manufacturers' product sheets.",
+          "b": "Manufacturer evidence lives on the web. The notes say it was gathered by searching the web and reading each document.",
+          "f": [
+            [
+              "Types",
+              "EPDs (environmental product declarations), HPDs (health product declarations) and Declare labels"
+            ]
+          ]
         },
         {
           "id": "author",
@@ -2556,7 +2572,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Claude Code session",
           "s": "Wrote and ran the data scripts.",
-          "b": "The app's Method tab says one working session in Claude Code went from the raw CSV to the application.",
+          "b": "It wrote and ran the scripts that turned the raw data into three files. No AI runs in the app.",
           "a": [
             "The Method tab's \"How this was built\" card says one working session in Claude Code went from a raw CSV to the finished application, and lists its eight steps.",
             "The repository's only commit comes from a Claude Code branch. The packing scripts and test harness the timeline names are not in the repository, so they are known only from that text."
@@ -2577,7 +2593,7 @@ window.AGENT_DECK = {
           "k": "code",
           "x": 303,
           "y": 232,
-          "n": "Filter, geocode, pack",
+          "n": "Data preparation",
           "s": "Shrinks the raw data into compact files.",
           "b": "Rows are filtered, located and packed into compact columns, then compressed. The scripts are not in the repository."
         },
@@ -2587,7 +2603,7 @@ window.AGENT_DECK = {
           "x": 303,
           "y": 464,
           "n": "Three data files",
-          "s": "Three files hold all the prepared data.",
+          "s": "Holds all the prepared data.",
           "b": "One file holds the column layout, lookups, wards and postcodes. The other two hold the packed homes and buildings."
         },
         {
@@ -2624,7 +2640,13 @@ window.AGENT_DECK = {
           "y": 232,
           "n": "Package and cost",
           "s": "Costs a retrofit package for every home.",
-          "b": "It picks each home's package and works out its cost, CO2e saving, bill change and energy rating (SAP)."
+          "b": "It picks each home's package and works out its cost, carbon saving, bill change and new energy rating.",
+          "f": [
+            [
+              "Measures",
+              "CO2e saving, SAP energy rating"
+            ]
+          ]
         },
         {
           "id": "mees",
