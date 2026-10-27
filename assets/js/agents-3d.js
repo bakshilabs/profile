@@ -115,7 +115,7 @@ const STEPS = [
   },
   {
     id: "worknodescanvas", ch: 4, tool: "worknodescanvas", title: "WorkNodesCanvas",
-    ring: { store: "state", members: ["chat", "checks", "agent", "salvage", "builder"] },
+    ring: { store: "state", members: ["chat", "builder", "checks", "agent", "salvage"] },
     flow: ["chat>checks", "checks>state", "agent>state", "salvage>state", "builder>state", "agent>salvage"],
     cap: "Four Claude agents run from cards on a canvas and keep their results in one state file. When an analysis hits its 10-minute limit, the rescue planner takes over and the app joins the parts."
   },
@@ -1582,7 +1582,8 @@ function makeWorld(M) {
   }
   function ringPose(tool) {
     const c = tool.board.localToWorld(new THREE.Vector3(tool.ringCenter.x, tool.ringCenter.y, 0));
-    return fitPose(c, 1500 * tool.S, 760 * tool.S, BOARD_DIR, 0, 15, 0.98);
+    const rs = tool.ringSize || { w: 1300, h: 560 };
+    return fitPose(c, (rs.w + 60) * tool.S, (rs.h + 60) * tool.S, BOARD_DIR, 0, 15, 1.0);
   }
 
   function poseFor(st) {
@@ -1727,19 +1728,36 @@ function makeWorld(M) {
         store.shownOnce = true;
       }
       const members = st.ring.members;
-      const rx = 640, rz = 500;
       const camPose = ringPose(tool);
       const camLocal = tool.board.worldToLocal(camPose.pos.clone());
       const tarLocal = tool.board.worldToLocal(camPose.target.clone());
       const face = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(camLocal, tarLocal, new THREE.Vector3(0, 1, 0)));
       store.qTo.copy(face);
+      // Slots in a plane parallel to the screen: one card each side of the store, the rest in a row above and a row below.
+      // Gaps come from the real card sizes, so no two cards touch; depth bends the rows gently.
+      const right = new THREE.Vector3(1, 0, 0).applyQuaternion(face);
+      const up = new THREE.Vector3(0, 1, 0).applyQuaternion(face);
+      const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(face);
+      const cw = tool.byId[members[0]].w, chh = tool.byId[members[0]].h;
+      const G = 84;
+      const sideX = store.w / 2 + G + cw / 2;
+      const rowY = store.h / 2 + G * 0.75 + chh / 2;
+      const rest = members.length - 2;
+      const nTop = Math.floor(rest / 2), nBot = rest - nTop;
+      const slots = [[-sideX, 0, -150], [sideX, 0, -150]];
+      const row = function (n, y, z) {
+        for (let i = 0; i < n; i++) slots.push([(i - (n - 1) / 2) * (cw + G), y, z - Math.abs(i - (n - 1) / 2) * 50]);
+      };
+      row(nTop, rowY, -60);
+      row(nBot, -rowY, 70);
       members.forEach(function (id, i) {
         const c = tool.byId[id];
-        const a = (90 + (i * 360) / members.length) * (Math.PI / 180);
-        const p = new THREE.Vector3(center.x + Math.cos(a) * rx, center.y, center.z + Math.sin(a) * rz);
+        const sl = slots[i];
+        const p = center.clone().addScaledVector(right, sl[0]).addScaledVector(up, sl[1]).addScaledVector(fwd, sl[2]);
         c.offTo.copy(p).sub(c.base);
         c.qTo.copy(face);
       });
+      tool.ringSize = { w: sideX * 2 + cw, h: rowY * 2 + chh };
       tool.cards.forEach(function (c) {
         if (c === big || c === store || members.indexOf(c.id) >= 0) return;
         c.ghost = 1;
