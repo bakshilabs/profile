@@ -184,11 +184,13 @@
 
     var tiles = el("div", "cover__tiles");
     DECK.slides.forEach(function (sl, i) {
-      var t = el("button", "tile");
+      var t = el("button", "tile" + (sl.featured ? " tile--featured" : ""));
       t.type = "button";
       t.style.setProperty("--i", i);
       t.appendChild(el("span", "tile__num", pad(i + 1)));
-      t.appendChild(el("span", "tile__name", sl.app));
+      var nm = el("span", "tile__name", sl.app);
+      if (sl.featured) nm.appendChild(el("span", "tile__badge", "Featured"));
+      t.appendChild(nm);
       t.appendChild(el("span", "tile__tag", sl.tag));
       var arrow = el("span", "tile__go");
       arrow.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -210,12 +212,27 @@
 
     var head = el("header", "slide__head");
     var hl = el("div", "slide__headl");
+    if (sl.featured) {
+      s.classList.add("slide--featured");
+      hl.appendChild(el("p", "badge rise", "Featured case study"));
+    }
     hl.appendChild(el("p", "kicker rise", sl.kicker));
     hl.appendChild(el("h2", "slide__title rise", sl.title));
     head.appendChild(hl);
     var hr = el("div", "slide__headr");
     hr.appendChild(el("p", "slide__lede rise", sl.lede));
-    hr.appendChild(el("p", "slide__tag rise", sl.tag));
+    if (sl.stats) {
+      var st = el("dl", "slide__stats rise");
+      sl.stats.forEach(function (x) {
+        var d = el("div");
+        d.appendChild(el("dt", null, x[0]));
+        d.appendChild(el("dd", null, x[1]));
+        st.appendChild(d);
+      });
+      hr.appendChild(st);
+    } else {
+      hr.appendChild(el("p", "slide__tag rise", sl.tag));
+    }
     head.appendChild(hr);
     s.appendChild(head);
 
@@ -223,7 +240,9 @@
     var wires = svg("svg", { class: "wires", viewBox: "0 0 1472 600", width: "1472", height: "600", "aria-hidden": "true" });
     canvas.appendChild(wires);
 
+    var byId = {};
     (sl.groups || []).forEach(function (g) {
+      if (g.id) byId[g.id] = { x: g.x, y: g.y, w: g.w, h: g.h };
       var gr = el("div", "group");
       gr.style.cssText = "left:" + g.x + "px;top:" + g.y + "px;width:" + g.w + "px;height:" + g.h + "px";
       gr.appendChild(el("span", "group__label", g.t));
@@ -243,7 +262,6 @@
       canvas.appendChild(l);
     });
 
-    var byId = {};
     var kindsUsed = {};
     sl.nodes.forEach(function (n, i) {
       byId[n.id] = n;
@@ -407,6 +425,7 @@
       var on = sl.nodes.filter(function (x) {
         return x.id === other;
       })[0];
+      if (!on) return;
       var li = el("li");
       var btn = el("button", "link-chip link-chip--" + KINDS[on.k].cls);
       btn.type = "button";
@@ -578,7 +597,7 @@
       go(slides.length - 1);
     } else if (e.key === "f" || e.key === "F") {
       toggleFull();
-    } else if (/^[1-8]$/.test(e.key)) {
+    } else if (/^[1-9]$/.test(e.key)) {
       go(parseInt(e.key, 10) - 1);
     }
   });

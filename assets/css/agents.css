@@ -1065,3 +1065,100 @@
     animation: none;
   }
 }
+
+/* Featured case study */
+
+.slide--featured::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: linear-gradient(90deg, #59c7fc, #16ffc6);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal-soft);
+}
+.badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16ffc6;
+  box-shadow: 0 0 0 0 rgba(22, 255, 198, 0.6);
+  animation: ring 2.4s var(--ease) infinite;
+}
+.slide__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.slide__stats dt {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--teal-deep);
+}
+.slide__stats dd {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.slide--featured .slide__lede {
+  font-size: 17px;
+}
+.tile--featured {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+.tile--featured .tile__num {
+  color: var(--teal-soft);
+}
+.tile--featured .tile__tag {
+  color: var(--teal-soft);
+}
+.tile--featured:hover {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+}
+.tile__badge {
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(22, 255, 198, 0.14);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  vertical-align: 4px;
+  color: #16ffc6;
+}
+.cover__tiles {
+  gap: 8px;
+}
+.cover__tiles .tile {
+  padding-block: 13px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge::before {
+    animation: none;
+  }
+}

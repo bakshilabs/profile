@@ -6,11 +6,11 @@
 
 window.AGENT_DECK = {
   cover: {
-    kicker: "Bakshi Labs · Seven tools",
+    kicker: "Bakshi Labs · Eight tools",
     title: "Agent Workflows",
-    lede: "Each slide maps how the agents in one tool hand work to each other. Hover over a card to flip it, and click it to read the full description.",
+    lede: "Each slide maps how the agents in one of eight tools hand work to each other. Hover over a card to flip it, and click it to read the full description.",
     stats: [
-      ["13", "agents run inside four of the tools"],
+      ["22", "agents run inside five of the tools"],
       ["6", "build agents made two of the others"],
       ["0", "agents call another agent directly"]
     ]
@@ -18,9 +18,173 @@ window.AGENT_DECK = {
 
   slides: [
     {
+      id: "prospecht",
+      app: "Prospecht",
+      featured: true,
+      kicker: "01 · Win work · Opportunity intelligence",
+      title: "Prospecht",
+      lede: "Claude finds and reads tender notices, and code checks every quote against the source. Code then works out which projects to pursue from the firm’s own profile.",
+      tag: "9 agents · 8,972 records",
+      stats: [["8,972", "published records"], ["8,871", "quotes matched"], ["178", "countries"], ["9", "agents"]],
+      cw: 222,
+      ch: 120,
+      small: true,
+      groups: [{ id: "tasks", x: 0, y: 450, w: 1472, h: 150, t: "Seven agents run from buttons in the app" }],
+      nodes: [
+        {
+          id: "feeds", k: "ext", x: 0, y: 0, n: "Official feeds",
+          s: "TED, Find a Tender, BOAMP, SAM.gov and more.",
+          b: "Tender portals and development-bank project lists are pulled over plain HTTP or SQL. No model is involved.",
+          f: [["Feeds", "TED, Find a Tender, BOAMP, PLACSP, UK portals, SAM.gov, CanadaBuys, GETS, development banks and GrowthSignal's database"], ["Source", "scripts/import-feeds.ts, scripts/feeds*.ts"]]
+        },
+        {
+          id: "sorter", k: "agent", x: 250, y: 0, n: "Feed sorter",
+          s: "Sorts notices in batches of 40.",
+          b: "It sets aside work that is not design. Each notice it keeps gets a sector, two scores, a stage, an English title and an exact quote.",
+          a: [
+            "The feed sorter reads official notices in batches of 40. It first sets aside anything that is not architecture, engineering or design work.",
+            "For each notice it keeps, it gives a sector, a sector fit score, a win probability, a stage, an English title and an exact quote from the notice. It uses the same judgement rules as the scan analyst, so imported and scanned records are scored the same way.",
+            "The last run sorted 116 batches. It added 2,075 records and set aside 746 notices."
+          ],
+          f: [["Model", "claude-sonnet-5-5, through Claude Code"], ["Tools", "None. Output must match a JSON schema"], ["Trigger", "npm run import:feeds"], ["Writes", "public/workspace.json, scripts/import-set-aside.json"], ["Source", "scripts/import-feeds.ts"]]
+        },
+        {
+          id: "web", k: "ext", x: 0, y: 150, n: "Live web",
+          s: "Search results and the pages behind them.",
+          b: "Scans search the web and read whole pages. The local page reader refuses private network addresses.",
+          f: [["Tools", "web_search and web_fetch with an API key, or WebSearch and fetch_page on a subscription"], ["Source", "src/lib/claude/scan.ts, scripts/claude-code-mcp.ts"]]
+        },
+        {
+          id: "scan", k: "agent", x: 250, y: 150, n: "Scan analyst",
+          s: "Finds live opportunities on the web.",
+          b: "It searches one sector and region, reads the best pages and records each opportunity with a quote. It never decides the verdict.",
+          a: [
+            "The scan analyst searches the web for one sector and region at a time. It can look for live tenders, early signals such as funding, land or planning, or recent awards.",
+            "It reads the most promising pages and records each opportunity through a strict record_opportunities tool, with a quote from its source. It gives two judgements, sector fit and win probability.",
+            "Its prompt says \"Do not decide Pursue, Monitor or Deprioritise.\" The app calculates the verdict instead. Records the team dismissed are passed to later scans so it skips them."
+          ],
+          f: [["Model", "claude-opus-5-5. OpenAI and Gemini are optional"], ["Tools", "Web search, page reading, record_opportunities"], ["Trigger", "The Scan view, npm run scan, or the weekly scheduled scan"], ["Cost", "About $0.45 to $1.00 a scan at the default settings"], ["Published", "101 scans found 343 records"], ["Source", "src/lib/claude/scan.ts"]]
+        },
+        {
+          id: "bridge", k: "code", x: 250, y: 300, n: "Claude Code bridge",
+          s: "Runs scans on a subscription.",
+          b: "It starts claude -p with a local server for page reading and recording, and stops at a set usage limit.",
+          f: [["Why", "Claude Code's WebFetch returns a summary, so a local fetch_page tool returns the page itself"], ["Source", "scripts/claude-code.ts, src/lib/claude/claudecode.ts"]]
+        },
+        {
+          id: "verify", k: "code", x: 500, y: 75, n: "Quote check",
+          s: "Matches every quote to the page text.",
+          b: "Each record is marked Verified, Sourced or Unconfirmed, with a count of the independent websites behind it.",
+          f: [["Published result", "8,871 Verified, 100 Sourced, 1 Unconfirmed"], ["Source", "src/lib/verify.ts"]]
+        },
+        {
+          id: "dedupe", k: "code", x: 750, y: 75, n: "Merge and log",
+          s: "Joins duplicates and logs what changed.",
+          b: "Records match on a shared link, a similar title, the client and the distance. Changes to stage, value or deadline are logged.",
+          f: [["Source", "src/lib/dedupe.ts"]]
+        },
+        {
+          id: "wsjson", k: "data", x: 1000, y: 0, n: "workspace.json",
+          s: "The 8,972 published records.",
+          b: "The published file holds 8,972 records from 178 countries, 101 scans and one firm profile.",
+          f: [["Records", "8,972"], ["Scans", "101 (51 procurement, 50 signals)"], ["Source", "public/workspace.json"]]
+        },
+        {
+          id: "deploy", k: "out", x: 1250, y: 0, n: "Tests and deploy",
+          s: "Checks the app, then publishes it.",
+          b: "CI runs type checks, 121 unit tests, a build and 15 browser tests. The site is then published to prospecht.com.",
+          f: [["Workflows", "ci.yml, pages.yml, and scan.yml every Monday at 06:17"], ["Tests", "121 Vitest and 15 Playwright cases, including a WCAG 2.2 AA contrast check"]]
+        },
+        {
+          id: "db", k: "data", x: 1000, y: 150, n: "Browser database",
+          s: "Each visitor's own copy, in IndexedDB.",
+          b: "Published records merge in when the app opens. A visitor's notes, pipeline moves and dismissals are kept.",
+          f: [["Server", "None, and no account"], ["Source", "src/lib/published.ts"]]
+        },
+        {
+          id: "profile", k: "data", x: 500, y: 300, n: "Firm profile",
+          s: "Sectors, scale, regions and thresholds.",
+          b: "Weights are 35 for sector, 20 for scale, 15 for geography, 20 for win and 10 for timing. Thresholds set each verdict.",
+          f: [["Default Pursue thresholds", "Score 75, sector 60, win 35"], ["Source", "src/data/profiles.ts"]]
+        },
+        {
+          id: "score", k: "code", x: 1000, y: 300, n: "Verdict calculator",
+          s: "Code decides the verdict for each record.",
+          b: "It computes scale, geography and timing, adds the model's two scores and applies the firm's weights. The formula is shown.",
+          f: [["Verdicts", "Pursue, Monitor or Deprioritise"], ["Source", "src/lib/scoring.ts"]]
+        },
+        {
+          id: "views", k: "ui", x: 1250, y: 300, n: "App views",
+          s: "13 screens, from Today to the map.",
+          b: "Today, Scan, Opportunities, Pipeline, Map, Network, Ask, Briefings and Profile, among others. Their buttons start the agents below.",
+          f: [["Source", "src/views/"]]
+        },
+        {
+          id: "assess", k: "agent", x: 16, y: 482, w: 194, h: 108, n: "Assessor",
+          s: "Scores records for another firm.",
+          b: "In batches of 20 it gives sector fit, win probability, caveats and a reason. It never decides the verdict.",
+          f: [["Tool", "record_assessments"], ["Trigger", "The Profile view"], ["Source", "src/lib/claude/tasks.ts"]]
+        },
+        {
+          id: "recheck", k: "agent", x: 222, y: 482, w: 194, h: 108, n: "Re-checker",
+          s: "Refreshes one record from the web.",
+          b: "It runs up to 5 searches and reads up to 4 pages, then records what changed in the record's log.",
+          f: [["Trigger", "The Opportunity view"], ["Source", "src/lib/claude/tasks.ts"]]
+        },
+        {
+          id: "brief", k: "agent", x: 428, y: 482, w: 194, h: 108, n: "Pursuit brief writer",
+          s: "Writes a bid strategy with sources.",
+          b: "Up to 8 searches and 6 page reads. It covers the client, route, competition, risks, win themes and next steps.",
+          f: [["Stored in", "The record's brief"], ["Source", "src/lib/claude/tasks.ts"]]
+        },
+        {
+          id: "weekly", k: "agent", x: 634, y: 482, w: 194, h: 108, n: "Briefing writer",
+          s: "Writes the weekly team briefing.",
+          b: "One turn with no tools and 250 to 450 words, exported as a PowerPoint deck, a PDF or a CSV.",
+          f: [["Trigger", "The Briefings view"], ["Source", "src/lib/claude/tasks.ts"]]
+        },
+        {
+          id: "drafter", k: "agent", x: 840, y: 482, w: 194, h: 108, n: "Profile drafter",
+          s: "Builds a firm profile from its website.",
+          b: "It reads up to 8 pages and runs 4 searches, then saves the firm's sectors, scale, regions and competitors.",
+          f: [["Tool", "save_firm_profile"], ["Related", "A second task drafts a single sector"], ["Source", "src/lib/claude/tasks.ts"]]
+        },
+        {
+          id: "calib", k: "agent", x: 1046, y: 482, w: 194, h: 108, n: "Calibrator",
+          s: "Suggests rule changes from feedback.",
+          b: "Where the team disagrees with verdicts, it proposes new thresholds and sector rules for the team to accept.",
+          f: [["Tool", "propose_calibration"], ["Source", "src/lib/claude/tasks.ts"]]
+        },
+        {
+          id: "ask", k: "agent", x: 1252, y: 482, w: 194, h: 108, n: "Ask analyst",
+          s: "Answers questions about the pipeline.",
+          b: "It answers from the records, cites each one as [OPP-n] and can run up to 4 web searches.",
+          f: [["Source", "src/lib/claude/ask.ts"]]
+        }
+      ],
+      edges: [
+        ["feeds", "sorter"],
+        ["web", "scan", { bi: true }],
+        ["bridge", "scan", { bi: true }],
+        ["sorter", "verify", { fs: "r", ts: "l", tf: 0.3, mid: 486 }],
+        ["scan", "verify", { fs: "r", ts: "l", tf: 0.7, mid: 486 }],
+        ["verify", "dedupe"],
+        ["dedupe", "wsjson", { fs: "r", ts: "l", mid: 986 }],
+        ["dedupe", "db", { fs: "r", ts: "l", tf: 0.3, mid: 986 }],
+        ["wsjson", "deploy"],
+        ["deploy", "db", { fs: "b", ts: "r", l: "merged on load" }],
+        ["db", "score"],
+        ["profile", "score"],
+        ["score", "views"],
+        ["views", "tasks"],
+        ["tasks", "db", { fs: "t", fo: 0.55, ts: "l", tf: 0.7, l: "results" }]
+      ]
+    },
+
+    {
       id: "modelchat",
       app: "ModelChat",
-      kicker: "01 · Design · BIM model queries",
+      kicker: "02 · Design · BIM model queries",
       title: "ModelChat",
       lede: "One Claude agent answers questions about an IFC model. Its 14 tools either read the model index in the helper or drive the 3D viewer in the browser.",
       tag: "1 agent · 14 tools",
@@ -101,7 +265,7 @@ window.AGENT_DECK = {
     {
       id: "growthsignal",
       app: "GrowthSignal",
-      kicker: "02 · Win work · Bid intelligence database",
+      kicker: "03 · Win work · Bid intelligence database",
       title: "GrowthSignal",
       lede: "Seven Claude agents read and write one SQLite database. None of them calls another, and none of them can use tools.",
       tag: "7 agents · 1 database",
@@ -246,7 +410,7 @@ window.AGENT_DECK = {
     {
       id: "spd",
       app: "Strategic Project Discovery",
-      kicker: "03 · Win work · Live project search",
+      kicker: "04 · Win work · Live project search",
       title: "Strategic Project Discovery",
       lede: "One Gemini agent runs for each sector scan. It searches the web through Google Search and returns scored opportunities as JSON.",
       tag: "1 agent · 1 search tool",
@@ -348,7 +512,7 @@ window.AGENT_DECK = {
     {
       id: "worknodescanvas",
       app: "WorkNodesCanvas",
-      kicker: "04 · Deliver · Document workbench",
+      kicker: "05 · Deliver · Document workbench",
       title: "WorkNodesCanvas",
       lede: "Four Claude agents run from the canvas. They hand work to each other only through the results saved on each node.",
       tag: "4 agents · 1 canvas",
@@ -450,7 +614,7 @@ window.AGENT_DECK = {
     {
       id: "rbe",
       app: "Reference Buildings Explorer",
-      kicker: "05 · Design · Energy modelling",
+      kicker: "06 · Design · Energy modelling",
       title: "Reference Buildings Explorer",
       lede: "The explorer runs no model. A main Claude Code agent wrote a shared contract, then four subagents built the data and the views in parallel.",
       tag: "1 main agent · 4 subagents",
@@ -561,7 +725,7 @@ window.AGENT_DECK = {
     {
       id: "materialscan",
       app: "MaterialScan",
-      kicker: "06 · Design · Material compliance",
+      kicker: "07 · Design · Material compliance",
       title: "MaterialScan",
       lede: "MaterialScan runs no agent. Its verdicts are written by hand before the build, and a Python site generator turns them into static pages.",
       tag: "No agents",
@@ -638,7 +802,7 @@ window.AGENT_DECK = {
     {
       id: "southwark",
       app: "Southwark Retrofit Atlas",
-      kicker: "07 · Portfolio · Housing retrofit",
+      kicker: "08 · Portfolio · Housing retrofit",
       title: "Southwark Retrofit Atlas",
       lede: "One Claude Code session built the atlas's data files. In the browser, plain code ranks all 149,062 homes with no model calls.",
       tag: "1 build agent",
