@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Agent Architecture in 3D · Bakshi Labs</title>
-    <meta name="description" content="How the agents in each of Bakshi Labs' eight tools hand work to each other, shown as an interactive 3D slide show." />
-    <meta name="theme-color" content="#060f15" />
+    <meta name="description" content="A guided 3D story of how the agents in Bakshi Labs' eight tools share work with code, data and people." />
+    <meta name="theme-color" content="#07090b" />
     <link rel="canonical" href="https://bakshilabs.github.io/profile/agents.html" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bakshi Labs" />
     <meta property="og:title" content="Agent Architecture in 3D · Bakshi Labs" />
-    <meta property="og:description" content="How the agents in each of the eight tools hand work to each other." />
+    <meta property="og:description" content="How the agents in eight tools share work with code, data and people." />
     <meta property="og:url" content="https://bakshilabs.github.io/profile/agents-3d.html" />
     <meta property="og:image" content="https://bakshilabs.github.io/profile/assets/img/og.png" />
     <link rel="preload" href="assets/fonts/schibsted-grotesk-var.woff2" as="font" type="font/woff2" crossorigin />
@@ -34,10 +34,8 @@
   <body class="x3d">
     <a class="skip" href="#main">Skip to content</a>
 
-    <div class="x-bg" data-bg aria-hidden="true">
-      <canvas class="x-gl" data-gl></canvas>
-      <div class="x-bg__veil"></div>
-    </div>
+    <div class="x-world" data-gl-host aria-hidden="false"></div>
+    <div class="x-flat" data-flat></div>
 
     <header class="nav is-dark is-solid x-nav" data-nav>
       <div class="nav__inner">
@@ -61,52 +59,49 @@
       </div>
     </header>
 
-    <main class="x-deck" id="main" data-deck aria-roledescription="carousel" aria-label="Agent architecture">
-      <svg class="x-defs" aria-hidden="true" focusable="false">
-        <defs>
-          <marker id="x-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5fe3d0"/></marker>
-          <marker id="x-arr-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#c9fff1"/></marker>
-        </defs>
-      </svg>
-
-      <div class="x-progress" aria-hidden="true"><span data-progress></span></div>
-
-      <div class="x-world" data-world>
-        <div class="x-frame" data-frame>
-          <div class="x-stage" data-stage></div>
+    <main class="x-deck" id="main" data-deck aria-label="Agent architecture, a guided story">
+      <div class="x-ui x-rail-wrap">
+        <div class="x-rail" data-rail role="group" aria-label="Chapters"></div>
+        <div class="x-tools">
+          <button class="x-pill" type="button" data-explore>Explore the map</button>
+          <a class="x-pill" href="agents.html" data-alt>Flat view</a>
+          <button class="x-icon" type="button" data-full aria-pressed="false" aria-label="Full screen">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </div>
 
-      <div class="x-list" data-list hidden></div>
+      <section class="x-ui x-caption" data-caption aria-live="polite">
+        <div class="x-caption__copy">
+          <p class="x-kicker" data-cap-kicker></p>
+          <h1 class="x-caption__title" data-cap-title></h1>
+          <p class="x-caption__text" data-cap-text></p>
+          <div class="x-stats" data-stats hidden></div>
+          <a class="x-cta" href="index.html#contact" data-cta hidden>Start a conversation</a>
+        </div>
+        <div class="x-caption__nav">
+          <button class="x-pill" type="button" data-back hidden>Back to the map</button>
+          <span class="x-count" data-count>01 / 22</span>
+          <button class="x-icon x-icon--lg" type="button" data-prev aria-label="Previous step">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="x-icon x-icon--lg x-icon--primary" type="button" data-next aria-label="Next step">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </section>
 
       <p class="x-tip" data-tip hidden></p>
+      <div class="x-list" data-list hidden></div>
 
-      <div class="x-bar" data-bar>
-        <button class="x-btn" type="button" data-prev data-mag aria-label="Previous slide">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="x-dots" data-dots role="group" aria-label="Slides"></div>
-        <button class="x-btn" type="button" data-next data-mag aria-label="Next slide">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <span class="x-count" data-count aria-live="polite">01 / 09</span>
-        <button class="x-btn x-btn--full" type="button" data-full data-mag aria-pressed="false" aria-label="Full screen">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <a class="x-alt" href="agents.html" data-alt data-mag>
-          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-          Flat view
-        </a>
-      </div>
-
-      <noscript><p class="x-noscript">The agent workflow slides need JavaScript. The same tools are described on the <a href="index.html#work">main page</a>.</p></noscript>
+      <noscript><p class="x-noscript">This story needs JavaScript. The same tools are shown on the <a href="agents.html">flat slides</a> and the <a href="index.html#work">main page</a>.</p></noscript>
     </main>
 
     <div class="x-modal" data-modal hidden>
       <div class="x-modal__scrim" data-close></div>
       <div class="x-modal__panel" role="dialog" aria-modal="true" aria-labelledby="x-modal-title">
         <button class="x-modal__close" type="button" data-close data-close-btn aria-label="Close">
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
         <p class="x-kicker" data-m-kicker></p>
         <h2 class="x-modal__title" id="x-modal-title" data-m-title></h2>
