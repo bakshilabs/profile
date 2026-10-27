@@ -55,7 +55,7 @@ window.TRAINING_DECK = {
       short: "Example",
       kicker: "03 · Illustrative example",
       title: "Sales before and after Level 1",
-      lede: "This example follows a fictional local services business through Level 1. Each card shows one part of its sales work before the training and after it.",
+      lede: "This example follows a fictional local services business through Level 1. Each card shows one part of its sales work before the training and after it.",
       rows: [
         ["Enquiries sit in the inbox.", "Every enquiry lands in one pipeline."],
         ["Leads live in heads and spreadsheets.", "Each lead has a stage and a next step."],
@@ -147,9 +147,9 @@ window.TRAINING_DECK = {
       title: "Results for clients",
       lede: "The trainers run AI and automation work for clients, so every session uses real examples from that work.",
       results: [
-        { big: "250+", text: "executives and SME founders trained in AI." },
-        { big: "100+ hrs", text: "of weekly work automated for a LinkedIn content agency." },
-        { big: "10 hrs", text: "of manual work automated every week for a market research agency." }
+        { kind: "Training", big: "250+", text: "executives and SME founders trained in AI." },
+        { kind: "Client work", big: "100+ hrs", text: "of weekly work automated for a LinkedIn content agency." },
+        { kind: "Client work", big: "10 hrs", text: "of manual work automated every week for a market research agency." }
       ],
       note: "Client names are available on request."
     },
@@ -165,7 +165,7 @@ window.TRAINING_DECK = {
       cycle: [
         ["Reach", "You invite businesses through your network."],
         ["Deliver", "We run the sessions and the build time."],
-        ["Check in", "We check in with each business on days 7, 30 and 60."],
+        ["Check in", "We check in with each business on days 7, 30 and 60."],
         ["Report", "The outcomes come back to you."],
         ["Improve", "The next cohort starts from what worked."]
       ],

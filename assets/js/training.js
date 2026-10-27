@@ -155,7 +155,7 @@
   }
 
   /* Before: tools scattered. After: the same tools joined through one AI layer. */
-  var GAP_BEFORE = [[40, 34], [258, 18], [446, 60], [92, 132], [330, 140], [40, 236], [226, 244], [432, 228]];
+  var GAP_BEFORE = [[40, 30], [262, 10], [446, 62], [96, 140], [322, 150], [30, 262], [228, 270], [430, 236]];
   function buildGap(d, n) {
     var s = slideShell(d, n);
     head(s, d);
@@ -188,7 +188,7 @@
     var after = el("div", "gap__panel gap__panel--after");
     after.appendChild(el("p", "gap__label gap__label--after", "After · connected through an AI layer"));
     var hub = el("div", "hub");
-    var W = 620, H = 400, cx = W / 2, cy = H / 2 + 6, rx = 238, ry = 150;
+    var W = 620, H = 440, cx = W / 2, cy = H / 2, rx = 238, ry = 172;
     var spokes = '<svg class="hub__spokes" viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '" aria-hidden="true">';
     var pts = d.tools.map(function (t, i) {
       var a = -Math.PI / 2 + (i * 2 * Math.PI) / d.tools.length;
@@ -454,6 +454,7 @@
     d.results.forEach(function (r, i) {
       var c = el("div", "result");
       c.style.setProperty("--i", i);
+      c.appendChild(el("span", "result__kind", r.kind));
       c.appendChild(el("b", "result__big", r.big));
       c.appendChild(el("p", "result__text", r.text));
       grid.appendChild(c);
