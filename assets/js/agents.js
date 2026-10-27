@@ -19,10 +19,11 @@
     data: { label: "Data", cls: "data" },
     doc: { label: "Build plan", cls: "data" },
     ui: { label: "Interface", cls: "ui" },
+    person: { label: "Person", cls: "ui" },
     ext: { label: "External source", cls: "ext" },
     out: { label: "Output", cls: "out" }
   };
-  var LEGEND_ORDER = ["agent", "build", "sub", "maybe", "code", "tool", "data", "doc", "ui", "ext", "out"];
+  var LEGEND_ORDER = ["agent", "build", "sub", "maybe", "code", "tool", "data", "doc", "ui", "person", "ext", "out"];
   var touch = window.matchMedia("(hover: none)");
   var SVGNS = "http://www.w3.org/2000/svg";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -337,7 +338,7 @@
       var len = pathLength(pts);
       var trim = Math.min(0.3, 22 / len).toFixed(3);
       // Short or shared connectors carry one dot, so the motion stays calm.
-      if (!o.quiet) {
+      if (!o.quiet && len >= 60) {
         addPulse(wires, d, dur, j, false, e, trim);
         if (o.bi && len >= 120) addPulse(wires, d, dur, j, true, e, trim);
       }
@@ -439,7 +440,7 @@
     (n.f || []).forEach(function (f) {
       var row = el("div", "facts__row");
       row.appendChild(el("dt", null, f[0]));
-      row.appendChild(el("dd", /^(Model|Source|Tools?|Call|Workflows|Files|Runtime)$/.test(f[0]) ? "is-code" : null, f[1]));
+      row.appendChild(el("dd", /[\/]|\.(ts|js|py|json|md|html|txt|yml)\b|\b(claude|gemini)-|--|_/.test(f[1]) ? "is-code" : null, f[1]));
       mFacts.appendChild(row);
     });
     mFacts.hidden = !(n.f && n.f.length);
@@ -482,8 +483,14 @@
       modal.classList.add("is-open");
     });
     mPanel.scrollTop = 0;
+    requestAnimationFrame(updateFade);
     modal.querySelector("[data-close-btn]").focus();
   }
+  function updateFade() {
+    mPanel.classList.toggle("has-more", mPanel.scrollHeight - mPanel.scrollTop - mPanel.clientHeight > 4);
+  }
+  mPanel.addEventListener("scroll", updateFade);
+
   function closeModal() {
     if (modal.hidden) return;
     modal.classList.remove("is-open");
@@ -527,7 +534,7 @@
     var edges = parseInt(slides[i].dataset.edges || "0", 10);
     drawTimer = setTimeout(function () {
       slides[i].classList.add("is-drawn");
-    }, reduce ? 0 : 150 + Math.min(edges * 20, 240) + 500);
+    }, reduce ? 0 : 150 + Math.min(edges * 20, 240) + 380);
     slides.forEach(function (s) {
       s.querySelectorAll(".node.is-flipped").forEach(function (o) {
         o.classList.remove("is-flipped");
@@ -545,6 +552,7 @@
     document.querySelector("[data-prev]").disabled = i === 0;
     document.querySelector("[data-next]").disabled = i === slides.length - 1;
     buildList(i);
+    showTip(i);
     var hash = i === 0 ? "" : "#" + DECK.slides[i - 1].id;
     if (!fromHash && location.hash !== hash) history.replaceState(null, "", hash || location.pathname);
   }
@@ -582,6 +590,35 @@
           t.style.fontSize = min + "px";
         });
       });
+    });
+  }
+
+  /* A one-time tip when the slide's own hint is hidden behind the controls. */
+  var tipEl = document.querySelector("[data-tip]");
+  var tipShown = false;
+  function showTip(i) {
+    if (!tipEl || tipShown || i === 0) return;
+    var help = slides[i].querySelector(".slide__help");
+    if (help && !help.hidden && !deckEl.classList.contains("is-compact")) return;
+    tipShown = true;
+    tipEl.textContent = touch.matches ? "Tap a card to flip it, and tap again for details." : "Hover over a card to flip it, and click it for details.";
+    tipEl.hidden = false;
+    requestAnimationFrame(function () {
+      tipEl.classList.add("is-on");
+    });
+    var hide = function () {
+      tipEl.classList.remove("is-on");
+      setTimeout(function () {
+        tipEl.hidden = true;
+      }, 300);
+      stage.removeEventListener("pointerover", hide);
+    };
+    setTimeout(hide, 5000);
+    stage.addEventListener("pointerover", function once(e) {
+      if (e.target.closest(".node")) {
+        stage.removeEventListener("pointerover", once);
+        hide();
+      }
     });
   }
 

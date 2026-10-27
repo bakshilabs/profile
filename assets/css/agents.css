@@ -1496,3 +1496,81 @@
   justify-content: flex-start;
   padding-top: 12px;
 }
+
+/* Round 6 polish */
+.node__name {
+  font-weight: 500;
+}
+.node--sm .node__kind {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+.slide__foot {
+  bottom: 14px;
+}
+.modal__panel {
+  max-height: min(820px, calc(100vh - 80px));
+  max-height: min(820px, calc(100dvh - 80px));
+}
+.modal__panel.has-more {
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 40px), transparent);
+}
+.node--wide .node__short {
+  max-width: 760px;
+  font-family: var(--sans);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.deck__tip {
+  position: absolute;
+  right: 16px;
+  bottom: 62px;
+  z-index: 7;
+  max-width: 320px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 14px;
+  box-shadow: 0 16px 30px -14px rgba(12, 27, 36, 0.5);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+  pointer-events: none;
+}
+.deck__tip.is-on {
+  opacity: 1;
+  transform: none;
+}
+.deck:not(.is-compact) .deck__tip {
+  bottom: 80px;
+  right: 50%;
+  transform: translate(50%, 6px);
+}
+.deck:not(.is-compact) .deck__tip.is-on {
+  transform: translate(50%, 0);
+}
+@media (orientation: portrait) and (max-width: 1100px) {
+  .deck {
+    justify-content: flex-start;
+    padding-top: calc(var(--nav-h) + 24px);
+  }
+  .deck__list:not([hidden]) {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    max-width: 720px;
+    margin-top: 16px;
+    padding: 0 16px 32px;
+  }
+  .agents-page {
+    overflow: auto;
+  }
+}
+@media (orientation: portrait) and (min-width: 701px) and (max-width: 1100px) {
+  .deck__list:not([hidden]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
