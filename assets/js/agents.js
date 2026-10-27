@@ -22,15 +22,8 @@
     ext: { label: "External source", cls: "ext" },
     out: { label: "Output", cls: "out" }
   };
-  var LEGEND = [
-    ["agent", "Agent"],
-    ["maybe", "Possible agent"],
-    ["code", "Code step"],
-    ["data", "Data"],
-    ["ui", "Interface"],
-    ["ext", "External source"],
-    ["out", "Output"]
-  ];
+  var LEGEND_ORDER = ["agent", "build", "sub", "maybe", "code", "tool", "data", "doc", "ui", "ext", "out"];
+  var touch = window.matchMedia("(hover: none)");
   var SVGNS = "http://www.w3.org/2000/svg";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -214,9 +207,13 @@
     var hl = el("div", "slide__headl");
     if (sl.featured) {
       s.classList.add("slide--featured");
-      hl.appendChild(el("p", "badge rise", "Featured case study"));
+      var eyebrow = el("div", "slide__eyebrow rise");
+      eyebrow.appendChild(el("span", "badge", "Featured case study"));
+      eyebrow.appendChild(el("span", "kicker", sl.kicker));
+      hl.appendChild(eyebrow);
+    } else {
+      hl.appendChild(el("p", "kicker rise", sl.kicker));
     }
-    hl.appendChild(el("p", "kicker rise", sl.kicker));
     hl.appendChild(el("h2", "slide__title rise", sl.title));
     head.appendChild(hl);
     var hr = el("div", "slide__headr");
@@ -267,9 +264,9 @@
       byId[n.id] = n;
       var r = rect(sl, n);
       var kind = KINDS[n.k];
-      kindsUsed[kind.cls] = true;
+      kindsUsed[n.k] = true;
       var wide = r.w > 600;
-      var b = el("button", "node node--" + kind.cls + (wide ? " node--wide" : "") + (sl.small ? " node--sm" : ""));
+      var b = el("button", "node node--" + kind.cls + (wide ? " node--wide" : "") + (sl.small || n.tray ? " node--sm" : "") + (n.tray ? " node--tray" : ""));
       b.type = "button";
       b.dataset.node = n.id;
       b.style.cssText = "left:" + r.x + "px;top:" + r.y + "px;width:" + r.w + "px;height:" + r.h + "px;--i:" + i;
@@ -284,11 +281,20 @@
       front.appendChild(el("span", "node__short", n.s));
       var back = el("span", "node__face node__back");
       back.appendChild(el("span", "node__btext", n.b));
-      back.appendChild(el("span", "node__hint", "Click for details"));
+      back.appendChild(el("span", "node__hint", touch.matches ? "Tap again for details" : "Click for details"));
       inner.appendChild(front);
       inner.appendChild(back);
       b.appendChild(inner);
       b.addEventListener("click", function () {
+        // On touch screens the first tap flips the card and the second opens it.
+        if (touch.matches && !b.classList.contains("is-flipped")) {
+          canvas.querySelectorAll(".node.is-flipped").forEach(function (o) {
+            o.classList.remove("is-flipped");
+          });
+          b.classList.add("is-flipped");
+          focusNode(canvas, n.id, true);
+          return;
+        }
         openModal(sl, n, b);
       });
       b.addEventListener("mouseenter", function () {
@@ -314,8 +320,9 @@
       p.style.setProperty("--j", j);
       wires.appendChild(p);
       var dur = Math.max(1.6, pathLength(pts) / 110).toFixed(2);
-      addPulse(wires, d, dur, j, false, e);
-      if (o.bi) addPulse(wires, d, dur, j, true, e);
+      var trim = Math.min(0.3, 15 / pathLength(pts)).toFixed(3);
+      addPulse(wires, d, dur, j, false, e, trim);
+      if (o.bi) addPulse(wires, d, dur, j, true, e, trim);
       if (o.l) {
         var at = labelPoint(pts);
         var lab = el("span", "wire-label", o.l);
@@ -330,20 +337,21 @@
 
     var foot = el("footer", "slide__foot");
     var legend = el("ul", "legend");
-    LEGEND.forEach(function (lg) {
-      if (!kindsUsed[lg[0]]) return;
-      var li = el("li", "legend__item legend__item--" + lg[0]);
+    LEGEND_ORDER.forEach(function (k) {
+      if (!kindsUsed[k]) return;
+      var li = el("li", "legend__item legend__item--" + KINDS[k].cls);
       li.appendChild(el("i"));
-      li.appendChild(document.createTextNode(lg[1]));
+      li.appendChild(document.createTextNode(KINDS[k].label));
       legend.appendChild(li);
     });
     foot.appendChild(legend);
-    foot.appendChild(el("p", "slide__help", "Hover to flip a card · Click for details"));
+    foot.appendChild(el("p", "slide__help", touch.matches ? "Tap a card to flip it · Tap again for details" : "Hover to flip a card · Click for details"));
+    s.dataset.edges = sl.edges.length;
     s.appendChild(foot);
     return s;
   }
 
-  function addPulse(wires, d, dur, j, reverse, e) {
+  function addPulse(wires, d, dur, j, reverse, e, trim) {
     if (reduce) return;
     var c = svg("circle", { r: "4.5", class: "pulse", "data-a": e[0], "data-b": e[1] });
     var m = svg("animateMotion", {
@@ -352,11 +360,10 @@
       path: d,
       begin: -((j * 0.53 + (reverse ? parseFloat(dur) / 2 : 0)) % parseFloat(dur)).toFixed(2) + "s"
     });
-    if (reverse) {
-      m.setAttribute("keyPoints", "1;0");
-      m.setAttribute("keyTimes", "0;1");
-      m.setAttribute("calcMode", "linear");
-    }
+    var a = trim, z = (1 - trim).toFixed(3);
+    m.setAttribute("keyPoints", reverse ? z + ";" + a : a + ";" + z);
+    m.setAttribute("keyTimes", "0;1");
+    m.setAttribute("calcMode", "linear");
     c.appendChild(m);
     wires.appendChild(c);
   }
@@ -487,9 +494,15 @@
     });
     current = i;
     clearTimeout(drawTimer);
+    var edges = parseInt(slides[i].dataset.edges || "0", 10);
     drawTimer = setTimeout(function () {
       slides[i].classList.add("is-drawn");
-    }, reduce ? 0 : 1100);
+    }, reduce ? 0 : 200 + edges * 30 + 550);
+    slides.forEach(function (s) {
+      s.querySelectorAll(".node.is-flipped").forEach(function (o) {
+        o.classList.remove("is-flipped");
+      });
+    });
     dotsEl.querySelectorAll("button").forEach(function (d, k) {
       d.classList.toggle("is-current", k === i);
       if (k === i) d.setAttribute("aria-current", "step");
@@ -503,23 +516,39 @@
     if (!fromHash && location.hash !== hash) history.replaceState(null, "", hash || location.pathname);
   }
 
-  /* Fit each card's text to the lines its face has room for. */
+  /* Shrink each card's text a little, when needed, so it fits its face whole. */
   function clampText() {
-    stage.querySelectorAll(".node:not(.node--wide) .node__short, .node__btext").forEach(function (t) {
+    stage.querySelectorAll(".node__short, .node__btext").forEach(function (t) {
       var face = t.parentElement;
-      var limit = face.clientHeight - parseFloat(getComputedStyle(face).paddingBottom);
-      if (t.classList.contains("node__btext")) limit -= t.nextSibling.offsetHeight + 6;
-      var lh = parseFloat(getComputedStyle(t).lineHeight) || 20;
-      t.style.webkitLineClamp = String(Math.max(1, Math.floor((limit - t.offsetTop) / lh)));
+      var cs = getComputedStyle(face);
+      t.style.fontSize = "";
+      t.style.webkitLineClamp = "unset";
+      var base = parseFloat(getComputedStyle(t).fontSize);
+      var limit;
+      if (t.classList.contains("node__btext")) limit = face.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - t.nextSibling.offsetHeight - 6;
+      else limit = face.clientHeight - parseFloat(cs.paddingBottom) - t.offsetTop;
+      var size = base;
+      while (t.scrollHeight > limit + 1 && size > 12) {
+        size -= 0.5;
+        t.style.fontSize = size + "px";
+      }
+      if (t.scrollHeight > limit + 1) {
+        var lh = parseFloat(getComputedStyle(t).lineHeight) || 18;
+        t.style.webkitLineClamp = String(Math.max(1, Math.floor(limit / lh)));
+      }
     });
   }
 
   function fit() {
     var bar = document.querySelector(".deck__bar");
-    var navH = deckEl.classList.contains("is-full") ? 0 : document.querySelector(".nav").offsetHeight;
-    var gutter = window.innerWidth < 700 ? 12 : 32;
+    var full = deckEl.classList.contains("is-full");
+    // On laptop-height screens the controls sit over the slide's corner.
+    var compact = window.innerWidth >= 900 && (full || window.innerHeight < 940);
+    deckEl.classList.toggle("is-compact", compact);
+    var navH = full ? 0 : document.querySelector(".nav").offsetHeight;
+    var gutter = window.innerWidth < 700 ? 12 : compact ? 16 : 32;
     var availW = window.innerWidth - gutter * 2;
-    var availH = window.innerHeight - navH - bar.offsetHeight - gutter * 1.5;
+    var availH = window.innerHeight - navH - (compact ? 0 : bar.offsetHeight) - gutter * (compact ? 1 : 1.5);
     var scale = Math.max(0.1, Math.min(availW / 1600, availH / 900));
     frame.style.width = 1600 * scale + "px";
     frame.style.height = 900 * scale + "px";
@@ -528,6 +557,7 @@
 
   function fromHash() {
     var id = location.hash.slice(1);
+    if (/^\d+$/.test(id)) return Math.max(0, Math.min(DECK.slides.length, parseInt(id, 10) - 1));
     for (var i = 0; i < DECK.slides.length; i++) if (DECK.slides[i].id === id) return i + 1;
     return 0;
   }
