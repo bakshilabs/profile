@@ -1,0 +1,31 @@
+{
+ "description": "Georeferencing of aviva_stadium.glb in the viewer frame (metres, Y up, footprint centre at the origin).",
+ "referencePoint": {
+  "lat": 53.3352,
+  "lon": -6.2284
+ },
+ "bearingOfPlusZ": 343.5531910800453,
+ "bearingUncertaintyDegrees": 2,
+ "originOffsetFromReferenceMetres": {
+  "east": 11.713631266524654,
+  "north": -11.75475215943085
+ },
+ "originLatLon": {
+  "lat": 53.33509437972285,
+  "lon": -6.2282241621755015
+ },
+ "transform": "east = -x*cos(b) + z*sin(b) + te ; north = x*sin(b) + z*cos(b) + tn   (b = bearingOfPlusZ in radians)",
+ "northInModelXZ": [
+  -0.2831250930523119,
+  0.9590829899878944
+ ],
+ "eastInModelXZ": [
+  -0.9590829899878944,
+  -0.2831250930523119
+ ],
+ "fit": {
+  "outerRmsMetres": 6.100348481667035,
+  "innerRmsMetres": 4.296120619472157,
+  "iouOuter": 0.8957670101980252
+ }
+}

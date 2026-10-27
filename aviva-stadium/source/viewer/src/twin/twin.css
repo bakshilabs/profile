@@ -1,0 +1,84 @@
+/* Digital twin page, in the style of the Bakshi Labs site: paper and ink themes, a display face for headings,
+   small letter-spaced mono labels and pill controls. */
+@font-face { font-family: 'Schibsted Grotesk'; font-style: normal; font-weight: 400 900; font-display: swap; src: url('/fonts/schibsted-grotesk-var.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('/fonts/inter-var.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/plex-mono-500.woff2') format('woff2'); }
+
+:root {
+  color-scheme: light;
+  --display: 'Schibsted Grotesk', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --page: #f6f5f0; --surface: rgba(255, 255, 255, 0.92); --ink: #0c1b24; --ink2: #46585f; --muted: #5d7079; --border: #d9d8cf; --grid: #e6e5dd;
+  --accent: #0a7268; --label: #0a7268; --focus: #0e9c8e; --sel-bg: #0c1b24; --sel-fg: #ffffff; --btn-line: rgba(12, 27, 36, 0.22); --btn-hover: #0c1b24;
+  --shadow: 0 1px 1px rgba(12, 27, 36, 0.04), 0 18px 40px -22px rgba(12, 27, 36, 0.28);
+  font-family: var(--sans);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+    --page: #0c1b24; --surface: rgba(18, 38, 48, 0.92); --ink: #f2f6f6; --ink2: #b4c4ca; --muted: #8fa4ad; --border: #28404d; --grid: #223a47;
+    --accent: #8fdcd2; --label: #8fdcd2; --focus: #16ffc6; --sel-bg: #8fdcd2; --sel-fg: #0c1b24; --btn-line: rgba(143, 166, 176, 0.45); --btn-hover: #16ffc6;
+    --shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 18px 40px -22px rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page: #0c1b24; --surface: rgba(18, 38, 48, 0.92); --ink: #f2f6f6; --ink2: #b4c4ca; --muted: #8fa4ad; --border: #28404d; --grid: #223a47;
+  --accent: #8fdcd2; --label: #8fdcd2; --focus: #16ffc6; --sel-bg: #8fdcd2; --sel-fg: #0c1b24; --btn-line: rgba(143, 166, 176, 0.45); --btn-hover: #16ffc6;
+  --shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 18px 40px -22px rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--page); color: var(--ink); overflow: hidden; }
+body { font-family: var(--sans); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; font-feature-settings: 'ss01', 'cv11'; }
+h1, p { margin: 0; }
+a { color: inherit; }
+::selection { background: #8fdcd2; color: #0c1b24; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+#app { position: fixed; inset: 0; }
+#app canvas { display: block; }
+
+.card { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); backdrop-filter: blur(8px); }
+#controls { left: 16px; top: 16px; width: 308px; max-height: calc(100vh - 110px); overflow: auto; padding: 14px 16px 14px; }
+#controls summary { list-style: none; }
+#controls summary::-webkit-details-marker { display: none; }
+.brand { display: inline-block; font-family: var(--display); font-size: 17px; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; }
+#controls h1 { font-family: var(--display); font-size: 21px; font-weight: 450; letter-spacing: -0.02em; line-height: 1.15; margin: 6px 0 2px; }
+.sub { color: var(--ink2); font-size: 12.5px; }
+.label { display: block; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--label); margin: 14px 0 6px; }
+.pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.pill, button.pill {
+  display: inline-flex; align-items: center; min-height: 28px; padding: 0 11px; border: 1px solid var(--btn-line); border-radius: 999px; background: transparent; cursor: pointer;
+  color: var(--ink); font-size: 12.5px; font-weight: 550; line-height: 1; text-decoration: none; white-space: nowrap; user-select: none;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.pill:hover { border-color: var(--btn-hover); }
+.pill input { position: absolute; opacity: 0; pointer-events: none; }
+.pill:has(input:checked) { background: var(--sel-bg); border-color: var(--sel-bg); color: var(--sel-fg); }
+.pill:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
+input[type='range'] { width: 100%; margin: 4px 0; accent-color: var(--accent); }
+#sunText { color: var(--ink2); font-size: 12.5px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.links { display: flex; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+#compass { right: 16px; top: 16px; width: 92px; height: 92px; padding: 0; border-radius: 50%; }
+#credits { left: 16px; right: 16px; bottom: 12px; padding: 8px 14px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+#credits b { color: var(--ink); font-weight: 600; }
+#credits p + p { margin-top: 2px; }
+#credits a { color: inherit; }
+
+#loading { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; background: var(--page); transition: opacity 0.4s; }
+#loading .box { width: 300px; text-align: center; }
+#loading h2 { font-family: var(--display); font-size: 28px; font-weight: 400; letter-spacing: -0.02em; margin: 0 0 6px; }
+#status { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--label); }
+#bar { height: 3px; background: var(--grid); border-radius: 2px; overflow: hidden; margin-top: 14px; }
+#fill { height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+
+@media (max-width: 760px) {
+  #controls { width: calc(100vw - 32px); max-height: 62vh; }
+  #controls:not([open]) { padding-bottom: 10px; }
+  #controls > summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  #controls > summary::after { content: 'Controls'; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--label); }
+  #compass { top: auto; bottom: 74px; width: 70px; height: 70px; }
+  #credits { font-size: 10.5px; }
+}

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aviva Stadium Viewer</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #dfe6ec; font-family: system-ui, sans-serif; }
+      #app { position: fixed; inset: 0; }
+      .card { background: rgba(255,255,255,0.88); border-radius: 6px; font-size: 12px; line-height: 1.5; color: #222; }
+      #hud { position: fixed; left: 12px; bottom: 12px; padding: 8px 12px; max-width: 360px; }
+      #hud a { color: inherit; }
+      #panel { position: fixed; left: 12px; top: 12px; width: 250px; padding: 10px 12px; box-sizing: border-box; }
+      #panel .row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+      #panel .row > label:first-child { width: 36px; }
+      #panel input[type=range] { flex: 1; min-width: 0; }
+      #panel .val { width: 62px; text-align: right; font-variant-numeric: tabular-nums; }
+      #panel button { font: inherit; padding: 2px 8px; border: 1px solid #9aa5b1; background: #fff; border-radius: 4px; cursor: pointer; }
+      #panel .buttons { flex-wrap: wrap; }
+      #sunInfo { margin-top: 4px; color: #444; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                 gap: 10px; background: #dfe6ec; color: #222; font-size: 14px; transition: opacity 0.4s; }
+      #bar { width: 240px; height: 4px; background: #b8c2cc; border-radius: 2px; overflow: hidden; }
+      #bar > div { height: 100%; width: 0; background: #2f6fed; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="loading"><div id="status">Loading model</div><div id="bar"><div id="fill"></div></div></div>
+    <div id="panel" class="card">
+      <div class="row"><label for="day">Date</label><input id="day" type="range" min="1" max="365" value="172" /><span id="dayLabel" class="val"></span></div>
+      <div class="row"><label for="minute">Time</label><input id="minute" type="range" min="0" max="1430" step="10" value="780" /><span id="timeLabel" class="val"></span></div>
+      <div class="row buttons">
+        <button id="play">Play</button>
+        <button data-preset="summer">Jun 21</button>
+        <button data-preset="equinox">Mar 21</button>
+        <button data-preset="winter">Dec 21</button>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="shadows" checked /> Shadows</label>
+        <label><input type="checkbox" id="path" checked /> Sun path</label>
+      </div>
+      <div id="sunInfo"></div>
+      <div id="clockNote">Time is local standard time (GMT). Add one hour for Irish summer time.</div>
+    </div>
+    <div id="hud" class="card">
+      <div id="stats"></div>
+      <div>Model: <a href="https://sketchfab.com/3d-models/aviva-stadium-d62b3a640ccb421487a650e9074609be">Aviva Stadium</a>
+        by S.Gandini, <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

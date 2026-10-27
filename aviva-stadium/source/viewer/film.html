@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aviva Stadium Solar and Comfort Film</title>
+    <style>
+      :root {
+        --bg: #0b0e13; --panel: #10151c; --line: #232b36; --text: #e7ecf2; --muted: #93a1b0;
+        font-family: Inter, system-ui, -apple-system, sans-serif;
+      }
+      html, body { margin: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
+      #stage { position: fixed; left: 0; top: 0; width: 1600px; height: 900px; }
+      canvas { position: absolute; left: 0; top: 0; }
+      .abs { position: absolute; }
+      #top { left: 0; top: 0; width: 1600px; height: 74px; border-bottom: 1px solid var(--line); box-sizing: border-box; }
+      #brand { left: 24px; top: 14px; }
+      #brand b { display: block; font-size: 19px; letter-spacing: -0.01em; }
+      #brand span { font-size: 12px; color: var(--muted); }
+      #shotTitle { left: 330px; top: 11px; width: 430px; }
+      #shotTitle b { display: block; font-size: 20px; letter-spacing: -0.01em; }
+      #shotTitle span { font-size: 12.5px; color: var(--muted); line-height: 1.35; display: block; margin-top: 2px; }
+      #clock { left: 780px; top: 8px; font-size: 44px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+      #clock small { font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: 0; margin-left: 6px; }
+      .kpi { top: 14px; width: 116px; }
+      .kpi b { display: block; font-size: 21px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+      .kpi span { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+      #progress { left: 0; top: 73px; height: 2px; width: 0; background: #3cc3cf; }
+      .label { top: 88px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+      .label b { display: block; color: var(--text); font-size: 15px; letter-spacing: -0.01em; }
+      #labL { left: 22px; } #labR { left: 822px; }
+      .legend { top: 706px; width: 770px; }
+      .bar { height: 8px; border-radius: 2px; margin: 0 2px 3px; }
+      .ticks { position: relative; height: 13px; margin: 0 2px; font-size: 10.5px; color: var(--muted); }
+      .ticks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+      .ticks.names span { color: #c4cfda; }
+      .legend .note { font-size: 10.5px; color: var(--muted); margin: 1px 2px 0; }
+      #sundial { left: 1452px; top: 3px; width: 128px; height: 68px; }
+      #legL { left: 14px; } #legR { left: 814px; }
+      #midline { left: 800px; top: 74px; width: 1px; height: 676px; background: var(--line); }
+      #fade { left: 0; top: 0; width: 1600px; height: 900px; background: var(--bg); opacity: 1; pointer-events: none; }
+      #footnote { left: 24px; top: 880px; font-size: 10.5px; color: #6f7c8a; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="top" class="abs">
+        <div id="brand" class="abs"><b>Aviva Stadium</b><span>Outdoor thermal comfort and solar exposure</span></div>
+        <div id="shotTitle" class="abs"><b id="shotName"></b><span id="shotBlurb"></span></div>
+        <div id="clock" class="abs"><span id="clockText">00:00</span><small>GMT</small></div>
+        <div class="kpi abs" style="left: 950px"><b id="kSun">0°</b><span>Sun altitude</span></div>
+        <div class="kpi abs" style="left: 1070px"><b id="kAir">0 °C</b><span>Air temp</span></div>
+        <div class="kpi abs" style="left: 1190px"><b id="kWind">0 m/s</b><span>Wind</span></div>
+        <div class="kpi abs" style="left: 1310px"><b id="kDni">0</b><span>Direct sun W/m²</span></div>
+        <canvas id="sundial" class="abs" width="128" height="68"></canvas>
+        <div id="progress" class="abs"></div>
+      </div>
+      <div id="labL" class="label abs"><b>Thermal stress (UTCI)</b>At head height: seated in the stands, standing on the pitch</div>
+      <div id="labR" class="label abs"><b>Accumulated solar energy</b>On a horizontal surface, from sunrise to the time shown</div>
+      <div id="midline" class="abs"></div>
+      <div id="legL" class="legend abs">
+        <div id="uBar" class="bar"></div>
+        <div id="uTicks" class="ticks"></div>
+        <div id="uNames" class="ticks names"></div>
+      </div>
+      <div id="legR" class="legend abs">
+        <div id="ramp" class="bar"></div>
+        <div id="rampTicks" class="ticks"></div>
+        <div class="note">Square-root scale, so low values stay visible. Energy at head height, direct sun plus sky light, in kWh/m².</div>
+      </div>
+      <canvas id="charts"></canvas>
+      <div id="footnote" class="abs">Clock time is Greenwich Mean Time. Irish summer time is one hour ahead.</div>
+      <div id="fade" class="abs"></div>
+    </div>
+    <script type="module" src="/src/film.js"></script>
+  </body>
+</html>
