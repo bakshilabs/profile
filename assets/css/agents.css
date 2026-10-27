@@ -1602,3 +1602,18 @@
 .cover__hint {
   color: var(--muted);
 }
+
+/* Round 8 polish */
+.deck.is-compact:not(.is-full) {
+  padding-top: calc(var(--nav-h) + 12px);
+}
+.deck.is-compact .deck__tip,
+.deck.is-compact .deck__tip.is-on {
+  left: 24px;
+  right: auto;
+  bottom: 56px;
+  max-width: 340px;
+}
+.wire-label {
+  padding: 4px 11px;
+}

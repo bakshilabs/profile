@@ -617,7 +617,10 @@ window.AGENT_DECK = {
         ],
         [
           "views",
-          "tasks"
+          "tasks",
+          {
+            "l": "buttons"
+          }
         ],
         [
           "tasks",
@@ -948,16 +951,6 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 0,
           "t": "Nightly at 03:00, in order"
-        },
-        {
-          "x": 261,
-          "y": 372,
-          "t": "Run by hand"
-        },
-        {
-          "x": 1262,
-          "y": 372,
-          "t": "Asked by users"
         }
       ],
       "nodes": [
@@ -1420,6 +1413,22 @@ window.AGENT_DECK = {
             "bi": true
           }
         ]
+      ],
+      "groups": [
+        {
+          "x": 109,
+          "y": 366,
+          "w": 996,
+          "h": 186,
+          "t": "Run by hand"
+        },
+        {
+          "x": 1113,
+          "y": 366,
+          "w": 250,
+          "h": 186,
+          "t": "Asked by users"
+        }
       ]
     },
     {
@@ -1756,7 +1765,7 @@ window.AGENT_DECK = {
         {
           "id": "pnodes",
           "k": "ui",
-          "x": 1152,
+          "x": 1172,
           "y": 0,
           "n": "Presentation nodes",
           "s": "Holds a brief and its inputs.",
@@ -1829,7 +1838,7 @@ window.AGENT_DECK = {
         {
           "id": "builder",
           "k": "agent",
-          "x": 1152,
+          "x": 1172,
           "y": 178,
           "n": "Document builder",
           "s": "Writes the deck, report or page.",
@@ -1908,7 +1917,7 @@ window.AGENT_DECK = {
         {
           "id": "file",
           "k": "out",
-          "x": 1152,
+          "x": 1172,
           "y": 356,
           "n": "Output file",
           "s": "Saves a deck, report or web page.",
@@ -2006,10 +2015,10 @@ window.AGENT_DECK = {
           "builder",
           "state",
           {
-            "fs": "r",
+            "fs": "l",
             "fo": 0.8,
             "ts": "t",
-            "tf": 0.9932
+            "tf": 0.699
           }
         ]
       ]
@@ -2217,7 +2226,7 @@ window.AGENT_DECK = {
           "id": "dash",
           "k": "out",
           "x": 1212,
-          "y": 0,
+          "y": 240,
           "n": "Dashboard",
           "s": "Runs from one 1.9 MB file.",
           "b": "It opens straight from disk. Its only outside download is the 3D library."
@@ -2226,7 +2235,7 @@ window.AGENT_DECK = {
           "id": "qa",
           "k": "code",
           "x": 1212,
-          "y": 420,
+          "y": 440,
           "n": "Browser check",
           "s": "Tested every tab on desktop and phone.",
           "b": "The main agent ran this check and sent each layout fault back to the bundler.",
@@ -2287,28 +2296,26 @@ window.AGENT_DECK = {
         [
           "bundle",
           "dash",
-          {
-            "fs": "t",
-            "fo": 0.88,
-            "ts": "b",
-            "tf": 0.2
-          }
+          {}
         ],
         [
           "bundle",
           "qa",
           {
             "fs": "b",
-            "ts": "l"
+            "fo": 0.3,
+            "ts": "l",
+            "tf": 0.75
           }
         ],
         [
           "qa",
           "bundle",
           {
-            "fs": "t",
-            "ts": "r",
-            "tf": 0.75,
+            "fs": "l",
+            "fo": 0.25,
+            "ts": "b",
+            "tf": 0.8,
             "l": "fix layout"
           }
         ],
@@ -2415,7 +2422,7 @@ window.AGENT_DECK = {
         {
           "id": "fetcher",
           "k": "code",
-          "x": 303,
+          "x": 606,
           "y": 440,
           "n": "Cover fetcher",
           "s": "Saves each document's first page.",

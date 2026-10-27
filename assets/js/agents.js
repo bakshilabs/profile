@@ -631,7 +631,22 @@
     listEl.textContent = "";
     var sl = DECK.slides[i - 1];
     if (!sl) {
-      listEl.hidden = true;
+      // The cover lists the tools, each opening its slide.
+      listEl.hidden = false;
+      DECK.slides.forEach(function (t, k) {
+        var li = el("li");
+        var btn = el("button", "deck__item" + (t.featured ? " deck__item--agent" : ""));
+        btn.type = "button";
+        btn.appendChild(el("span", "deck__itemkind", pad(k + 1) + (t.featured ? " · Featured" : "")));
+        btn.appendChild(el("span", "deck__itemname", t.app));
+        btn.appendChild(el("span", "deck__itemtext", t.tag));
+        btn.addEventListener("click", function () {
+          go(k + 1);
+          window.scrollTo(0, 0);
+        });
+        li.appendChild(btn);
+        listEl.appendChild(li);
+      });
       return;
     }
     listEl.hidden = false;
@@ -664,7 +679,7 @@
     var navH = full || getComputedStyle(navEl).display === "none" ? 0 : navEl.offsetHeight;
     var gutter = window.innerWidth < 700 ? 12 : compact ? 12 : 32;
     var availW = window.innerWidth - gutter * 2 - (side ? bar.offsetWidth + 10 : 0);
-    var availH = window.innerHeight - navH - (compact || side ? 0 : bar.offsetHeight) - gutter * (compact || side ? 1 : 1.5);
+    var availH = window.innerHeight - navH - (compact || side ? 0 : bar.offsetHeight) - gutter * (compact || side ? 1 : 1.5) - (compact && !full ? 12 : 0);
     var scale = Math.max(0.1, Math.min(availW / 1600, availH / 900));
     stage.style.setProperty("--bar-gap", compact ? (bar.offsetWidth + 28) / scale + "px" : "0px");
     requestAnimationFrame(function () {
