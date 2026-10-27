@@ -9,7 +9,7 @@ It is a static single page with no build step. Edit the files directly and push 
 | `index.html` | All page content: hero, work, method, services, about, contact, and the seven case-study sheets |
 | `agents.html` | The agent workflow slide show, one slide per tool, linked from the Agents menu item |
 | `agents-3d.html` | The 3D version of the agent slide show, linked from the 3D view button on the flat deck |
-| `workflows.html` | The Sustainable Design Workflows slide show, linked from the Workflows menu item |
+| `workflows.html` | The Workflow Discovery slide show, linked from the Workflows menu item |
 | `training.html` | The AI training programme slide show for small businesses, linked from the Training menu item |
 | `assets/css/site.css` | Styles, with the colour and type tokens at the top |
 | `assets/js/site.js` | Navigation, case-study sheets, walkthrough steps, demo video, copy button |
