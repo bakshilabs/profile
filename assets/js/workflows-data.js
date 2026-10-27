@@ -1,5 +1,5 @@
 /* Bakshi Labs: content for the sustainable design workflow slides.
-   Taken from the Sustainable Design Workflows deck in the pain-points repo
+   Taken from the workflows deck in the pain-points repo
    (deck-workflows/sustainability.json), with British spelling.
    Each practice area has four workflows (before, pain point, with Claude and
    sign-off, plus a sentence for each in the detail window) and one featured
@@ -9,8 +9,8 @@
 
 window.WORKFLOW_DECK = {
   "cover": {
-    "kicker": "Bakshi Labs · Sustainability practice",
-    "title": "Sustainable Design Workflows",
+    "kicker": "Bakshi Labs · Consulting example",
+    "title": "Workflow Discovery",
     "lede": "Each slide shows how one area of sustainability consulting runs today, and how it runs with Claude. The areas include LEED, energy modelling and ESG reporting. A named professional signs off every workflow.",
     "stats": [
       [

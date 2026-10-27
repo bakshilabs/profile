@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Agent Architecture in 3D · Bakshi Labs</title>
+    <meta name="description" content="A guided 3D story of how the agents in Bakshi Labs' eight tools share work with code, data and people." />
+    <meta name="theme-color" content="#07090b" />
+    <link rel="canonical" href="https://bakshilabs.github.io/profile/agents.html" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bakshi Labs" />
+    <meta property="og:title" content="Agent Architecture in 3D · Bakshi Labs" />
+    <meta property="og:description" content="How the agents in eight tools share work with code, data and people." />
+    <meta property="og:url" content="https://bakshilabs.github.io/profile/agents-3d.html" />
+    <meta property="og:image" content="https://bakshilabs.github.io/profile/assets/img/og.png" />
+    <link rel="preload" href="assets/fonts/schibsted-grotesk-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/plex-mono-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" crossorigin />
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <link rel="stylesheet" href="assets/css/agents-3d.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script src="assets/js/agents-data.js" defer></script>
+    <script type="module" src="assets/js/agents-3d.js"></script>
+  </head>
+  <body class="x3d">
+    <a class="skip" href="#main">Skip to content</a>
+
+    <div class="x-world" data-gl-host aria-hidden="false"></div>
+    <div class="x-flat" data-flat></div>
+
+    <header class="nav is-dark is-solid x-nav" data-nav>
+      <div class="nav__inner">
+        <a class="brand" href="index.html" aria-label="Bakshi Labs, home">
+          <span class="brand__name">Bakshi Labs</span>
+        </a>
+        <nav class="nav__links" id="nav-links" aria-label="Sections">
+          <a href="index.html#work">Work</a>
+          <a class="is-current" href="agents.html" aria-current="page">Agents</a>
+          <a href="workflows.html">Workflows</a>
+          <a href="training.html">Training</a>
+          <a href="index.html#method">Method</a>
+          <a href="index.html#services">Services</a>
+          <a href="index.html#about">About</a>
+          <a class="nav__cta" href="index.html#contact">Start a conversation</a>
+        </nav>
+        <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" data-nav-toggle>
+          <span class="sr-only">Menu</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path class="i-open" d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="i-close" d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="x-deck" id="main" data-deck aria-label="Agent architecture, a guided story">
+      <div class="x-ui x-rail-wrap">
+        <div class="x-rail" data-rail role="group" aria-label="Chapters"></div>
+        <div class="x-tools">
+          <button class="x-pill" type="button" data-explore>Explore the map</button>
+          <a class="x-pill" href="agents.html" data-alt>Flat view</a>
+          <button class="x-icon" type="button" data-full aria-pressed="false" aria-label="Full screen">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <section class="x-ui x-caption" data-caption aria-live="polite">
+        <div class="x-caption__copy">
+          <p class="x-kicker" data-cap-kicker></p>
+          <h1 class="x-caption__title" data-cap-title></h1>
+          <p class="x-caption__text" data-cap-text></p>
+          <div class="x-stats" data-stats hidden></div>
+          <a class="x-cta" href="index.html#contact" data-cta hidden>Start a conversation</a>
+        </div>
+        <div class="x-caption__nav">
+          <button class="x-pill" type="button" data-back hidden>Back to the map</button>
+          <span class="x-count" data-count>01 / 22</span>
+          <button class="x-icon x-icon--lg" type="button" data-prev aria-label="Previous step">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="x-icon x-icon--lg x-icon--primary" type="button" data-next aria-label="Next step">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <p class="x-tip" data-tip hidden></p>
+      <div class="x-list" data-list hidden></div>
+
+      <noscript><p class="x-noscript">This story needs JavaScript. The same tools are shown on the <a href="agents.html">flat slides</a> and the <a href="index.html#work">main page</a>.</p></noscript>
+    </main>
+
+    <div class="x-modal" data-modal hidden>
+      <div class="x-modal__scrim" data-close></div>
+      <div class="x-modal__panel" role="dialog" aria-modal="true" aria-labelledby="x-modal-title">
+        <button class="x-modal__close" type="button" data-close data-close-btn aria-label="Close">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <p class="x-kicker" data-m-kicker></p>
+        <h2 class="x-modal__title" id="x-modal-title" data-m-title></h2>
+        <div class="x-modal__body" data-m-body></div>
+        <dl class="x-facts" data-m-facts></dl>
+        <div class="x-modal__links">
+          <p class="x-kicker x-kicker--quiet">Connected to</p>
+          <ul data-m-links></ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
