@@ -1617,3 +1617,49 @@
 .wire-label {
   padding: 4px 11px;
 }
+
+/* Round 9 polish */
+.group--left .group__label {
+  left: 18px;
+  right: auto;
+  text-align: left;
+}
+.group--right .group__label {
+  left: auto;
+  right: 18px;
+  text-align: right;
+}
+.node--wide .node__front {
+  justify-content: flex-start;
+}
+.modal__panel.has-more {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.modal__panel.has-more::after {
+  content: "";
+  position: sticky;
+  bottom: -36px;
+  display: block;
+  height: 56px;
+  margin: -56px -44px -36px;
+  background: linear-gradient(rgba(246, 245, 240, 0), var(--paper) 80%);
+  pointer-events: none;
+}
+.deck.is-compact .slide__help {
+  display: none;
+}
+.deck.is-compact .deck__tip,
+.deck.is-compact .deck__tip.is-on {
+  top: 14px;
+  bottom: auto;
+  left: 50%;
+  right: auto;
+  max-width: 420px;
+}
+.deck.is-compact .deck__tip {
+  transform: translate(-50%, -6px);
+}
+.deck.is-compact .deck__tip.is-on {
+  transform: translate(-50%, 0);
+}

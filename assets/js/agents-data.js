@@ -1420,14 +1420,16 @@ window.AGENT_DECK = {
           "y": 366,
           "w": 996,
           "h": 186,
-          "t": "Run by hand"
+          "t": "Run by hand",
+          "align": "left"
         },
         {
           "x": 1113,
           "y": 366,
-          "w": 250,
+          "w": 344,
           "h": 186,
-          "t": "Asked by users"
+          "t": "Asked by users",
+          "align": "right"
         }
       ]
     },
@@ -2715,7 +2717,13 @@ window.AGENT_DECK = {
         ],
         [
           "controls",
-          "recompute"
+          "recompute",
+          {
+            "fs": "b",
+            "fo": 0.3,
+            "ts": "t",
+            "tf": 0.3
+          }
         ],
         [
           "recompute",
@@ -2726,7 +2734,7 @@ window.AGENT_DECK = {
           "score",
           {
             "fs": "t",
-            "fo": 0.92,
+            "fo": 0.7,
             "ts": "t",
             "tf": 0.3,
             "mid": 184,
