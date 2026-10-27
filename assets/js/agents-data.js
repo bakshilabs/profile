@@ -31,7 +31,7 @@ window.AGENT_DECK = {
       "featured": true,
       "kicker": "01 · Win work · Opportunity intelligence",
       "title": "Prospecht",
-      "lede": "Claude finds tender notices, and code checks every quote against its source. A formula then decides which projects to pursue.",
+      "lede": "Prospecht finds projects worth bidding for. Claude reads tender notices, code checks every quote, and a formula picks what to pursue.",
       "tag": "9 agents · 8,972 records",
       "stats": [
         [
@@ -51,16 +51,16 @@ window.AGENT_DECK = {
           "agents"
         ]
       ],
-      "cw": 200,
-      "ch": 112,
+      "cw": 210,
+      "ch": 116,
       "small": true,
       "groups": [
         {
           "id": "tasks",
           "x": 0,
-          "y": 456,
+          "y": 440,
           "w": 1472,
-          "h": 144,
+          "h": 160,
           "t": "Seven agents run from buttons in the app"
         }
       ],
@@ -72,7 +72,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Official feeds",
           "s": "Supplies official tender notices.",
-          "b": "Tender portals and development bank project lists are downloaded directly. No model is involved at this step.",
+          "b": "Official portals and development banks are downloaded with no AI.",
           "f": [
             [
               "Feeds",
@@ -82,16 +82,19 @@ window.AGENT_DECK = {
               "Source",
               "scripts/import-feeds.ts, scripts/feeds*.ts"
             ]
+          ],
+          "a": [
+            "Tender portals and development bank project lists are downloaded directly. No AI is involved at this step."
           ]
         },
         {
           "id": "sorter",
           "k": "agent",
-          "x": 254,
+          "x": 252,
           "y": 0,
           "n": "Feed sorter",
           "s": "Sorts notices in batches of 40.",
-          "b": "It sets aside work that is not design. Each notice it keeps gets a sector, two scores, a stage, an English title and an exact quote.",
+          "b": "It sets aside non-design work and tags each notice it keeps with a quote.",
           "a": [
             "The feed sorter reads official notices in batches of 40. It first sets aside anything that is not architecture, engineering or design work.",
             "For each notice it keeps, it gives a sector, a sector fit score, a win probability, a stage, an English title and an exact quote from the notice. It uses the same judgement rules as the scan analyst, so imported and scanned records are scored the same way.",
@@ -124,10 +127,10 @@ window.AGENT_DECK = {
           "id": "web",
           "k": "ext",
           "x": 0,
-          "y": 152,
+          "y": 150,
           "n": "Live web",
           "s": "Supplies search results and whole pages.",
-          "b": "Scans search the web and read whole pages. The page reader will not open addresses on private networks.",
+          "b": "Scans search the web and read whole pages, never private addresses.",
           "f": [
             [
               "Tools",
@@ -142,15 +145,15 @@ window.AGENT_DECK = {
         {
           "id": "scan",
           "k": "agent",
-          "x": 254,
-          "y": 152,
+          "x": 252,
+          "y": 150,
           "n": "Scan analyst",
           "s": "Finds live opportunities on the web.",
-          "b": "It searches one sector and region, reads the best pages and records each opportunity with a quote. It never decides the verdict.",
+          "b": "It records each lead with a quote from its page. It never sets the verdict.",
           "a": [
             "The scan analyst searches the web for one sector and region at a time. It can look for live tenders, early signals such as funding, land or planning, or recent awards.",
-            "It reads the most promising pages and records each opportunity through a strict record_opportunities tool, with a quote from its source. It gives two judgements, sector fit and win probability.",
-            "Its prompt says \"Do not decide Pursue, Monitor or Deprioritise.\" The app calculates the verdict instead. Records the team dismissed are passed to later scans so it skips them."
+            "It reads the most promising pages and records each opportunity on a fixed form, with a quote from its source. It gives two judgements, sector fit and win probability.",
+            "Its instructions say \"Do not decide Pursue, Monitor or Deprioritise.\" The app calculates the verdict instead. Records the team dismissed are passed to later scans so it skips them."
           ],
           "f": [
             [
@@ -176,36 +179,21 @@ window.AGENT_DECK = {
             [
               "Source",
               "src/lib/claude/scan.ts"
-            ]
-          ]
-        },
-        {
-          "id": "bridge",
-          "k": "code",
-          "x": 254,
-          "y": 304,
-          "n": "Claude Code bridge",
-          "s": "Lets scans run on a subscription.",
-          "b": "It lets scans run on a Claude subscription. It starts Claude Code with a local page reader and stops at a set usage limit.",
-          "f": [
-            [
-              "Why",
-              "Claude Code's WebFetch returns a summary, so a local fetch_page tool returns the page itself"
             ],
             [
-              "Source",
-              "scripts/claude-code.ts, src/lib/claude/claudecode.ts"
+              "Subscription",
+              "Scans can also run on a Claude subscription through Claude Code, with a local page reader that returns whole pages"
             ]
           ]
         },
         {
           "id": "verify",
           "k": "code",
-          "x": 509,
-          "y": 76,
+          "x": 505,
+          "y": 75,
           "n": "Quote check",
           "s": "Matches every quote to its source page.",
-          "b": "Each record is marked Verified, Sourced or Unconfirmed, with a count of the independent websites behind it.",
+          "b": "Each record is marked Verified, Sourced or Unconfirmed.",
           "f": [
             [
               "Published result",
@@ -215,31 +203,37 @@ window.AGENT_DECK = {
               "Source",
               "src/lib/verify.ts"
             ]
+          ],
+          "a": [
+            "Each record is marked Verified, Sourced or Unconfirmed, with a count of the independent websites behind it."
           ]
         },
         {
           "id": "dedupe",
           "k": "code",
-          "x": 763,
-          "y": 76,
+          "x": 757,
+          "y": 75,
           "n": "Merge and log",
           "s": "Joins duplicates and logs what changed.",
-          "b": "Records match on a shared link, a similar title, the same client and a nearby location. Changes to stage, value or deadline are logged.",
+          "b": "Duplicates are matched by link, title, client and place.",
           "f": [
             [
               "Source",
               "src/lib/dedupe.ts"
             ]
+          ],
+          "a": [
+            "Records match on a shared link, a similar title, the same client and a nearby location. Changes to stage, value or deadline are logged."
           ]
         },
         {
           "id": "wsjson",
           "k": "data",
-          "x": 1018,
+          "x": 1010,
           "y": 0,
           "n": "Published records",
           "s": "Holds the records every visitor sees.",
-          "b": "The published file also holds 101 scans and one firm profile. Its records come from 178 countries.",
+          "b": "It also holds 101 scans and a firm profile for every visitor.",
           "f": [
             [
               "Records",
@@ -258,11 +252,11 @@ window.AGENT_DECK = {
         {
           "id": "deploy",
           "k": "out",
-          "x": 1272,
+          "x": 1262,
           "y": 0,
           "n": "Tests and deploy",
-          "s": "Checks the app, then publishes it.",
-          "b": "Each change passes type checks, 121 unit tests, a build and 15 browser tests before the site goes live at prospecht.com.",
+          "s": "Tests the app, then publishes it.",
+          "b": "121 unit tests and 15 browser tests run before each release.",
           "f": [
             [
               "Workflows",
@@ -272,16 +266,19 @@ window.AGENT_DECK = {
               "Tests",
               "121 Vitest and 15 Playwright cases, including a WCAG 2.2 AA contrast check"
             ]
+          ],
+          "a": [
+            "Each change passes type checks, 121 unit tests, a build and 15 browser tests before the site goes live at prospecht.com."
           ]
         },
         {
           "id": "db",
           "k": "data",
-          "x": 1018,
-          "y": 152,
+          "x": 1010,
+          "y": 150,
           "n": "Browser database",
           "s": "Keeps each visitor's own copy.",
-          "b": "Published records are added each time the app opens. A visitor's notes, pipeline moves and dismissals stay in their browser.",
+          "b": "Notes, pipeline moves and dismissals stay in each visitor's browser.",
           "f": [
             [
               "Server",
@@ -291,16 +288,19 @@ window.AGENT_DECK = {
               "Source",
               "src/lib/published.ts"
             ]
+          ],
+          "a": [
+            "Published records are added each time the app opens. A visitor's notes, pipeline moves and dismissals stay in their browser, with no server or account."
           ]
         },
         {
           "id": "profile",
           "k": "data",
-          "x": 763,
-          "y": 304,
+          "x": 757,
+          "y": 300,
           "n": "Firm profile",
           "s": "Sets sectors, scale, regions and thresholds.",
-          "b": "Weights are 35 for sector, 20 for scale, 15 for geography, 20 for win and 10 for timing. Thresholds set each verdict.",
+          "b": "Its weights and thresholds turn scores into verdicts.",
           "f": [
             [
               "Default Pursue thresholds",
@@ -310,16 +310,19 @@ window.AGENT_DECK = {
               "Source",
               "src/data/profiles.ts"
             ]
+          ],
+          "a": [
+            "Weights are 35 for sector, 20 for scale, 15 for geography, 20 for win and 10 for timing. The firm's thresholds then set each verdict."
           ]
         },
         {
           "id": "score",
           "k": "code",
-          "x": 1018,
-          "y": 304,
+          "x": 1010,
+          "y": 300,
           "n": "Verdict calculator",
           "s": "Decides the verdict for each record.",
-          "b": "It works out scale, geography and timing, adds the model's two scores and applies the firm's weights. The formula is shown.",
+          "b": "It adds Claude's two scores to computed scale, place and timing.",
           "f": [
             [
               "Verdicts",
@@ -329,33 +332,39 @@ window.AGENT_DECK = {
               "Source",
               "src/lib/scoring.ts"
             ]
+          ],
+          "a": [
+            "It works out scale, geography and timing, adds Claude's two scores and applies the firm's weights. The formula is shown beside every verdict."
           ]
         },
         {
           "id": "views",
           "k": "ui",
-          "x": 1272,
-          "y": 304,
+          "x": 1262,
+          "y": 300,
           "n": "App views",
           "s": "Holds 13 screens, from Today to the map.",
-          "b": "The 13 screens include Today, Scan, Opportunities, Pipeline, Map and Profile. Their buttons start the agents below.",
+          "b": "Buttons on these screens start the seven agents below.",
           "f": [
             [
               "Source",
               "src/views/"
             ]
+          ],
+          "a": [
+            "The 13 screens include Today, Scan, Opportunities, Pipeline, Map, Network, Ask, Briefings and Profile. Their buttons start the seven agents in the tray below."
           ]
         },
         {
           "id": "assess",
           "k": "agent",
           "x": 16,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Assessor",
-          "s": "Scores records for another firm.",
-          "b": "It scores records in batches of 20 for another firm. It never decides the verdict.",
+          "s": "Scores records for a different firm.",
+          "b": "It uses that firm's profile, 20 records at a time.",
           "f": [
             [
               "Tool",
@@ -376,12 +385,12 @@ window.AGENT_DECK = {
           "id": "recheck",
           "k": "agent",
           "x": 222,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Re-checker",
           "s": "Refreshes one record.",
-          "b": "It runs up to 5 searches and 4 page reads, then logs what changed.",
+          "b": "It runs up to 5 searches, then logs what changed.",
           "f": [
             [
               "Trigger",
@@ -398,12 +407,12 @@ window.AGENT_DECK = {
           "id": "brief",
           "k": "agent",
           "x": 428,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Pursuit brief writer",
           "s": "Writes a cited bid strategy.",
-          "b": "It reads up to 6 pages, then sets out the client, route, rivals, risks and next steps.",
+          "b": "It sets out the client, route, rivals, risks and next steps.",
           "f": [
             [
               "Stored in",
@@ -420,12 +429,12 @@ window.AGENT_DECK = {
           "id": "weekly",
           "k": "agent",
           "x": 634,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Briefing writer",
           "s": "Writes the weekly team briefing.",
-          "b": "It writes 250 to 450 words, which export as slides, a PDF or a CSV.",
+          "b": "It writes 250 to 450 words to export as slides or a PDF.",
           "f": [
             [
               "Trigger",
@@ -442,12 +451,12 @@ window.AGENT_DECK = {
           "id": "drafter",
           "k": "agent",
           "x": 840,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Profile drafter",
           "s": "Drafts a firm's profile.",
-          "b": "It reads the firm's website and saves its sectors, regions and competitors.",
+          "b": "It reads the firm's website and saves its sectors and regions.",
           "f": [
             [
               "Tool",
@@ -468,12 +477,12 @@ window.AGENT_DECK = {
           "id": "calib",
           "k": "agent",
           "x": 1046,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Calibrator",
           "s": "Suggests rule changes from feedback.",
-          "b": "It reads the team's feedback and proposes new thresholds for the team to accept.",
+          "b": "It turns team feedback into proposed new thresholds.",
           "f": [
             [
               "Tool",
@@ -490,12 +499,12 @@ window.AGENT_DECK = {
           "id": "ask",
           "k": "agent",
           "x": 1252,
-          "y": 486,
+          "y": 470,
           "w": 194,
-          "h": 104,
+          "h": 122,
           "n": "Ask analyst",
           "s": "Answers questions about the pipeline.",
-          "b": "It answers from the records, links each one it cites and can search the web.",
+          "b": "It answers from the records and links each one it cites.",
           "f": [
             [
               "Source",
@@ -518,20 +527,13 @@ window.AGENT_DECK = {
           }
         ],
         [
-          "bridge",
-          "scan",
-          {
-            "l": "runs"
-          }
-        ],
-        [
           "sorter",
           "verify",
           {
             "fs": "r",
             "ts": "l",
             "tf": 0.3,
-            "mid": 481
+            "mid": 483
           }
         ],
         [
@@ -541,7 +543,7 @@ window.AGENT_DECK = {
             "fs": "r",
             "ts": "l",
             "tf": 0.7,
-            "mid": 481
+            "mid": 483
           }
         ],
         [
@@ -554,7 +556,7 @@ window.AGENT_DECK = {
           {
             "fs": "r",
             "ts": "l",
-            "mid": 990
+            "mid": 988
           }
         ],
         [
@@ -564,7 +566,7 @@ window.AGENT_DECK = {
             "fs": "r",
             "ts": "l",
             "tf": 0.3,
-            "mid": 990
+            "mid": 988
           }
         ],
         [
@@ -601,7 +603,7 @@ window.AGENT_DECK = {
           "db",
           {
             "fs": "t",
-            "fo": 0.4755,
+            "fo": 0.4144,
             "ts": "l",
             "tf": 0.75,
             "l": "results"
@@ -614,7 +616,7 @@ window.AGENT_DECK = {
       "app": "ModelChat",
       "kicker": "02 · Design · BIM model queries",
       "title": "ModelChat",
-      "lede": "One Claude agent answers questions about an IFC model. Its 14 tools either read the model index in the helper or drive the 3D viewer in the browser.",
+      "lede": "One Claude agent answers questions about a BIM model. Its 14 tools either look up the model's contents or move the 3D view in the browser.",
       "tag": "1 agent · 14 tools",
       "cw": 320,
       "ch": 128,
@@ -642,7 +644,7 @@ window.AGENT_DECK = {
           "x": 40,
           "y": 20,
           "n": "Chat panel",
-          "s": "Sends each message and streams the reply.",
+          "s": "Sends each message and shows the reply.",
           "b": "The panel sends each message to the helper. The reply and a chip for each tool Claude uses appear as they arrive.",
           "f": [
             [
@@ -692,12 +694,12 @@ window.AGENT_DECK = {
           "x": 1112,
           "y": 20,
           "n": "BIM assistant",
-          "s": "Answers model questions with 14 tools.",
-          "b": "It is the only model in ModelChat. It backs every number with a tool call and asks a short question when a reference is unclear.",
+          "s": "Answers questions with 14 tools.",
+          "b": "It is ModelChat's only AI. It checks every number with a tool and asks a short question when a request is unclear.",
           "a": [
-            "ModelChat's only agent answers plain-English questions about the loaded IFC model and drives the 3D viewer to show its answer.",
-            "Its system prompt tells it to back every numeric or counting answer with a tool call. A request to show something runs query_index, then isolate and focus_camera. A whole-model quantity comes from compute_quantity, with the unit and method reported.",
-            "When a reference such as \"the meeting room\" is ambiguous, it asks one short clarifying question. Replies stay short, and it does not narrate each tool call."
+            "ModelChat's only agent answers plain-English questions about the loaded building model and moves the 3D view to show its answer.",
+            "Its instructions tell it to check every number or count with a tool. To show something, it looks up the matching parts, isolates them and frames the camera on them. For a quantity across the whole model, it reports the unit and how it was measured.",
+            "When a request such as \"show the meeting room\" could mean more than one thing, it asks one short question. Its replies stay short, and it does not describe each tool it uses."
           ],
           "f": [
             [
@@ -802,7 +804,7 @@ window.AGENT_DECK = {
           "y": 450,
           "n": "Model loading",
           "s": "Prepares the model before the first question.",
-          "b": "A dropped model file is fingerprinted and looked up in two caches. If it is new, the helper prepares it and the browser sends over the index.",
+          "b": "Each dropped model file is checked against two caches. The helper prepares a new file, and the browser then sends it the index.",
           "f": [
             [
               "Trigger",
@@ -911,7 +913,7 @@ window.AGENT_DECK = {
       "app": "GrowthSignal",
       "kicker": "03 · Win work · Bid intelligence database",
       "title": "GrowthSignal",
-      "lede": "Seven Claude agents read and write one SQLite database. None of them calls another, and none of them can use tools.",
+      "lede": "GrowthSignal gathers public tenders and news into one database. Seven Claude agents read and write it, and none of them calls another.",
       "tag": "7 agents · 1 database",
       "cw": 222,
       "ch": 136,
@@ -939,7 +941,7 @@ window.AGENT_DECK = {
           "k": "code",
           "x": 0,
           "y": 28,
-          "n": "Connectors ingest",
+          "n": "Source connectors",
           "s": "Pulls records from 270+ public sources.",
           "b": "All connectors run at once. They add or update tenders, projects, deals, news items and the source documents.",
           "f": [
@@ -986,12 +988,12 @@ window.AGENT_DECK = {
           "x": 500,
           "y": 28,
           "n": "Enrichment analyst",
-          "s": "Turns raw records into fields and fit scores.",
+          "s": "Turns raw records into facts and scores.",
           "b": "It reads each new tender or project and returns its key facts, fit scores and a verdict as one structured record.",
           "a": [
-            "The enrichment analyst reads raw tender and project records, with their incumbent awards, and returns a single JSON object of structured fields.",
-            "The fields cover stage, sub-sector, owner, design team, contractor, storeys, floor area, value in USD, start and end quarters, funding mode, city and a one-sentence narrative. It also scores fit for the practice from 0 to 100 on sector, scale, geography and win probability, and writes a one-sentence verdict.",
-            "Every call is logged with a hash of its prompt. When the prompt changes, a run with --stale re-enriches the records it affects."
+            "The enrichment analyst reads raw tender and project records, with the firms that won earlier work, and returns one structured record of facts.",
+            "The facts cover stage, sub-sector, owner, design team, contractor, storeys, floor area, value in US dollars, start and end dates, funding and city, with a one-sentence summary. It also scores fit for the practice from 0 to 100 on sector, scale, geography and win probability, and writes a one-sentence verdict.",
+            "Every call is logged with a fingerprint of its instructions. When the instructions change, the records they affect can be enriched again."
           ],
           "f": [
             [
@@ -1045,12 +1047,12 @@ window.AGENT_DECK = {
           "x": 1000,
           "y": 28,
           "n": "Briefing writer",
-          "s": "Writes the daily briefing from the last 36 hours.",
+          "s": "Writes a daily briefing of new records.",
           "b": "It summarises new tenders, approved projects, news and deals in five sections and cites each source ID.",
           "a": [
-            "The briefing writer turns the last 36 hours of records into a daily construction-intelligence briefing for a senior architect or engineer.",
-            "It writes 250 to 400 words in five sections: Top deals, Tenders to watch, Project approvals, Sector signals and Watch-list. Each bullet leads with the buyer, country or firm, bolds values and dates, and cites source IDs such as [t1234].",
-            "Its prompt asks it to be opinionated about what is unusual or large, and to leave out any value it was not given."
+            "The briefing writer turns the last 36 hours of records into a daily briefing for a senior architect or engineer.",
+            "It writes 250 to 400 words in five sections: Top deals, Tenders to watch, Project approvals, Sector signals and Watch-list. Each point leads with the buyer, country or firm, picks out values and dates, and cites the record behind it.",
+            "Its instructions ask it to say what is unusual or large, and to leave out any value it was not given."
           ],
           "f": [
             [
@@ -1085,8 +1087,8 @@ window.AGENT_DECK = {
           "x": 1250,
           "y": 28,
           "n": "Daily digest",
-          "s": "Saves the day's digest as a document.",
-          "b": "The last nightly step saves the day's digest as a text file in the digests folder.",
+          "s": "Saves the day's digest as a file.",
+          "b": "The last nightly step writes the digest to a text file for the team.",
           "f": [
             [
               "Writes",
@@ -1106,11 +1108,11 @@ window.AGENT_DECK = {
           "w": 1472,
           "h": 112,
           "n": "SQLite database",
-          "s": "The one store that every agent reads and writes. It holds tenders, projects, deals, news, search passages, enrichment results, briefings and chat history.",
-          "b": "Every agent reads its inputs from these tables and writes its results back. Rows the scripts add are enriched the next night.",
+          "s": "Every agent reads from and writes to this one store. It holds tenders, projects, deals, news, search passages, briefings and chat history.",
+          "b": "No agent hands work to another directly. Rows added by the news and SEC scripts are enriched the next night.",
           "a": [
             "The database is the only thing the seven agents share. Each one reads its inputs from these tables and writes its results back to them.",
-            "Rows that the news and SEC scripts add have no enrichment yet, so the next nightly enrichment run selects them. The next embedding run chunks them too."
+            "Rows that the news and SEC scripts add have no enrichment yet, so the next nightly enrichment run picks them up. The next search index run adds them too."
           ],
           "f": [
             [
@@ -1132,9 +1134,9 @@ window.AGENT_DECK = {
           "s": "Reads deals for construction signals.",
           "b": "It pulls out the facts of each deal and judges which kind of construction it signals. It runs only when started by hand.",
           "a": [
-            "The deal analyst reads M&A and investment records and extracts the acquirer, target, value, deal type, status and strategic rationale.",
-            "It then decides what built-environment pipeline the deal signals, such as data centres or ports, and scores sector, scale and geography fit and win probability from 0 to 100. Its verdict opens with \"Pursue actively\", \"Monitor\" or \"Deprioritise\".",
-            "The nightly run enriches tenders and projects only, so this agent runs when enrichment is started with --tables deals."
+            "The deal analyst reads takeover and investment records and pulls out the buyer, target, value, deal type, status and reason for the deal.",
+            "It then decides what kind of construction the deal points to, such as data centres or ports, and scores sector, scale and geography fit and win probability from 0 to 100. Its verdict opens with \"Pursue actively\", \"Monitor\" or \"Deprioritise\".",
+            "The nightly run enriches tenders and projects only, so this agent runs only when someone starts it for deals."
           ],
           "f": [
             [
@@ -1170,7 +1172,7 @@ window.AGENT_DECK = {
           "y": 400,
           "n": "News-to-project extractor",
           "s": "Turns announcements into project records.",
-          "b": "It reads each new news item. An announcement of a specific building or programme becomes a project record that links to the story.",
+          "b": "Each announcement of a specific building becomes a project record linked to its story.",
           "a": [
             "This agent scans news items for announcements of a specific new building, infrastructure programme or development.",
             "It skips corporate transactions, opinion pieces, completed buildings, awards, appointments and vague mentions. A confident match becomes a new project record, with its stage and opportunity score."
@@ -1203,12 +1205,12 @@ window.AGENT_DECK = {
           "k": "agent",
           "x": 500,
           "y": 400,
-          "n": "SEC capex extractor",
+          "n": "Company filings extractor",
           "s": "Finds named projects in US annual reports.",
-          "b": "It reads the spending paragraphs in company filings to the US regulator and lists projects tied to a named building or site.",
+          "b": "It reads spending paragraphs in US company filings and lists named building projects.",
           "a": [
-            "The script pulls the latest 10-K and four 10-Q filings from EDGAR for a list of large corporate occupiers and keeps the capital-expenditure paragraphs that carry a number.",
-            "The agent lists named projects tied to a specific building, site, campus or facility, with at least a location, value, floor area, year or developer. Generic capex totals, buybacks and M&A are left out."
+            "The script pulls the latest annual report and four quarterly reports that large US companies file with the regulator, and keeps the spending paragraphs that contain a figure.",
+            "The agent lists named projects tied to a specific building, site, campus or facility, with at least a location, value, floor area, year or developer. General spending totals, share buybacks and takeovers are left out."
           ],
           "f": [
             [
@@ -1277,9 +1279,9 @@ window.AGENT_DECK = {
           "s": "Answers questions with cited sources.",
           "b": "It answers from the 8 most relevant passages and cites each one. A repeated question gets the saved answer.",
           "a": [
-            "The intelligence analyst answers questions in the chat dock, on the /ask page and from the Ask Claude button on each record.",
-            "Retrieval fuses vector and keyword search and passes the 8 most relevant chunks in a context block. The agent treats them as ground truth, cites them inline as [1] and [2], labels inferences and never invents figures.",
-            "A question already asked about a record replays its cached answer with no model call."
+            "The intelligence analyst answers questions in the chat panel, on the Ask page and from the Ask Claude button on each record.",
+            "It finds the 8 most relevant passages by meaning and by keyword. It cites each one as [1] or [2], marks its guesses and never invents figures.",
+            "A question already asked about a record gets the saved answer with no AI call."
           ],
           "f": [
             [
@@ -1406,7 +1408,7 @@ window.AGENT_DECK = {
       "app": "Strategic Project Discovery",
       "kicker": "04 · Win work · Live project search",
       "title": "Strategic Project Discovery",
-      "lede": "One Gemini agent runs for each sector scan. It searches the web through Google Search and returns a scored list of opportunities.",
+      "lede": "Strategic Project Discovery searches procurement sites live. One Gemini agent runs for each sector scan and returns a scored list of opportunities.",
       "tag": "1 agent · 1 search tool",
       "cw": 220,
       "ch": 128,
@@ -1418,7 +1420,7 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 0,
           "n": "Sector",
-          "s": "The user picks one sector or all seven.",
+          "s": "Picks one sector or all seven.",
           "b": "Seven fixed sectors sit in the sidebar. Scan All runs them one after another, pausing 4 seconds between live calls.",
           "f": [
             [
@@ -1441,7 +1443,7 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 236,
           "n": "Region",
-          "s": "The user picks one of six regions.",
+          "s": "Picks one of six regions.",
           "b": "The chosen region is written into the prompt. Demo mode filters its sample data by the same region.",
           "f": [
             [
@@ -1456,7 +1458,7 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 472,
           "n": "Sources",
-          "s": "The user switches 676 sources on or off.",
+          "s": "Switches 676 sources on or off.",
           "b": "Every source starts switched on. The prompt names only the first 60 enabled sources.",
           "f": [
             [
@@ -1514,10 +1516,10 @@ window.AGENT_DECK = {
           "y": 236,
           "n": "Discovery engine",
           "s": "Finds and scores live opportunities.",
-          "b": "Gemini 2.5 Flash searches for 8 to 20 current opportunities and scores each one for sector, scale, geography and win probability.",
+          "b": "Gemini 2.5 Flash finds 8 to 20 current leads and scores each one for fit.",
           "a": [
-            "The app's only agent is a business development intelligence engine. For the chosen sector and region it finds 8 to 20 real, current infrastructure procurement opportunities.",
-            "It returns them as a JSON array. Each result carries a title, client, location with latitude and longitude, stage, urgency, relevance, value, deadline, contract type, source, overview and context.",
+            "The app's only agent finds business development leads. For the chosen sector and region it finds 8 to 20 real, current infrastructure tenders and projects.",
+            "It returns them as a structured list. Each result carries a title, client, location with map coordinates, stage, urgency, relevance, value, deadline, contract type, source, overview and background.",
             "Each result also holds a fit assessment: sector fit, scale fit, geographic fit and win probability from 0 to 100, with a one-line verdict."
           ],
           "f": [
@@ -1565,7 +1567,7 @@ window.AGENT_DECK = {
           "y": 236,
           "n": "Reply reader",
           "s": "Tries three ways to read the reply.",
-          "b": "It reads the reply whole, then as a trimmed list, then one result at a time. If all three fail, an error banner appears.",
+          "b": "It reads the reply as a whole, then trims it, then reads one result at a time. If all three fail, an error appears.",
           "f": [
             [
               "Retries",
@@ -1583,8 +1585,8 @@ window.AGENT_DECK = {
           "x": 1000,
           "y": 236,
           "n": "Results by sector",
-          "s": "Each new scan replaces the last.",
-          "b": "Results are kept per sector, and duplicates are not merged. The views show every sector's results together.",
+          "s": "A new scan replaces that sector's results.",
+          "b": "Results are kept per sector without merging duplicates, and shown together.",
           "f": [
             [
               "Held in",
@@ -1617,7 +1619,7 @@ window.AGENT_DECK = {
           "y": 472,
           "n": "JSON files",
           "s": "Saves scans as files.",
-          "b": "Live scans download one JSON file per sector. Save keeps the last 10 searches in the browser."
+          "b": "Live scans download one JSON file per sector. Save keeps the last 10 scans in the browser."
         }
       ],
       "edges": [
@@ -1661,7 +1663,7 @@ window.AGENT_DECK = {
           "search",
           {
             "bi": true,
-            "l": "grounding"
+            "l": "searches"
           }
         ],
         [
@@ -1709,10 +1711,10 @@ window.AGENT_DECK = {
       "app": "WorkNodesCanvas",
       "kicker": "05 · Deliver · Document workbench",
       "title": "WorkNodesCanvas",
-      "lede": "Four Claude agents run from the canvas. They hand work to each other only through the results saved on each node.",
+      "lede": "Four Claude agents run from cards, called nodes, on a canvas. They pass work to each other only through the results saved on each node.",
       "tag": "4 agents · 1 canvas",
       "cw": 300,
-      "ch": 128,
+      "ch": 120,
       "nodes": [
         {
           "id": "user",
@@ -1745,14 +1747,14 @@ window.AGENT_DECK = {
           "id": "chat",
           "k": "agent",
           "x": 0,
-          "y": 170,
+          "y": 178,
           "n": "Canvas chat assistant",
           "s": "Edits the canvas when asked in chat.",
-          "b": "It sees a summary of every card and adds a list of changes to its reply when the canvas should change.",
+          "b": "It sees a summary of every node and adds a list of changes to its reply when the canvas should change.",
           "a": [
             "The chat assistant holds a conversation in the side panel and can change the canvas on request.",
-            "Its prompt carries a summary of up to 80 nodes, with each one's id, type, name, key fields, position, size and whether it has a result. When the canvas should change, it ends the reply with a JSON block of actions.",
-            "The 11 actions create references, notes, analyses and presentations, update, connect, disconnect and delete nodes, and set position, size and collapsed state. Chat has no action that starts a run."
+            "Its instructions carry a summary of up to 80 nodes, with each one's name, type, main fields, position, size and whether it has a result. When the canvas should change, it ends its reply with a list of changes in a fixed format.",
+            "The 11 kinds of change create references, notes, analyses and presentations, edit, wire, unwire and delete nodes, and set position, size and whether a node is folded. Chat cannot start a run."
           ],
           "f": [
             [
@@ -1777,14 +1779,14 @@ window.AGENT_DECK = {
           "id": "agent",
           "k": "agent",
           "x": 586,
-          "y": 170,
+          "y": 178,
           "n": "Analysis agent",
           "s": "Works through a node's objective.",
           "b": "It reads the wired references and upstream results, then answers the objective. A run stops after 10 minutes.",
           "a": [
             "The analysis agent runs when the user clicks Run on an Analysis node. It works through the node's objective using the wired reference files and the results of directly wired analyses.",
-            "Text files up to 100 KB are placed in the prompt. Larger files such as PDFs and Office documents are passed as paths for the agent to open with the Read tool. URLs are passed as text.",
-            "It answers with no preamble and uses Markdown tables when asked for a table. JSON with a known type, such as a compliance matrix, is rendered as a formatted table. Progress streams back to the canvas as NDJSON."
+            "Text files up to 100 KB go straight into its instructions. Larger files such as PDFs and Office documents are passed by location, and the agent opens them itself. Web links are passed as text.",
+            "It answers without a preamble and uses tables when asked for one. A structured answer, such as a compliance matrix, is shown as a formatted table. Its progress appears on the canvas as it works."
           ],
           "f": [
             [
@@ -1809,14 +1811,14 @@ window.AGENT_DECK = {
           "id": "builder",
           "k": "agent",
           "x": 1172,
-          "y": 170,
+          "y": 178,
           "n": "Document builder",
           "s": "Writes the deck, report or page.",
           "b": "It turns wired references and analyses into a PPTX, DOCX or HTML file that follows the node's brief.",
           "a": [
             "The document builder runs when the user clicks Run on a Presentation node. It turns the wired references and analyses into a file that follows the node's brief.",
-            "A deck is built with the pptx skill, a Word report with python-docx and an HTML report with the Write tool. It writes the file to a fixed path and replies with one line.",
-            "If no file is written, the run fails. A run that times out still succeeds when the file exists."
+            "It builds a deck with Claude's PowerPoint skill, a Word report with a Python library or a web page directly. It saves the file to a set location and replies with one line.",
+            "If no file is saved, the run fails. A run that times out still succeeds when the file exists."
           ],
           "f": [
             [
@@ -1837,10 +1839,10 @@ window.AGENT_DECK = {
           "id": "checks",
           "k": "code",
           "x": 0,
-          "y": 340,
+          "y": 356,
           "n": "Action checks",
-          "s": "Validates every chat action.",
-          "b": "Every change must name a real card and follow the allowed wiring. Each change passes or fails on its own.",
+          "s": "Checks every chat change.",
+          "b": "Every change must name a real node and follow the allowed wiring. Each change passes or fails on its own.",
           "f": [
             [
               "Wires",
@@ -1856,14 +1858,14 @@ window.AGENT_DECK = {
           "id": "salvage",
           "k": "agent",
           "x": 586,
-          "y": 340,
+          "y": 356,
           "n": "Timeout rescue planner",
           "s": "Splits an answer that timed out.",
           "b": "It splits a long answer into parts. The helper then asks Claude for each part, up to 40 times, and joins them.",
           "a": [
-            "The salvage planner takes over when an analysis run hits its 10-minute limit.",
-            "In a plan call it returns JSON with a header, a footer, the list of items, a chunk size of 1 to 10 and a row template. The helper then sends one process call per chunk, up to 40, and joins the header, fragments and footer.",
-            "Counts that depend on the finished cells, such as verdict totals, are written as tokens like {{P}} and filled in after assembly. Salvage covers analyses only."
+            "The timeout rescue planner takes over when an analysis run hits its 10-minute limit.",
+            "It plans the answer as a header, a footer and a list of items in batches of 1 to 10. The helper asks Claude for each batch, up to 40 times, and joins them.",
+            "Totals that depend on the finished table are left as placeholders and filled in after the parts are joined. Only analyses get this rescue."
           ],
           "f": [
             [
@@ -1888,7 +1890,7 @@ window.AGENT_DECK = {
           "id": "file",
           "k": "out",
           "x": 1172,
-          "y": 340,
+          "y": 356,
           "n": "Output file",
           "s": "Saves a PPTX, DOCX or HTML file.",
           "b": "The builder writes the file to the outputs folder, and the helper renders thumbnails of each slide."
@@ -1897,12 +1899,12 @@ window.AGENT_DECK = {
           "id": "state",
           "k": "data",
           "x": 0,
-          "y": 505,
+          "y": 522,
           "w": 1472,
-          "h": 95,
+          "h": 78,
           "n": "Canvas state file",
           "s": "Every node keeps its latest result and the five before it. Wired nodes read their inputs from here.",
-          "b": "The canvas JSON holds every node, wire and result. Downstream nodes read whatever result their wired nodes hold now.",
+          "b": "The canvas file holds every node, wire and result. A node reads whatever result its wired nodes hold now.",
           "f": [
             [
               "History",
@@ -1970,9 +1972,7 @@ window.AGENT_DECK = {
         [
           "salvage",
           "state",
-          {
-            "l": "result"
-          }
+          {}
         ],
         [
           "agent",
@@ -1990,7 +1990,7 @@ window.AGENT_DECK = {
       "app": "Reference Buildings Explorer",
       "kicker": "06 · Design · Energy modelling",
       "title": "Reference Buildings Explorer",
-      "lede": "The explorer runs no model. A main Claude Code agent wrote a shared contract, then four subagents built the data and the views in parallel.",
+      "lede": "The explorer shows energy simulations of 16 US reference buildings in 3D. A main Claude Code agent wrote a plan, and four subagents built the parts at once.",
       "tag": "1 main agent · 4 subagents",
       "cw": 260,
       "ch": 128,
@@ -2019,12 +2019,12 @@ window.AGENT_DECK = {
           "x": 0,
           "y": 240,
           "n": "Main build agent",
-          "s": "Recovers the data and leads the build.",
+          "s": "Recovered the data and led the build.",
           "b": "It downloaded and sorted the models, wrote the contract, and built the page frame and the tool that joins the parts.",
           "a": [
-            "The main agent did the research and recovery. It checked 64 download addresses, downloaded all 64 ZIPs, compared checksums to remove duplicates and sorted 864 files by building type.",
-            "It wrote SPEC.md so the four subagents could work on their own, and built the dashboard frame, side panels and the bundler.",
-            "After the subagents finished, it bundled their work and tested every tab in a headless browser at desktop and phone widths, fixing the layout problems it found."
+            "The main agent did the research and recovery. It checked 64 download addresses, downloaded all 64 archives, compared file fingerprints to remove duplicates and sorted 864 files by building type.",
+            "It wrote SPEC.md so the four subagents could work on their own, and built the dashboard frame, the side panels and the bundler.",
+            "After the subagents finished, it bundled their work and tested every tab in an automated browser at desktop and phone widths, fixing the layout problems it found."
           ],
           "f": [
             [
@@ -2085,7 +2085,7 @@ window.AGENT_DECK = {
           "y": 36,
           "h": 128,
           "n": "Data subagent",
-          "s": "Builds data for 256 combinations.",
+          "s": "Built data for 256 combinations.",
           "b": "It turned reports, workbooks, model files and weather files into one data file and checked the totals.",
           "a": [
             "The data subagent wrote the Python pipeline that turns the model library into one dataset covering all 256 combinations of building type and climate.",
@@ -2110,7 +2110,7 @@ window.AGENT_DECK = {
           "y": 176,
           "h": 128,
           "n": "View agent A",
-          "s": "Builds the Building Explorer view.",
+          "s": "Built the Building Explorer view.",
           "b": "It built the 3D building view with section cuts and exploded floors, using sample data and checking screenshots.",
           "a": [
             "View agent A built the Building Explorer: the EnergyPlus geometry in 3D, with a cutting plane, floor-by-floor slicing, exploded floors and rooms coloured by load or hours out of comfort.",
@@ -2130,7 +2130,7 @@ window.AGENT_DECK = {
           "y": 316,
           "h": 128,
           "n": "View agent B",
-          "s": "Builds two comparison views.",
+          "s": "Built two comparison views.",
           "b": "It built the 16 × 16 energy city and the stacked end-use columns, checking each one with screenshots.",
           "a": [
             "View agent B built two views: Compare Types × Climates, an energy city of 16 × 16 bars with a moving cutting plane, and End-Use Stacks, 3D columns stacked by end use.",
@@ -2150,7 +2150,7 @@ window.AGENT_DECK = {
           "y": 456,
           "h": 128,
           "n": "View agent C",
-          "s": "Builds three time-based views.",
+          "s": "Built three time-based views.",
           "b": "It built the monthly surfaces, the hourly climate carpet and the operating schedules, checking each with screenshots.",
           "a": [
             "View agent C built three views: Monthly Surfaces, Climate Carpet with 365 × 24 hours of weather as terrain, and Operating Schedules that morph between weekday and weekend.",
@@ -2176,7 +2176,7 @@ window.AGENT_DECK = {
           "id": "dash",
           "k": "out",
           "x": 1212,
-          "y": 60,
+          "y": 0,
           "n": "Dashboard",
           "s": "Runs from one 1.9 MB file.",
           "b": "The finished explorer opens straight from disk. Its only outside download is the 3D library."
@@ -2187,8 +2187,8 @@ window.AGENT_DECK = {
           "x": 1212,
           "y": 420,
           "n": "Browser check",
-          "s": "Tests every tab on desktop and phone.",
-          "b": "The main agent tested every tab in a hidden browser at desktop and phone widths, then fixed the layout problems it found.",
+          "s": "Tested every tab on desktop and phone.",
+          "b": "Each layout problem it found went back to the bundler to be fixed and rebuilt.",
           "f": [
             [
               "Widths",
@@ -2245,7 +2245,8 @@ window.AGENT_DECK = {
           {
             "fs": "r",
             "ts": "l",
-            "mid": 577
+            "mid": 577,
+            "quiet": true
           }
         ],
         [
@@ -2254,7 +2255,8 @@ window.AGENT_DECK = {
           {
             "fs": "r",
             "ts": "l",
-            "mid": 577
+            "mid": 577,
+            "quiet": true
           }
         ],
         [
@@ -2263,7 +2265,8 @@ window.AGENT_DECK = {
           {
             "fs": "r",
             "ts": "l",
-            "mid": 577
+            "mid": 577,
+            "quiet": true
           }
         ],
         [
@@ -2283,7 +2286,8 @@ window.AGENT_DECK = {
             "fs": "r",
             "ts": "l",
             "tf": 0.5,
-            "mid": 906
+            "mid": 906,
+            "quiet": true
           }
         ],
         [
@@ -2293,7 +2297,8 @@ window.AGENT_DECK = {
             "fs": "r",
             "ts": "l",
             "tf": 0.5,
-            "mid": 906
+            "mid": 906,
+            "quiet": true
           }
         ],
         [
@@ -2303,7 +2308,8 @@ window.AGENT_DECK = {
             "fs": "r",
             "ts": "l",
             "tf": 0.5,
-            "mid": 906
+            "mid": 906,
+            "quiet": true
           }
         ],
         [
@@ -2340,7 +2346,7 @@ window.AGENT_DECK = {
       "app": "MaterialScan",
       "kicker": "07 · Design · Material compliance",
       "title": "MaterialScan",
-      "lede": "MaterialScan runs no agent. Its verdicts are written by hand before the build, and a Python site generator turns them into static pages.",
+      "lede": "MaterialScan checks product evidence against LBC and WELL. People wrote the verdicts by hand, and a Python script turns them into web pages.",
       "tag": "No agents",
       "cw": 260,
       "ch": 136,
@@ -2381,7 +2387,7 @@ window.AGENT_DECK = {
           "y": 0,
           "n": "Hand-written verdicts",
           "s": "Gives every sample a written verdict.",
-          "b": "Each palette sample carries lines such as \"LBC Core Compliance: PARTIAL\" with a reason and a source URL.",
+          "b": "Each palette sample carries lines such as \"LBC Core Compliance: PARTIAL\", with a reason and a source link.",
           "f": [
             [
               "Files",
@@ -2412,8 +2418,8 @@ window.AGENT_DECK = {
           "k": "code",
           "x": 909,
           "y": 232,
-          "n": "Graph and scorecard",
-          "s": "Keeps the worst verdict per standard.",
+          "n": "Verdict summary and scorecard",
+          "s": "Keeps each product's worst verdict.",
           "b": "Each product keeps its worst verdict per standard. The scorecard counts the evidence against fixed targets."
         },
         {
@@ -2432,16 +2438,16 @@ window.AGENT_DECK = {
           "y": 232,
           "n": "Renderers",
           "s": "Writes section, material and gap pages.",
-          "b": "They write the HTML pages, the JSON data and the report, and a link check runs over the result."
+          "b": "They write the HTML pages, the data file and the report, and a link check runs over the result."
         },
         {
           "id": "site",
           "k": "out",
           "x": 1212,
           "y": 0,
-          "n": "site/ folder",
-          "s": "Publishes static pages with no model calls.",
-          "b": "This is the published compliance dashboard. Its scripts make no network calls."
+          "n": "Published site",
+          "s": "Publishes the dashboard as static pages.",
+          "b": "Its scripts make no network calls, and no AI runs while it is used."
         }
       ],
       "edges": [
@@ -2504,7 +2510,7 @@ window.AGENT_DECK = {
       "app": "Southwark Retrofit Atlas",
       "kicker": "08 · Portfolio · Housing retrofit",
       "title": "Southwark Retrofit Atlas",
-      "lede": "One Claude Code session built the atlas's data files. In the browser, plain code ranks all 149,062 homes with no model calls.",
+      "lede": "The atlas ranks Southwark's 149,062 homes for retrofit funding. Claude Code built its data files, and the browser does the ranking with no AI.",
       "tag": "1 build agent",
       "cw": 260,
       "ch": 136,
@@ -2521,18 +2527,18 @@ window.AGENT_DECK = {
           "k": "ext",
           "x": 0,
           "y": 0,
-          "n": "GLA LBSM 2",
-          "s": "Lists 149,062 homes in 63 columns.",
-          "b": "The Greater London Authority's building stock model gives each home's attributes as a raw CSV."
+          "n": "London building stock model",
+          "s": "Lists 149,062 homes.",
+          "b": "The Greater London Authority's model lists 63 attributes for every home."
         },
         {
           "id": "epc",
           "k": "ext",
           "x": 0,
           "y": 232,
-          "n": "Non-domestic EPCs",
-          "s": "Supplies 7,045 commercial buildings.",
-          "b": "Non-domestic certificates supply 7,045 commercial buildings, which the atlas checks against the minimum energy standard for lettings (MEES)."
+          "n": "Commercial energy certificates",
+          "s": "Adds 7,045 commercial buildings.",
+          "b": "These certificates are checked against the minimum energy standard for lettings (MEES)."
         },
         {
           "id": "ons",
@@ -2582,7 +2588,7 @@ window.AGENT_DECK = {
           "y": 464,
           "n": "Three data files",
           "s": "Three files hold all the prepared data.",
-          "b": "meta.json holds the column layout, lookups, wards and postcodes. The text files hold the packed homes and buildings."
+          "b": "One file holds the column layout, lookups, wards and postcodes. The other two hold the packed homes and buildings."
         },
         {
           "id": "controls",
@@ -2618,7 +2624,7 @@ window.AGENT_DECK = {
           "y": 232,
           "n": "Package and cost",
           "s": "Costs a retrofit package for every home.",
-          "b": "It picks each home's package and works out its cost, CO2e saving, bill change and SAP score."
+          "b": "It picks each home's package and works out its cost, CO2e saving, bill change and energy rating (SAP)."
         },
         {
           "id": "mees",
@@ -2643,8 +2649,8 @@ window.AGENT_DECK = {
           "k": "out",
           "x": 1212,
           "y": 0,
-          "n": "Canvas map",
-          "s": "Draws every home on the map.",
+          "n": "Home map",
+          "s": "Draws every home on a map.",
           "b": "The map redraws from the new ranking after each run."
         },
         {
@@ -2710,7 +2716,7 @@ window.AGENT_DECK = {
           "score",
           {
             "fs": "t",
-            "fo": 0.8,
+            "fo": 0.92,
             "ts": "t",
             "tf": 0.3,
             "mid": 184,

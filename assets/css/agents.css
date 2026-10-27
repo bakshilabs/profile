@@ -3,8 +3,8 @@
 .agents-page {
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--ink);
-  color: var(--white);
+  background: var(--paper-deep);
+  color: var(--ink);
   overflow: hidden;
 }
 .sr-defs {
@@ -24,9 +24,8 @@
   min-height: 100dvh;
   padding-top: var(--nav-h);
   background:
-    radial-gradient(70% 60% at 80% 0%, rgba(14, 156, 142, 0.16), transparent 70%),
-    radial-gradient(60% 50% at 0% 100%, rgba(89, 199, 252, 0.08), transparent 70%),
-    var(--ink);
+    radial-gradient(70% 60% at 80% 0%, rgba(14, 156, 142, 0.08), transparent 70%),
+    var(--paper-deep);
 }
 .deck.is-full {
   padding-top: 0;
@@ -36,7 +35,7 @@
   overflow: hidden;
   border-radius: 14px;
   background: var(--paper);
-  box-shadow: 0 0 0 1px var(--ink-line), 0 50px 100px -40px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 0 0 1px var(--line), 0 40px 80px -44px rgba(12, 27, 36, 0.45);
   touch-action: pan-y;
 }
 .deck__progress {
@@ -76,10 +75,10 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(12, 27, 36, 0.22);
   border-radius: 999px;
   background: transparent;
-  color: var(--white);
+  color: var(--ink);
   cursor: pointer;
   transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease), opacity 0.2s;
 }
@@ -88,9 +87,9 @@
   height: 16px;
 }
 .deck__btn:hover:not(:disabled) {
-  background: var(--white);
-  border-color: var(--white);
-  color: var(--ink);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
 }
 .deck__btn:disabled {
   opacity: 0.3;
@@ -122,15 +121,15 @@
   position: absolute;
   inset: 11px 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(12, 27, 36, 0.2);
   transition: background-color 0.25s var(--ease), inset 0.3s var(--ease);
 }
 .dot:hover::before {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(12, 27, 36, 0.45);
 }
 .dot.is-current::before {
   inset: 10px 0;
-  background: var(--teal-soft);
+  background: var(--teal);
 }
 .dot::after {
   content: attr(data-name);
@@ -139,8 +138,8 @@
   left: 50%;
   padding: 5px 10px;
   border-radius: 6px;
-  background: var(--white);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -160,7 +159,7 @@
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.14em;
-  color: var(--mist);
+  color: var(--muted);
   text-align: center;
 }
 .deck__rotate,
@@ -198,7 +197,7 @@
 .slide {
   position: absolute;
   inset: 0;
-  padding: 44px 64px 0;
+  padding: 66px 64px 0;
   visibility: hidden;
   opacity: 0;
   transform: translateX(48px);
@@ -253,7 +252,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 640px;
   gap: 48px;
-  align-items: end;
+  align-items: start;
   height: 140px;
 }
 .slide__title {
@@ -266,6 +265,7 @@
   text-wrap: balance;
 }
 .slide__lede {
+  margin-top: -4px;
   font-size: 18px;
   line-height: 1.55;
   color: var(--muted);
@@ -384,7 +384,7 @@
 }
 .is-active .wire {
   stroke-dashoffset: 0;
-  transition-delay: calc(var(--j) * 30ms + 0.2s), 0s, 0s, 0s;
+  transition-delay: calc(min(var(--j) * 30ms, 400ms) + 0.2s), 0s, 0s, 0s;
 }
 .is-drawn .wire {
   marker-end: url(#arr);
@@ -469,7 +469,7 @@
 .is-active .node {
   opacity: 1;
   transform: none;
-  transition-delay: calc(var(--i) * 35ms + 0.1s);
+  transition-delay: calc(min(var(--i) * 30ms, 450ms) + 0.1s);
 }
 .node:focus-visible {
   outline: none;
@@ -497,8 +497,11 @@
   transform: rotateY(180deg);
 }
 .canvas.is-focus .node:not(.is-linked) .node__face {
-  opacity: 0.35;
-  filter: saturate(0.4);
+  opacity: 0.5;
+  filter: saturate(0.3);
+}
+.canvas.is-focus .node--agent:not(.is-linked) .node__face {
+  opacity: 0.26;
 }
 .node__face {
   position: absolute;
@@ -530,7 +533,7 @@
   align-items: center;
   gap: 7px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -555,8 +558,8 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  font-size: 15px;
-  line-height: 1.38;
+  font-size: 16px;
+  line-height: 1.36;
   color: var(--muted);
 }
 .node__btext {
@@ -570,6 +573,7 @@
 }
 .node__hint {
   flex: none;
+  white-space: nowrap;
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 500;
@@ -585,14 +589,14 @@
   font-size: 18.5px;
 }
 .node--sm .node__short {
-  font-size: 14px;
+  font-size: 15px;
 }
 .node--sm .node__btext {
-  font-size: 14px;
+  font-size: 14.5px;
   -webkit-line-clamp: 5;
 }
 .node--sm .node__kind {
-  font-size: 11px;
+  font-size: 11.5px;
   letter-spacing: 0.12em;
 }
 .node--tray .node__face {
@@ -1221,8 +1225,33 @@
   gap: 16px;
 }
 .deck.is-compact .deck__bar {
-  bottom: 8px;
-  padding: 4px 6px 4px 8px;
+  bottom: 6px;
+  padding: 3px 5px 3px 7px;
+}
+.deck.is-compact .deck__btn {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--white);
+}
+.deck.is-compact .deck__btn:hover:not(:disabled) {
+  background: var(--white);
+  color: var(--ink);
+}
+.deck.is-compact .dot::before {
+  background: rgba(255, 255, 255, 0.28);
+}
+.deck.is-compact .dot.is-current::before {
+  background: var(--teal-soft);
+}
+.deck.is-compact .deck__count {
+  color: var(--mist);
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .agents-page .nav {
+    display: none;
+  }
+  .deck {
+    padding-top: 0;
+  }
 }
 .deck.is-compact .deck__btn {
   width: 30px;
@@ -1231,4 +1260,23 @@
 .deck.is-compact .deck__btn svg {
   width: 14px;
   height: 14px;
+}
+
+.deck.is-side .deck__wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.deck.is-side .deck__bar {
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+}
+.deck.is-side .deck__dots,
+.deck.is-side .deck__rotate {
+  display: none;
+}
+.deck.is-side .deck__btn {
+  width: 40px;
+  height: 40px;
 }

@@ -281,7 +281,7 @@
       front.appendChild(el("span", "node__short", n.s));
       var back = el("span", "node__face node__back");
       back.appendChild(el("span", "node__btext", n.b));
-      back.appendChild(el("span", "node__hint", touch.matches ? "Tap again for details" : "Click for details"));
+      back.appendChild(el("span", "node__hint", touch.matches ? "Tap for details" : "Click for details"));
       inner.appendChild(front);
       inner.appendChild(back);
       b.appendChild(inner);
@@ -320,9 +320,13 @@
       p.style.setProperty("--j", j);
       wires.appendChild(p);
       var dur = Math.max(1.6, pathLength(pts) / 110).toFixed(2);
-      var trim = Math.min(0.3, 15 / pathLength(pts)).toFixed(3);
-      addPulse(wires, d, dur, j, false, e, trim);
-      if (o.bi) addPulse(wires, d, dur, j, true, e, trim);
+      var len = pathLength(pts);
+      var trim = Math.min(0.3, 15 / len).toFixed(3);
+      // Short or shared connectors carry one dot, so the motion stays calm.
+      if (!o.quiet) {
+        addPulse(wires, d, dur, j, false, e, trim);
+        if (o.bi && len >= 120) addPulse(wires, d, dur, j, true, e, trim);
+      }
       if (o.l) {
         var at = labelPoint(pts);
         var lab = el("span", "wire-label", o.l);
@@ -337,11 +341,20 @@
 
     var foot = el("footer", "slide__foot");
     var legend = el("ul", "legend");
+    var byLook = {}, looks = [];
     LEGEND_ORDER.forEach(function (k) {
       if (!kindsUsed[k]) return;
-      var li = el("li", "legend__item legend__item--" + KINDS[k].cls);
+      var cls = KINDS[k].cls;
+      if (!byLook[cls]) {
+        byLook[cls] = [];
+        looks.push(cls);
+      }
+      byLook[cls].push(KINDS[k].label);
+    });
+    looks.forEach(function (cls) {
+      var li = el("li", "legend__item legend__item--" + cls);
       li.appendChild(el("i"));
-      li.appendChild(document.createTextNode(KINDS[k].label));
+      li.appendChild(document.createTextNode(byLook[cls].join(" · ")));
       legend.appendChild(li);
     });
     foot.appendChild(legend);
@@ -497,7 +510,7 @@
     var edges = parseInt(slides[i].dataset.edges || "0", 10);
     drawTimer = setTimeout(function () {
       slides[i].classList.add("is-drawn");
-    }, reduce ? 0 : 200 + edges * 30 + 550);
+    }, reduce ? 0 : 200 + Math.min(edges * 30, 400) + 480);
     slides.forEach(function (s) {
       s.querySelectorAll(".node.is-flipped").forEach(function (o) {
         o.classList.remove("is-flipped");
@@ -528,10 +541,11 @@
       if (t.classList.contains("node__btext")) limit = face.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - t.nextSibling.offsetHeight - 6;
       else limit = face.clientHeight - parseFloat(cs.paddingBottom) - t.offsetTop;
       var size = base;
-      while (t.scrollHeight > limit + 1 && size > 12) {
+      while (t.scrollHeight > limit + 1 && size > 13) {
         size -= 0.5;
         t.style.fontSize = size + "px";
       }
+      t.toggleAttribute("data-clamped", t.scrollHeight > limit + 1);
       if (t.scrollHeight > limit + 1) {
         var lh = parseFloat(getComputedStyle(t).lineHeight) || 18;
         t.style.webkitLineClamp = String(Math.max(1, Math.floor(limit / lh)));
@@ -543,12 +557,16 @@
     var bar = document.querySelector(".deck__bar");
     var full = deckEl.classList.contains("is-full");
     // On laptop-height screens the controls sit over the slide's corner.
-    var compact = window.innerWidth >= 900 && (full || window.innerHeight < 940);
+    // Short landscape screens (phones on their side) stack the controls beside the slide.
+    var side = window.innerHeight < 500 && window.innerWidth > window.innerHeight;
+    var compact = !side && window.innerWidth >= 900 && (full || window.innerHeight < 940);
     deckEl.classList.toggle("is-compact", compact);
-    var navH = full ? 0 : document.querySelector(".nav").offsetHeight;
+    deckEl.classList.toggle("is-side", side);
+    var navEl = document.querySelector(".nav");
+    var navH = full || getComputedStyle(navEl).display === "none" ? 0 : navEl.offsetHeight;
     var gutter = window.innerWidth < 700 ? 12 : compact ? 16 : 32;
-    var availW = window.innerWidth - gutter * 2;
-    var availH = window.innerHeight - navH - (compact ? 0 : bar.offsetHeight) - gutter * (compact ? 1 : 1.5);
+    var availW = window.innerWidth - gutter * 2 - (side ? bar.offsetWidth + 10 : 0);
+    var availH = window.innerHeight - navH - (compact || side ? 0 : bar.offsetHeight) - gutter * (compact || side ? 1 : 1.5);
     var scale = Math.max(0.1, Math.min(availW / 1600, availH / 900));
     frame.style.width = 1600 * scale + "px";
     frame.style.height = 900 * scale + "px";
