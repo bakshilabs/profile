@@ -37,14 +37,14 @@ DECK.slides.forEach(function (s) {
 /* ---------- The story ---------- */
 
 const CHAPTERS = [
-  { id: "agent", t: "What an agent is" },
-  { id: "map", t: "Eight tools" },
-  { id: "noai", t: "No AI while it runs" },
-  { id: "one", t: "One agent with tools" },
-  { id: "shared", t: "Agents around shared data" },
-  { id: "record", t: "One record through Prospecht" },
-  { id: "finding", t: "The finding" },
-  { id: "explore", t: "Explore" }
+  { id: "agent", t: "What an agent is", s: "Agent" },
+  { id: "map", t: "Eight tools", s: "Tools" },
+  { id: "noai", t: "No AI while it runs", s: "No AI" },
+  { id: "one", t: "One agent with tools", s: "One agent" },
+  { id: "shared", t: "Agents around shared data", s: "Shared data" },
+  { id: "record", t: "One record through Prospecht", s: "Prospecht" },
+  { id: "finding", t: "The finding", s: "Finding" },
+  { id: "explore", t: "Explore", s: "Explore" }
 ];
 
 const SW_BUILD = ["lbsm", "epc", "ons", "session", "pack", "files"];
@@ -571,7 +571,7 @@ function buildRail() {
     b.type = "button";
     b.dataset.ch = i;
     b.appendChild(el("span", "x-rail__bar"));
-    b.appendChild(el("span", "x-rail__label", c.t));
+    b.appendChild(el("span", "x-rail__label", c.s));
     b.setAttribute("aria-label", "Chapter " + (i + 1) + ": " + c.t);
     b.addEventListener("click", function () {
       for (let k = 0; k < STEPS.length; k++) if (STEPS[k].ch === i) return go(k);
@@ -1321,7 +1321,7 @@ function makeWorld(M) {
     const board = new THREE.Group();
     const S = sl.featured ? 1.3 : 1;
     board.scale.setScalar(S);
-    board.position.set(-6400 + k * 1840 + (sl.featured ? 260 : 0), 430 + k * 165 + (sl.featured ? 90 : 0), -k * 260);
+    board.position.set(-5600 + k * 1600 + (sl.featured ? 230 : 0), 430 + k * 250 + (sl.featured ? 120 : 0), -k * 180);
     board.rotation.x = (-TILT * Math.PI) / 180;
     scene.add(board);
     const tool = { id: id, k: k, sl: sl, g: g, board: board, cards: [], byId: {}, wires: [], overlays: [], bridges: [], packets: null, S: S };
@@ -1446,24 +1446,26 @@ function makeWorld(M) {
 
   /* The ladder axis on the floor. */
   const first = tools[LADDER[0]].board.position, last = tools[LADDER[7]].board.position;
-  const axisZ = 700;
+  const axisZ = 520;
+  const axisGroup = new THREE.Group();
+  scene.add(axisGroup);
   const axisMat = new THREE.MeshStandardMaterial({ color: new THREE.Color("#3a454b"), roughness: 0.6 });
   const axis = makeTube([[first.x - 900, 2, axisZ], [last.x + 1200, 2, axisZ]], axisMat, 3);
-  scene.add(axis.mesh);
-  addCone(scene, [last.x + 1240, 2, axisZ], [last.x + 1000, 2, axisZ], axisMat).scale.setScalar(3);
+  axisGroup.add(axis.mesh);
+  addCone(axisGroup, [last.x + 1240, 2, axisZ], [last.x + 1000, 2, axisZ], axisMat).scale.setScalar(3);
   function floorLabel(text, x, cls) {
     const d = el("div", "x-axislabel " + (cls || ""), text);
     const o = cssObject(d);
-    o.position.set(x, 3, axisZ + 260);
+    o.position.set(x, 3, axisZ + 170);
     o.rotation.x = -Math.PI / 2;
-    scene.add(o);
+    axisGroup.add(o);
     return o;
   }
-  const axisLabels = [floorLabel("No AI", first.x - 500, "is-start"), floorLabel("Many agents", last.x + 600, "is-end")];
+  const axisLabels = [floorLabel("No AI", first.x - 760, "is-start"), floorLabel("Many agents", last.x + 300, "is-end")];
   LADDER.forEach(function (id) {
     const p = tools[id].board.position;
     const tick = makeTube([[p.x, 2, axisZ - 50], [p.x, 2, axisZ + 50]], axisMat, 2.5);
-    scene.add(tick.mesh);
+    axisGroup.add(tick.mesh);
   });
 
   /* The opening scene: three parts that lock into one agent. */
@@ -1571,8 +1573,8 @@ function makeWorld(M) {
   }
   function mapPose() {
     const a = tools[LADDER[0]].board.position, b = tools[LADDER[7]].board.position;
-    const c = new THREE.Vector3((a.x + b.x) / 2 - 150, (a.y + b.y) / 2 - 120, (a.z + b.z) / 2 + 200);
-    return fitPose(c, b.x - a.x + 3600, b.y - a.y + 1500, BOARD_DIR, -10, 16, 1.0);
+    const c = new THREE.Vector3((a.x + b.x) / 2 - 120, (a.y + b.y) / 2 - 90, (a.z + b.z) / 2 + 160);
+    return fitPose(c, b.x - a.x + 2900, b.y - a.y + 1250, BOARD_DIR, -8, 12, 1.0);
   }
   function introPose() {
     const c = intro.group.position.clone();
@@ -1580,7 +1582,7 @@ function makeWorld(M) {
   }
   function ringPose(tool) {
     const c = tool.board.localToWorld(new THREE.Vector3(tool.ringCenter.x, tool.ringCenter.y, 0));
-    return fitPose(c, (BW + 360) * tool.S, 900 * tool.S, BOARD_DIR, -4, 20, 1.0);
+    return fitPose(c, 1500 * tool.S, 760 * tool.S, BOARD_DIR, 0, 15, 0.98);
   }
 
   function poseFor(st) {
@@ -1600,7 +1602,9 @@ function makeWorld(M) {
       c.qTo.identity();
       c.dim.t = 0;
       c.ghost = 0;
+      c.hideAt = c.ringOnly ? 1 : 0;
     });
+    tool.alias = {};
     tool.wires.forEach(function (w) {
       w.show = true;
       w.hotT = 0;
@@ -1620,8 +1624,11 @@ function makeWorld(M) {
     });
     tool.bridges = [];
   }
+  function cardOf(tool, id) {
+    return (tool.alias && tool.alias[id]) || tool.byId[id];
+  }
   function itemCenter(tool, id) {
-    const c = tool.byId[id];
+    const c = cardOf(tool, id);
     if (c) return c.base.clone().add(c.offTo);
     const o = tool.overlays.filter(function (x) {
       return x.id === id;
@@ -1629,7 +1636,7 @@ function makeWorld(M) {
     return o ? o.base.clone().add(o.offTo || new THREE.Vector3()) : new THREE.Vector3();
   }
   function itemOff(tool, id) {
-    const c = tool.byId[id];
+    const c = cardOf(tool, id);
     if (c) return c.offTo;
     const o = tool.overlays.filter(function (x) {
       return x.id === id;
@@ -1639,7 +1646,7 @@ function makeWorld(M) {
   /* A curved 3D connector between two cards that no longer share a plane. */
   function addBridge(tool, aId, bId, key) {
     const A = itemCenter(tool, aId), B = itemCenter(tool, bId);
-    const ca = tool.byId[aId], cb = tool.byId[bId];
+    const ca = cardOf(tool, aId), cb = cardOf(tool, bId);
     const ha = ca ? ca.h / 2 : 0, hb = cb ? cb.h / 2 : 0;
     const wa = ca ? ca.w / 2 : 0, wb = cb ? cb.w / 2 : 0;
     // Leave from the edge that faces the other card.
@@ -1669,6 +1676,22 @@ function makeWorld(M) {
     return rec;
   }
 
+  function compactStore(tool, big) {
+    if (tool.compact) return tool.compact;
+    const it = { id: big.id, n: big.n, x: big.it.x + big.w / 2 - 280, y: big.it.y + big.h / 2 - 80, w: 560, h: 160 };
+    const c = makeCard(tool, it, tool.board);
+    c.ringOnly = true;
+    c.order = 0;
+    c.hideAt = 1;
+    tool.cards.push(c);
+    cssToolObjects[tool.id].push(c.fObj, c.bObj, c.hObj);
+    tool.compact = c;
+    setTimeout(function () {
+      fitFaceText(c.fEl);
+      fitFaceText(c.bEl);
+    }, 120);
+    return c;
+  }
   function applyLayout(tool, st, now) {
     resetToolLayout(tool);
     const focus = st.focus ? new Set(st.focus) : null;
@@ -1687,26 +1710,42 @@ function makeWorld(M) {
       if (st.ring && (o.group || o.lane || o.divider)) o.hide = true;
     });
     if (st.ring) {
-      const store = tool.byId[st.ring.store];
-      const center = store.base.clone();
+      // A compact copy of the shared store sits in the centre; the agents ring it, all parallel to the screen.
+      const big = tool.byId[st.ring.store];
+      const store = compactStore(tool, big);
+      const center = big.base.clone();
       tool.ringCenter = center;
+      tool.alias[st.ring.store] = store;
+      big.ghost = 1;
+      big.dim.t = 1;
+      big.hideAt = now + (reduce ? 0 : 1000);
+      store.hideAt = 0;
+      if (!store.shownOnce || store.asm >= 1) {
+        store.asm = 0;
+        store.asmT0 = now + (reduce ? -1e6 : 450);
+        store.asmDelay = 0;
+        store.shownOnce = true;
+      }
       const members = st.ring.members;
-      const rx = store.w / 2 + 150, rz = 520;
+      const rx = 640, rz = 500;
       const camPose = ringPose(tool);
       const camLocal = tool.board.worldToLocal(camPose.pos.clone());
+      const tarLocal = tool.board.worldToLocal(camPose.target.clone());
+      const face = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(camLocal, tarLocal, new THREE.Vector3(0, 1, 0)));
+      store.qTo.copy(face);
       members.forEach(function (id, i) {
         const c = tool.byId[id];
-        const a = ((i / members.length) * 360 + 200) * (Math.PI / 180);
-        const p = new THREE.Vector3(center.x + Math.cos(a) * rx, center.y + 40, center.z + Math.sin(a) * rz);
+        const a = (90 + (i * 360) / members.length) * (Math.PI / 180);
+        const p = new THREE.Vector3(center.x + Math.cos(a) * rx, center.y, center.z + Math.sin(a) * rz);
         c.offTo.copy(p).sub(c.base);
-        const m = new THREE.Matrix4().lookAt(camLocal, p, new THREE.Vector3(0, 1, 0));
-        c.qTo.setFromRotationMatrix(m);
+        c.qTo.copy(face);
       });
       tool.cards.forEach(function (c) {
-        if (c === store || members.indexOf(c.id) >= 0) return;
+        if (c === big || c === store || members.indexOf(c.id) >= 0) return;
         c.ghost = 1;
         c.dim.t = 1;
-        c.offTo.set(0, -60, -700);
+        c.offTo.set(0, -60, -500);
+        c.hideAt = now + (reduce ? 0 : 1000);
       });
     }
     // Connectors: those whose ends moved apart become curved 3D bridges.
@@ -1816,13 +1855,29 @@ function makeWorld(M) {
       if (activeTool === tool) applyLayout(tool, st, now);
       else applyLayout(tool, { flow: null }, now);
     });
+    LADDER.forEach(function (id) {
+      const tool = tools[id];
+      tool.away = !!st.tool && tool !== activeTool;
+      if (tool.away) {
+        tool.cards.forEach(function (c) {
+          c.dim.t = 1;
+          c.ghost = 1;
+        });
+        tool.wires.forEach(function (w) {
+          w.dimT = 1;
+        });
+      } else {
+        tool.board.visible = true;
+        tool.floorShadow.visible = true;
+      }
+    });
     const toPose = poseFor(st);
     // Finding: every agent lights up, and the links around them turn teal in a sweep.
     LADDER.forEach(function (id, k) {
       const tool = tools[id];
       tool.cards.forEach(function (c) {
         c.accentT = st.finding && c.n.k === "agent" ? 1 : 0;
-        if (st.finding && c.n.k !== "agent") c.dim.t = 0.6;
+        if (st.finding && c.n.k !== "agent") c.dim.t = 1;
       });
       tool.wires.forEach(function (w) {
         const ka = tool.g.items[w.w.a].n, kb = tool.g.items[w.w.b].n;
@@ -2131,6 +2186,11 @@ function makeWorld(M) {
     camera.position.copy(cam.target).add(off);
     camera.lookAt(cam.target);
     floorMat.uniforms.uCam.value.copy(cam.target);
+    if ("environmentIntensity" in scene) {
+      const envT = step && step.ring ? 0.1 : 0.45;
+      scene.environmentIntensity += (envT - scene.environmentIntensity) * (reduce ? 1 : 1 - Math.pow(0.02, dt));
+    }
+    axisGroup.visible = !(step && step.tool && !flight);
 
     // Intro
     if (step) {
@@ -2191,7 +2251,8 @@ function makeWorld(M) {
           c.anchor.quaternion.multiply(tmpQ);
         }
         c.anchor.scale.setScalar(Math.max(0.001, a <= 0 ? 0.001 : 0.82 + 0.18 * ae));
-        c.anchor.visible = a > 0;
+        const hidden = c.hideAt && now > c.hideAt;
+        c.anchor.visible = a > 0 && !hidden;
         c.flip.rotation.y = c.flipS.x * Math.PI;
         // Glass dims towards the background and agents light up for the finding.
         const dimK = c.dim.x * (c.ghost ? 0.92 : 0.75);
@@ -2207,7 +2268,7 @@ function makeWorld(M) {
         }
         // Shadow spreads and softens as the card lifts.
         const L = c.lift.x;
-        c.shadow.visible = quality > 1 && a > 0;
+        c.shadow.visible = quality > 1 && a > 0 && !hidden;
         c.shadow.position.set(c.anchor.position.x + 6 + L * 14, c.anchor.position.y - 10 - L * 26, -T / 2 - 18 + c.off.z);
         c.shadow.scale.setScalar(1 + L * 0.12);
         c.shadow.material.opacity = (0.5 - L * 0.22) * ae * (1 - c.dim.x * 0.6);
@@ -2260,6 +2321,10 @@ function makeWorld(M) {
         b.mat.color.copy(WIRE_HOT);
         b.mat.emissive.copy(WIRE_HOT).multiplyScalar(0.22);
       });
+      if (tool.away && !flight) {
+        tool.board.visible = false;
+        tool.floorShadow.visible = false;
+      }
       tool.board.position.z = tool.baseZ == null ? (tool.baseZ = tool.board.position.z) : tool.baseZ + tool.lift.x * 60;
       updatePackets(tool, now);
       // HTML faces only for tools near the camera
