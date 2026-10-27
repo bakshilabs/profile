@@ -8,12 +8,16 @@ It is a static single page with no build step. Edit the files directly and push 
 | --- | --- |
 | `index.html` | All page content: hero, work, method, services, about, contact, and the seven case-study sheets |
 | `agents.html` | The agent workflow slide show, one slide per tool, linked from the Agents menu item |
+| `workflows.html` | The Sustainable Design Workflows slide show, linked from the Workflows menu item |
 | `assets/css/site.css` | Styles, with the colour and type tokens at the top |
 | `assets/js/site.js` | Navigation, case-study sheets, walkthrough steps, demo video, copy button |
 | `assets/js/stories.js` | The seven animated tool stories, each with a wide and a phone layout |
 | `assets/js/agents-data.js` | Cards, connectors and descriptions for each agent workflow slide |
 | `assets/js/agents.js` | Builds and scales the slides, routes the connectors and runs the detail window |
 | `assets/css/agents.css` | Styles for the agent workflow slides |
+| `assets/js/workflows-data.js` | Practice areas, workflows and maps for the workflows slides, from the pain-points repo's sustainability.json |
+| `assets/js/workflows.js` | Builds and scales the workflows slides and runs their detail window |
+| `assets/css/workflows.css` | Styles for the workflows slides |
 | `assets/js/southwark-data.js` | Southwark ward outlines and a sample of 1,700 homes, from the atlas data |
 | `assets/js/world-data.js` | Land cells for the world map, from Natural Earth via world-atlas |
 | `assets/img/work/` | Six walkthrough screenshots for each tool |

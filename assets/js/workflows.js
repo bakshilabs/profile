@@ -105,7 +105,7 @@
 
   var CANVAS = { W: 1472, H: 340 };
   var Z = {
-    sourceW: 196, artifactW: 204, claudeW: 236, nodeW: 220, chipInset: 26, nodeInset: 28,
+    sourceW: 196, artifactW: 216, claudeW: 236, nodeW: 220, chipInset: 26, nodeInset: 28,
     sourceH: 44, artifactH: 56, artifactBareH: 42, claudeH: 90, nodeH: 88, rowInset: 14,
     portInset: 14, portStepY: 14, portStepX: 22, arrowGap: 3, loopRadius: 14,
     labelCharW: 7.4, labelPad: 20, labelH: 22, labelClear: 3
@@ -208,8 +208,11 @@
     var q = anchor(B, x.inn, x.o1), nIn = NORMAL[x.inn];
     var p1 = [q[0] + nIn[0] * Z.arrowGap, q[1] + nIn[1] * Z.arrowGap];
     if (e.via !== undefined) {
-      var y = L.gy(e.via);
-      return { d: rounded([p0, [p0[0], y], [p1[0], y], p1], Z.loopRadius), mid: [(p0[0] + p1[0]) / 2, y] };
+      // Loop lanes stay a little inside the canvas, clear of the text above and the legend below.
+      var y = Math.max(16, Math.min(CANVAS.H - 16, L.gy(e.via)));
+      // A lane along the bottom carries its label nearer its end, clear of the compact controls.
+      var f = y > CANVAS.H / 2 ? 0.6 : 0.5;
+      return { d: rounded([p0, [p0[0], y], [p1[0], y], p1], Z.loopRadius), mid: [p0[0] + (p1[0] - p0[0]) * f, y] };
     }
     var nOut = NORMAL[x.out];
     var dist = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
@@ -707,7 +710,7 @@
     clearTimeout(drawTimer);
     drawTimer = setTimeout(function () {
       slides[i].classList.add("is-drawn");
-    }, reduce ? 0 : 640);
+    }, reduce ? 0 : 560);
     dotsEl.querySelectorAll("button").forEach(function (d, k) {
       d.classList.toggle("is-current", k === i);
       if (k === i) d.setAttribute("aria-current", "step");

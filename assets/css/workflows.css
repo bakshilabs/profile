@@ -595,6 +595,9 @@
   align-items: start;
   height: 116px;
 }
+.slide__headl {
+  padding-bottom: 8px;
+}
 .slide__title {
   margin-top: 12px;
   font-family: var(--display);
@@ -1640,5 +1643,22 @@
   .modal__scrim,
   .deck__progress span {
     transition: none !important;
+  }
+}
+
+/* Ten dots and three buttons fit a 360 px phone held upright */
+@media (max-width: 520px) {
+  .deck__bar {
+    gap: 6px;
+  }
+  .deck__dots {
+    gap: 2px;
+  }
+  .dot {
+    width: 15px;
+  }
+  .deck__btn {
+    width: 40px;
+    height: 40px;
   }
 }
