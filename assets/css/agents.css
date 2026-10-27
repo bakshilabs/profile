@@ -497,10 +497,11 @@
   transform: rotateY(180deg);
 }
 .canvas.is-focus .node:not(.is-linked) .node__face {
-  opacity: 0.35;
+  opacity: 0.4;
+  box-shadow: none;
 }
 .canvas.is-focus .node--agent:not(.is-linked) .node__face {
-  opacity: 0.22;
+  opacity: 0.4;
 }
 .node__face {
   position: absolute;
@@ -1201,8 +1202,11 @@
 .deck.is-compact .deck__count {
   min-width: 56px;
 }
-.deck.is-compact .slide__help {
-  opacity: 0;
+.deck.is-compact .slide__foot {
+  right: calc(64px + var(--bar-gap, 0px));
+}
+.slide__help[hidden] {
+  display: none;
 }
 
 .slide__eyebrow {
@@ -1306,4 +1310,123 @@
 .node--tray .node__hname {
   font-size: 10px;
   letter-spacing: 0.08em;
+}
+
+/* Agent cards fade in from paper instead of through grey */
+.node {
+  transition: opacity 0.2s var(--ease), transform 0.65s var(--ease);
+}
+.node__face::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 3;
+  border-radius: inherit;
+  background: var(--paper);
+  pointer-events: none;
+  opacity: 1;
+}
+.is-active .node__face::before {
+  opacity: 0;
+  transition: opacity 0.45s var(--ease) calc(min(var(--i) * 20ms, 240ms) + 0.15s);
+}
+.node__back::before {
+  display: none;
+}
+/* A brief pause before a hover flip, so a sweeping pointer does not flip every card */
+@media (hover: hover) {
+  .node:hover .node__inner {
+    transition-delay: 0.09s;
+  }
+}
+.agents-page {
+  --nav-h: 58px;
+}
+.cover__title em {
+  font-style: italic;
+  font-weight: 340;
+  color: var(--teal-deep);
+}
+.tile__name {
+  white-space: nowrap;
+}
+.slide__stats dt {
+  font-size: 26px;
+}
+.slide__stats {
+  margin-top: 12px;
+  padding-top: 12px;
+}
+.slide__help {
+  white-space: nowrap;
+}
+.legend__item--code i {
+  box-shadow: none;
+  border-top: 3px solid var(--teal);
+}
+.legend__item--ui i {
+  border: 1.5px solid #2f7fb0;
+}
+.deck__list {
+  display: none;
+}
+@media (max-width: 700px) and (orientation: portrait) {
+  .deck__list:not([hidden]) {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    max-width: 520px;
+    margin-top: 16px;
+    padding: 0 12px 32px;
+  }
+  .deck__rotate {
+    margin-bottom: 0;
+  }
+  .agents-page {
+    overflow: auto;
+  }
+}
+.deck__item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  text-align: left;
+  cursor: pointer;
+}
+.deck__item--agent {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+.deck__itemkind {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+}
+.deck__item--agent .deck__itemkind {
+  color: var(--teal-soft);
+}
+.deck__itemname {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 450;
+}
+.deck__itemtext {
+  font-size: 14px;
+  color: var(--muted);
+}
+.deck__item--agent .deck__itemtext {
+  color: #b5c4ca;
+}
+@media (prefers-reduced-motion: reduce) {
+  .node__face::before {
+    display: none;
+  }
 }

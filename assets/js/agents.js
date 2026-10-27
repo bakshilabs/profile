@@ -160,7 +160,11 @@
 
     var left = el("div", "cover__copy");
     left.appendChild(el("p", "kicker rise", c.kicker));
-    left.appendChild(el("h1", "cover__title rise", c.title));
+    var ct = el("h1", "cover__title rise");
+    var words = c.title.split(" ");
+    ct.appendChild(document.createTextNode(words.slice(0, -1).join(" ") + " "));
+    ct.appendChild(el("em", null, words[words.length - 1]));
+    left.appendChild(ct);
     left.appendChild(el("p", "cover__lede rise", c.lede));
     var stats = el("div", "cover__stats rise");
     c.stats.forEach(function (st) {
@@ -234,6 +238,7 @@
     s.appendChild(head);
 
     var canvas = el("div", "canvas");
+    if (sl.canvasTop) canvas.style.top = sl.canvasTop + "px";
     var wires = svg("svg", { class: "wires", viewBox: "0 0 1472 600", width: "1472", height: "600", "aria-hidden": "true" });
     canvas.appendChild(wires);
 
@@ -398,7 +403,7 @@
     var group = card && card.dataset.group;
     canvas.querySelectorAll(".wire, .pulse, .wire-label").forEach(function (w) {
       var a = w.getAttribute("data-a"), b = w.getAttribute("data-b");
-      var hot = on && (a === id || b === id || (group && (a === group || b === group)));
+      var hot = !!(on && (a === id || b === id || (group && (a === group || b === group))));
       w.classList.toggle("is-hot", hot);
       if (hot) {
         linked[a] = true;
@@ -536,6 +541,7 @@
     progress.style.transform = "scaleX(" + (i + 1) / slides.length + ")";
     document.querySelector("[data-prev]").disabled = i === 0;
     document.querySelector("[data-next]").disabled = i === slides.length - 1;
+    buildList(i);
     var hash = i === 0 ? "" : "#" + DECK.slides[i - 1].id;
     if (!fromHash && location.hash !== hash) history.replaceState(null, "", hash || location.pathname);
   }
@@ -576,6 +582,33 @@
     });
   }
 
+  /* Upright phones get the current slide's cards as a readable list under the slide. */
+  var listEl = document.querySelector("[data-list]");
+  function buildList(i) {
+    if (!listEl) return;
+    listEl.textContent = "";
+    var sl = DECK.slides[i - 1];
+    if (!sl) {
+      listEl.hidden = true;
+      return;
+    }
+    listEl.hidden = false;
+    sl.nodes.forEach(function (n) {
+      var kind = KINDS[n.k];
+      var li = el("li");
+      var btn = el("button", "deck__item deck__item--" + kind.cls);
+      btn.type = "button";
+      btn.appendChild(el("span", "deck__itemkind", kind.label));
+      btn.appendChild(el("span", "deck__itemname", n.n));
+      btn.appendChild(el("span", "deck__itemtext", n.s));
+      btn.addEventListener("click", function () {
+        openModal(sl, n, btn);
+      });
+      li.appendChild(btn);
+      listEl.appendChild(li);
+    });
+  }
+
   function fit() {
     var bar = document.querySelector(".deck__bar");
     var full = deckEl.classList.contains("is-full");
@@ -587,10 +620,18 @@
     deckEl.classList.toggle("is-side", side);
     var navEl = document.querySelector(".nav");
     var navH = full || getComputedStyle(navEl).display === "none" ? 0 : navEl.offsetHeight;
-    var gutter = window.innerWidth < 700 ? 12 : compact ? 16 : 32;
+    var gutter = window.innerWidth < 700 ? 12 : compact ? 12 : 32;
     var availW = window.innerWidth - gutter * 2 - (side ? bar.offsetWidth + 10 : 0);
     var availH = window.innerHeight - navH - (compact || side ? 0 : bar.offsetHeight) - gutter * (compact || side ? 1 : 1.5);
     var scale = Math.max(0.1, Math.min(availW / 1600, availH / 900));
+    stage.style.setProperty("--bar-gap", compact ? (bar.offsetWidth + 28) / scale + "px" : "0px");
+    requestAnimationFrame(function () {
+      stage.querySelectorAll(".slide__foot").forEach(function (f) {
+        var lg = f.querySelector(".legend"), hp = f.querySelector(".slide__help");
+        hp.hidden = false;
+        hp.hidden = lg.scrollWidth + hp.scrollWidth + 32 > f.clientWidth;
+      });
+    });
     frame.style.width = 1600 * scale + "px";
     frame.style.height = 900 * scale + "px";
     stage.style.transform = "scale(" + scale + ")";
