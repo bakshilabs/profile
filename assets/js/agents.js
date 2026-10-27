@@ -246,7 +246,7 @@
     var byId = {};
     (sl.groups || []).forEach(function (g) {
       if (g.id) byId[g.id] = { x: g.x, y: g.y, w: g.w, h: g.h };
-      var gr = el("div", "group");
+      var gr = el("div", "group" + (g.bracket ? " group--bracket" : ""));
       gr.style.cssText = "left:" + g.x + "px;top:" + g.y + "px;width:" + g.w + "px;height:" + g.h + "px";
       gr.appendChild(el("span", "group__label", g.t));
       canvas.appendChild(gr);
@@ -440,7 +440,9 @@
     (n.f || []).forEach(function (f) {
       var row = el("div", "facts__row");
       row.appendChild(el("dt", null, f[0]));
-      row.appendChild(el("dd", /[\/]|\.(ts|js|py|json|md|html|txt|yml)\b|\b(claude|gemini)-|--|_/.test(f[1]) ? "is-code" : null, f[1]));
+      var code = /[\/]|\.(ts|js|py|json|md|html|txt|yml)\b|\b(claude|gemini)-|--|_/.test(f[1]);
+      // Non-breaking hyphens keep flags such as --resume on one line.
+      row.appendChild(el("dd", code ? "is-code" : null, code ? f[1].replace(/--/g, "\u2011\u2011") : f[1]));
       mFacts.appendChild(row);
     });
     mFacts.hidden = !(n.f && n.f.length);

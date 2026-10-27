@@ -1574,3 +1574,31 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Round 7 polish */
+.group--bracket::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 36px;
+  bottom: 16px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--teal);
+  opacity: 0.55;
+}
+.facts dd.is-code {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.node--wide .node__front {
+  justify-content: center;
+}
+.is-active .wire-label {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  transition-delay: calc(min(var(--j) * 20ms, 240ms) + 0.5s);
+}
+.cover__hint {
+  color: var(--muted);
+}

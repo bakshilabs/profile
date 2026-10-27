@@ -631,7 +631,7 @@ window.AGENT_DECK = {
           }
         ]
       ],
-      "canvasTop": 238
+      "canvasTop": 232
     },
     {
       "id": "modelchat",
@@ -955,7 +955,7 @@ window.AGENT_DECK = {
           "t": "Run by hand"
         },
         {
-          "x": 1125,
+          "x": 1262,
           "y": 372,
           "t": "Asked by users"
         }
@@ -1756,7 +1756,7 @@ window.AGENT_DECK = {
         {
           "id": "pnodes",
           "k": "ui",
-          "x": 1172,
+          "x": 1152,
           "y": 0,
           "n": "Presentation nodes",
           "s": "Holds a brief and its inputs.",
@@ -1829,7 +1829,7 @@ window.AGENT_DECK = {
         {
           "id": "builder",
           "k": "agent",
-          "x": 1172,
+          "x": 1152,
           "y": 178,
           "n": "Document builder",
           "s": "Writes the deck, report or page.",
@@ -1908,7 +1908,7 @@ window.AGENT_DECK = {
         {
           "id": "file",
           "k": "out",
-          "x": 1172,
+          "x": 1152,
           "y": 356,
           "n": "Output file",
           "s": "Saves a deck, report or web page.",
@@ -2001,6 +2001,16 @@ window.AGENT_DECK = {
             "ts": "t",
             "tf": 0.632
           }
+        ],
+        [
+          "builder",
+          "state",
+          {
+            "fs": "r",
+            "fo": 0.8,
+            "ts": "t",
+            "tf": 0.9932
+          }
         ]
       ]
     },
@@ -2020,7 +2030,8 @@ window.AGENT_DECK = {
           "w": 300,
           "h": 600,
           "t": "Four subagents in parallel",
-          "id": "subs"
+          "id": "subs",
+          "bracket": true
         }
       ],
       "nodes": [
@@ -2404,7 +2415,7 @@ window.AGENT_DECK = {
         {
           "id": "fetcher",
           "k": "code",
-          "x": 909,
+          "x": 303,
           "y": 440,
           "n": "Cover fetcher",
           "s": "Saves each document's first page.",
@@ -2466,7 +2477,10 @@ window.AGENT_DECK = {
           "graph",
           "fetcher",
           {
-            "l": "document links"
+            "l": "document links",
+            "fs": "b",
+            "ts": "t",
+            "mid": 410
           }
         ],
         [
