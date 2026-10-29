@@ -3288,3 +3288,34 @@ button {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+/* Hero: no corner marks on the portrait, and a fainter grid that stays clear of the photo */
+.portrait {
+  padding: 0;
+}
+.portrait::before,
+.portrait::after {
+  content: none;
+}
+.hero__grid {
+  opacity: 0.6;
+  -webkit-mask-image: radial-gradient(90% 80% at 30% 20%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(90% 80% at 30% 20%, #000 20%, transparent 75%);
+}
+/* Services close on a plain rule instead of a filled box, with less space before About */
+.next {
+  margin-top: 0;
+  padding: 32px 0 0;
+  border-radius: 0;
+  background: none;
+}
+#services {
+  padding-bottom: clamp(48px, 5vw, 72px);
+}
+/* Section headings sit a step below the hero title so the hero leads */
+.head__title {
+  font-size: clamp(30px, 3.3vw, 46px);
+  line-height: 1.12;
+}
+.section--about {
+  padding-top: clamp(56px, 6vw, 88px);
+}
